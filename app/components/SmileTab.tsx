@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Heart, Activity, Lock, Unlock } from "lucide-react";
+import { Heart, Activity, Sparkles, ChevronDown } from "lucide-react";
 import { PULSE_TILES } from "../config/personal";
 import { audioEngine } from "../lib/sound";
 
@@ -12,8 +12,7 @@ export default function SmileTab() {
   const [bpm, setBpm] = useState(78);
   const [heartPulsing, setHeartPulsing] = useState(false);
   const [activeTileId, setActiveTileId] = useState<number>(1);
-  const [tapsLeft, setTapsLeft] = useState(5);
-  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [isMysteryOpen, setIsMysteryOpen] = useState(false);
 
   const starMoods = [
     { face: "✨", label: "Quietly shining", desc: "Always here in peace." },
@@ -41,15 +40,9 @@ export default function SmileTab() {
     setTimeout(() => setHeartPulsing(false), 240);
   };
 
-  const handleUnlockTap = () => {
-    if (tapsLeft > 1) {
-      audioEngine.playHaptic(440 + (5 - tapsLeft) * 70);
-      setTapsLeft((t) => t - 1);
-    } else {
-      audioEngine.playChimeChord();
-      setTapsLeft(0);
-      setIsUnlocked(true);
-    }
+  const toggleMystery = () => {
+    audioEngine.playHaptic(isMysteryOpen ? 460 : 640);
+    setIsMysteryOpen(!isMysteryOpen);
   };
 
   return (
@@ -77,14 +70,15 @@ export default function SmileTab() {
           <button
             type="button"
             onClick={handleBloomTap}
-            aria-label="Tap to bloom flower"
-            className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#17131b] border border-[var(--border-subtle)] flex items-center justify-center active:scale-95 transition-transform touch-target"
+            aria-label="Tap to cycle blooming flower"
+            className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#17131b] border border-[var(--border-subtle)] flex items-center justify-center active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] transition-transform touch-target"
           >
             <motion.span
               key={flowerStage}
               initial={{ scale: 0.7 }}
               animate={{ scale: 1 }}
               className="text-3xl select-none"
+              aria-hidden="true"
             >
               {flowerStage === 1 && "🌱"}
               {flowerStage === 2 && "🌿"}
@@ -113,10 +107,10 @@ export default function SmileTab() {
           <button
             type="button"
             onClick={handleStarTap}
-            aria-label="Tap to change star mood"
-            className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#17131b] border border-[var(--border-subtle)] flex items-center justify-center active:scale-95 transition-transform touch-target"
+            aria-label="Tap to cycle star mood"
+            className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#17131b] border border-[var(--border-subtle)] flex items-center justify-center active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] transition-transform touch-target"
           >
-            <span className="text-3xl select-none">
+            <span className="text-3xl select-none" aria-hidden="true">
               {starMoods[starIndex].face}
             </span>
           </button>
@@ -144,16 +138,16 @@ export default function SmileTab() {
           </h3>
           <p className="text-[11px] text-[#b7aabf]">
             {bpm > 95
-              ? "Jab tum samne aati ho toh aise hi barhti hai 😉"
-              : "Heart sensor pe tap karke pulse check karo"}
+              ? "A gentle reminder to take a deep breath and relax."
+              : "Tap heart sensor for a steady calming rhythm."}
           </p>
         </div>
 
         <button
           type="button"
           onClick={handleHeartSensor}
-          aria-label="Tap heart sensor"
-          className={`w-12 h-12 rounded-xl bg-[#211a26] border border-[var(--border-prominent)] text-[#f0eaf0] flex items-center justify-center transition-transform touch-target ${
+          aria-label="Tap heart sensor for calming rhythm"
+          className={`w-12 h-12 rounded-xl bg-[#211a26] border border-[var(--border-prominent)] text-[#f0eaf0] flex items-center justify-center transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] touch-target ${
             heartPulsing ? "scale-110" : "scale-100"
           }`}
         >
@@ -162,7 +156,7 @@ export default function SmileTab() {
       </div>
 
       {/* ─── Row 3: Detail Tiles ─── */}
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-2 gap-2" role="region" aria-label="Personal reflections tiles">
         {PULSE_TILES.map((tile) => {
           const isSelected = activeTileId === tile.id;
           return (
@@ -173,13 +167,14 @@ export default function SmileTab() {
                 audioEngine.playHaptic(540);
                 setActiveTileId(tile.id);
               }}
-              className={`p-3 rounded-xl text-left border transition-colors touch-target ${
+              aria-pressed={isSelected}
+              className={`p-3 rounded-xl text-left border transition-colors touch-target focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] ${
                 isSelected
                   ? "bg-[#2b2230] text-[#f0eaf0] border-[var(--border-prominent)]"
                   : "bg-[#211a26] text-[#b7aabf] border-[var(--border-subtle)] hover:text-[#f0eaf0]"
               }`}
             >
-              <span className="text-xl">{tile.emoji}</span>
+              <span className="text-xl" aria-hidden="true">{tile.emoji}</span>
               <p className="text-xs font-semibold mt-1 leading-snug">{tile.title}</p>
               <p className="text-[10px] text-[#82738a] mt-0.5">
                 {tile.subtitle}
@@ -195,6 +190,8 @@ export default function SmileTab() {
           tile.id === activeTileId && (
             <div
               key={tile.id}
+              role="region"
+              aria-live="polite"
               className="ios-surface p-3.5 text-left space-y-1"
             >
               <p className="text-[10px] font-semibold uppercase tracking-wider text-[#b995b8]">
@@ -207,55 +204,41 @@ export default function SmileTab() {
           )
       )}
 
-      {/* ─── Row 4: Secret Vault ─── */}
-      <div className="ios-surface-elevated p-5 text-center space-y-3">
-        <div className="w-12 h-12 rounded-xl bg-[#17131b] border border-[var(--border-subtle)] text-[#b995b8] flex items-center justify-center mx-auto">
-          {isUnlocked ? (
-            <Unlock className="w-5 h-5 text-[#f0eaf0]" />
-          ) : (
-            <Lock className="w-5 h-5" />
-          )}
-        </div>
-
-        <div className="space-y-0.5">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-[#b995b8]">
-            The Secret Hook • &ldquo;Knsi Kami??&rdquo;
-          </span>
-          <h3 className="text-base font-bold text-[#f0eaf0]">
-            {isUnlocked ? "Raaz Phir Bhi Mehfooz Hai 😉" : `Tap ${tapsLeft} Times To Reveal`}
-          </h3>
-        </div>
-
-        {!isUnlocked ? (
+      {/* ─── Row 4: Secret Hook (Autonomy-first, zero gating) ─── */}
+      <div className="ios-surface-elevated p-5 text-left space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-[#17131b] border border-[var(--border-subtle)] text-[#b995b8] flex items-center justify-center">
+              <Sparkles className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-[#b995b8]">
+                A Quiet Inside Note
+              </span>
+              <h3 className="text-sm font-bold text-[#f0eaf0]">
+                Woh Ek Baat...
+              </h3>
+            </div>
+          </div>
           <button
             type="button"
-            onClick={handleUnlockTap}
-            className="w-full py-3 rounded-xl bg-[#211a26] border border-[var(--border-prominent)] text-[#f0eaf0] text-xs font-medium active:bg-[#362c3d] touch-target"
+            onClick={toggleMystery}
+            aria-expanded={isMysteryOpen}
+            className="text-xs px-3 py-1.5 rounded-lg bg-[#211a26] border border-[var(--border-subtle)] text-[#b7aabf] hover:text-[#f0eaf0] flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] touch-target"
           >
-            Tap to Unlock ({tapsLeft} left)
+            <span>{isMysteryOpen ? "Hide" : "Read note"}</span>
+            <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isMysteryOpen ? "rotate-180" : ""}`} />
           </button>
-        ) : (
-          <div className="ios-surface p-3.5 text-left space-y-1.5">
-            <p className="text-xs font-semibold text-[#f0eaf0]">
-              &ldquo;Ufffff / Achwww&rdquo; bolne se baat nahi banegi! 😂
+        </div>
+
+        {isMysteryOpen && (
+          <div className="ios-surface p-3.5 text-left space-y-2 border border-[var(--border-prominent)] mt-2">
+            <p className="text-xs font-serif italic text-[#f0eaf0] leading-relaxed">
+              Bracelet wali baat aur pending birthday wish screen par nahi—jab bhi kabhi munasib waqt hua, tab wazeh hogi.
             </p>
-            <p className="text-xs text-[#b7aabf] leading-relaxed font-light">
-              Bracelet wali picture mein jo ek cheez missing thi, aur jo 15 October ka pending surprise hai—woh chat ya website par leak nahi ho sakta.
+            <p className="text-xs text-[#b995b8] font-medium">
+              Koi shart ya dabao nahi hai. Hamesha izzat aur sukoon pehle. 💜
             </p>
-            <p className="text-xs font-semibold text-[#b995b8]">
-              Shart abhi bhi wohi hai: Samne aane par khud ba khud dikh jayegi. 💜
-            </p>
-            <button
-              type="button"
-              onClick={() => {
-                setIsUnlocked(false);
-                setTapsLeft(5);
-                audioEngine.playHaptic(440);
-              }}
-              className="text-[11px] text-[#82738a] hover:text-[#f0eaf0] underline pt-1 touch-target inline-block"
-            >
-              Lock again
-            </button>
           </div>
         )}
       </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useCallback } from "react";
-import { Star, RotateCcw } from "lucide-react";
+import { Star, RotateCcw, ArrowDown } from "lucide-react";
 import { CONSTELLATION_POINTS } from "../config/personal";
 import { audioEngine } from "../lib/sound";
 
@@ -52,23 +52,45 @@ export default function ConstellationTab() {
     setConnectedIds([]);
   };
 
+  const scrollToLetter = () => {
+    audioEngine.playHaptic(500);
+    const el = document.getElementById("closing-letter");
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <div className="space-y-4 sm:space-y-5">
       <div className="text-center space-y-1">
         <span className="text-[10px] font-semibold tracking-wider uppercase text-[#b995b8] bg-[#211a26] px-3 py-1 rounded-full border border-[var(--border-subtle)]">
-          Chapter 04 • Signature Interaction
+          Chapter 04 • Quiet Night & Closing Note
         </span>
         <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[#f0eaf0]">
           A Tiny Constellation
         </h2>
         <p className="text-xs text-[#b7aabf]">
-          Tap or drag across the stars to connect the heart ({connectedIds.length}/
-          {CONSTELLATION_POINTS.length}).
+          An optional interactive canvas, or skip straight to the closing note.
         </p>
+
+        {/* Autonomy-First Direct Jump */}
+        <div className="pt-1.5 flex justify-center">
+          <button
+            type="button"
+            onClick={scrollToLetter}
+            className="inline-flex items-center gap-1.5 text-xs text-[#b995b8] hover:text-[#f0eaf0] bg-[#211a26] border border-[var(--border-subtle)] px-3 py-1.5 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] transition-colors touch-target"
+          >
+            <ArrowDown className="w-3.5 h-3.5" />
+            <span>Read closing letter directly</span>
+          </button>
+        </div>
       </div>
 
-      {/* ─── Constellation Box ─── */}
-      <div className="ios-surface-elevated p-4 sm:p-5 relative overflow-hidden">
+      {/* ─── Constellation Box (Optional Interaction) ─── */}
+      <section 
+        aria-label="Interactive constellation canvas" 
+        className="ios-surface-elevated p-4 sm:p-5 relative overflow-hidden"
+      >
         <div
           ref={containerRef}
           onPointerDown={handlePointerMove}
@@ -80,6 +102,7 @@ export default function ConstellationTab() {
             viewBox="0 0 100 100"
             preserveAspectRatio="none"
             className="w-full h-full absolute inset-0 pointer-events-none"
+            aria-hidden="true"
           >
             {connectedIds.length > 1 &&
               connectedIds.map((id, idx) => {
@@ -114,7 +137,7 @@ export default function ConstellationTab() {
             )}
           </svg>
 
-          {/* Star Buttons (Touch targets 44px) */}
+          {/* Star Buttons (Touch targets 44px with keyboard activation) */}
           {CONSTELLATION_POINTS.map((pt) => {
             const isLit = connectedIds.includes(pt.id);
             return (
@@ -123,8 +146,9 @@ export default function ConstellationTab() {
                 key={pt.id}
                 onClick={() => connectStar(pt.id, pt.freq)}
                 style={{ left: `${pt.x}%`, top: `${pt.y}%` }}
-                aria-label={`Star ${pt.label}`}
-                className="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group focus:outline-none touch-target justify-center"
+                aria-pressed={isLit}
+                aria-label={`Connect ${pt.label} star`}
+                className="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] rounded-full touch-target justify-center"
               >
                 <span
                   className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors ${
@@ -151,12 +175,12 @@ export default function ConstellationTab() {
                 Made with care. Nothing expected in return. 💜
               </p>
               <p className="text-[10px] text-[#82738a]">
-                Every star connected—a quiet symbol of genuine effort.
+                A quiet symbol of genuine effort.
               </p>
             </div>
           ) : (
             <p className="text-[11px] text-[#82738a]">
-              Tap stars or tap &ldquo;Auto-Connect&rdquo; to complete the heart.
+              Tap stars or tap &ldquo;Auto-Connect&rdquo; to light them all.
             </p>
           )}
 
@@ -165,7 +189,7 @@ export default function ConstellationTab() {
               <button
                 type="button"
                 onClick={autoConnect}
-                className="text-xs px-3 py-1.5 rounded-lg bg-[#211a26] border border-[var(--border-prominent)] text-[#f0eaf0] transition-colors flex items-center gap-1.5 touch-target"
+                className="text-xs px-3 py-1.5 rounded-lg bg-[#211a26] border border-[var(--border-prominent)] text-[#f0eaf0] hover:bg-[#2b2230] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] transition-colors flex items-center gap-1.5 touch-target"
               >
                 <span>Auto-Connect</span>
               </button>
@@ -173,17 +197,22 @@ export default function ConstellationTab() {
             <button
               type="button"
               onClick={resetConstellation}
-              className="text-xs px-2.5 py-1.5 rounded-lg border border-[var(--border-subtle)] text-[#b7aabf] hover:text-[#f0eaf0] transition-colors flex items-center gap-1 touch-target"
+              className="text-xs px-2.5 py-1.5 rounded-lg border border-[var(--border-subtle)] text-[#b7aabf] hover:text-[#f0eaf0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] transition-colors flex items-center gap-1 touch-target"
             >
               <RotateCcw className="w-3 h-3" />
-              <span>Replay</span>
+              <span>Reset</span>
             </button>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* ─── Final Letter with No Expectations ─── */}
-      <div className="ios-surface-elevated p-6 text-left space-y-3.5">
+      {/* ─── Final Letter with No Expectations (Always Directly Accessible) ─── */}
+      <section
+        id="closing-letter"
+        tabIndex={-1}
+        aria-label="Final letter to Fatima"
+        className="ios-surface-elevated p-6 text-left space-y-3.5 scroll-mt-20 focus:outline-none"
+      >
         <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-2.5">
           <span className="text-[10px] font-semibold uppercase tracking-wider text-[#b995b8] font-mono">
             Final Chapter • With Peace
@@ -213,7 +242,7 @@ export default function ConstellationTab() {
             — Hassaan 💜
           </p>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

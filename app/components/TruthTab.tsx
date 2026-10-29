@@ -17,11 +17,11 @@ export default function TruthTab() {
   const getIcon = (name: string) => {
     switch (name) {
       case "Ear":
-        return <Ear className="w-4 h-4 text-[#b995b8]" />;
+        return <Ear className="w-4 h-4 text-[#b995b8]" aria-hidden="true" />;
       case "ShieldCheck":
-        return <ShieldCheck className="w-4 h-4 text-[#b995b8]" />;
+        return <ShieldCheck className="w-4 h-4 text-[#b995b8]" aria-hidden="true" />;
       default:
-        return <Compass className="w-4 h-4 text-[#b995b8]" />;
+        return <Compass className="w-4 h-4 text-[#b995b8]" aria-hidden="true" />;
     }
   };
 
@@ -37,7 +37,10 @@ export default function TruthTab() {
       </div>
 
       {/* ─── Exact Documented Apology Letter ─── */}
-      <div className="ios-surface-elevated p-6 text-left space-y-3.5 relative overflow-hidden">
+      <section 
+        aria-label="Direct apology letter"
+        className="ios-surface-elevated p-6 text-left space-y-3.5 relative overflow-hidden"
+      >
         <div className="space-y-3 font-serif text-xs sm:text-sm text-[#f0eaf0] leading-relaxed">
           <p>
             Fatima, I know there were moments when I didn&apos;t handle things the way I should have.
@@ -61,10 +64,10 @@ export default function TruthTab() {
             You don&apos;t owe me forgiveness, a reply, or another chance. I simply wanted to acknowledge my part honestly.
           </p>
         </div>
-      </div>
+      </section>
 
       {/* ─── Chapter 03: The Things That Matter ─── */}
-      <div className="space-y-2.5 pt-1">
+      <section aria-label="Core values and lessons" className="space-y-2.5 pt-1">
         <div className="text-left px-1">
           <h3 className="text-base sm:text-lg font-bold text-[#f0eaf0]">
             The Things That Matter
@@ -74,18 +77,23 @@ export default function TruthTab() {
           </p>
         </div>
 
-        <div className="space-y-2.5">
+        <div className="space-y-2.5" role="region" aria-label="Pillars of growth">
           {MATTER_CARDS.map((card) => {
             const isOpen = expandedId === card.id;
             return (
               <div
                 key={card.id}
-                onClick={() => toggleExpand(card.id)}
-                className={`ios-surface p-4 cursor-pointer transition-colors ${
-                  isOpen ? "bg-[#2b2230] border-[var(--border-prominent)]" : "active:bg-[#211a26]"
+                className={`ios-surface p-4 transition-colors ${
+                  isOpen ? "bg-[#2b2230] border-[var(--border-prominent)]" : ""
                 }`}
               >
-                <div className="flex items-center justify-between">
+                <button
+                  type="button"
+                  onClick={() => toggleExpand(card.id)}
+                  aria-expanded={isOpen}
+                  aria-controls={`matter-desc-${card.id}`}
+                  className="w-full flex items-center justify-between text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] rounded-lg touch-target"
+                >
                   <div className="flex items-center gap-2.5">
                     <div className="w-8 h-8 rounded-lg bg-[#17131b] flex items-center justify-center shrink-0">
                       {getIcon(card.iconName)}
@@ -103,12 +111,14 @@ export default function TruthTab() {
                     className={`w-4 h-4 text-[#82738a] transition-transform duration-200 shrink-0 ${
                       isOpen ? "rotate-180 text-[#b995b8]" : ""
                     }`}
+                    aria-hidden="true"
                   />
-                </div>
+                </button>
 
                 <AnimatePresence>
                   {isOpen && (
                     <motion.div
+                      id={`matter-desc-${card.id}`}
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: "auto" }}
                       exit={{ opacity: 0, height: 0 }}
@@ -125,7 +135,7 @@ export default function TruthTab() {
             );
           })}
         </div>
-      </div>
+      </section>
     </div>
   );
 }

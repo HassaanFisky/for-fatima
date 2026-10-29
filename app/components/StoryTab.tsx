@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mail, ChevronRight, ChevronLeft } from "lucide-react";
+import { Mail, ChevronRight, ChevronLeft, BookOpen, X } from "lucide-react";
 import { POETIC_CARDS } from "../config/personal";
 import { audioEngine } from "../lib/sound";
 
@@ -10,20 +10,32 @@ export default function StoryTab() {
   const [envelopeOpen, setEnvelopeOpen] = useState(false);
   const [cardIndex, setCardIndex] = useState(0);
 
-  const nextCard = () => {
+  const nextCard = useCallback(() => {
     audioEngine.playHaptic(600);
     setCardIndex((prev) => (prev + 1) % POETIC_CARDS.length);
-  };
+  }, []);
 
-  const prevCard = () => {
+  const prevCard = useCallback(() => {
     audioEngine.playHaptic(520);
     setCardIndex((prev) => (prev - 1 + POETIC_CARDS.length) % POETIC_CARDS.length);
-  };
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowRight") nextCard();
+      if (e.key === "ArrowLeft") prevCard();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [nextCard, prevCard]);
 
   return (
     <div className="space-y-4 sm:space-y-5">
-      {/* ─── Apple Letter Envelope ─── */}
-      <div className="ios-surface-elevated p-5 sm:p-6 text-center relative overflow-hidden">
+      {/* ─── Apple Letter Envelope (Autonomy-First) ─── */}
+      <section 
+        aria-label="Welcome note" 
+        className="ios-surface-elevated p-5 sm:p-6 text-center relative overflow-hidden"
+      >
         <AnimatePresence mode="wait">
           {!envelopeOpen ? (
             <motion.div
@@ -49,17 +61,27 @@ export default function StoryTab() {
                 </span>
               </p>
 
-              <button
-                type="button"
-                onClick={() => {
-                  audioEngine.playChimeChord();
-                  setEnvelopeOpen(true);
-                }}
-                className="w-full max-w-xs mx-auto py-3 px-5 rounded-xl bg-[#211a26] border border-[var(--border-prominent)] text-xs font-medium text-[#f0eaf0] flex items-center justify-center gap-2.5 active:bg-[#362c3d] transition-colors touch-target"
-              >
-                <Mail className="w-4 h-4 text-[#b995b8]" />
-                <span>Tap to unseal the envelope</span>
-              </button>
+              <div className="flex flex-col sm:flex-row gap-2 max-w-xs mx-auto pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    audioEngine.playChimeChord();
+                    setEnvelopeOpen(true);
+                  }}
+                  className="w-full py-3 px-4 rounded-xl bg-[#211a26] border border-[var(--border-prominent)] text-xs font-medium text-[#f0eaf0] flex items-center justify-center gap-2 active:bg-[#362c3d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] transition-colors touch-target"
+                >
+                  <Mail className="w-4 h-4 text-[#b995b8]" />
+                  <span>Unseal the envelope</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEnvelopeOpen(true)}
+                  className="w-full py-2.5 px-4 rounded-xl bg-transparent border border-[var(--border-subtle)] text-xs text-[#b7aabf] hover:text-[#f0eaf0] flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] transition-colors touch-target"
+                >
+                  <BookOpen className="w-3.5 h-3.5 text-[#82738a]" />
+                  <span>Read note directly</span>
+                </button>
+              </div>
             </motion.div>
           ) : (
             <motion.div
@@ -73,9 +95,17 @@ export default function StoryTab() {
                 <span className="font-serif italic text-base text-[#b995b8]">
                   hey fatima...
                 </span>
-                <span className="text-[10px] text-[#82738a] uppercase tracking-widest font-mono">
-                  Personal Note
-                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    audioEngine.playHaptic(480);
+                    setEnvelopeOpen(false);
+                  }}
+                  aria-label="Fold note closed"
+                  className="w-8 h-8 rounded-full bg-white/5 text-[#b7aabf] hover:text-[#f0eaf0] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] touch-target"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
               </div>
 
               <div className="space-y-2.5 font-serif text-xs sm:text-sm text-[#f0eaf0] leading-relaxed">
@@ -97,7 +127,7 @@ export default function StoryTab() {
                     audioEngine.playHaptic(480);
                     setEnvelopeOpen(false);
                   }}
-                  className="text-[11px] text-[#82738a] hover:text-[#f0eaf0] underline underline-offset-4 touch-target inline-flex items-center"
+                  className="text-[11px] text-[#82738a] hover:text-[#f0eaf0] underline underline-offset-4 touch-target inline-flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8]"
                 >
                   Fold note closed
                 </button>
@@ -108,28 +138,21 @@ export default function StoryTab() {
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
+      </section>
 
-      {/* ─── Poetic Card Deck ─── */}
-      <div className="space-y-2.5">
+      {/* ─── Poetic Card Deck (Accessible & Non-Trapping) ─── */}
+      <section aria-label="Poetic reflections deck" className="space-y-2.5">
         <div className="flex items-center justify-between px-1">
           <span className="text-[10px] font-semibold uppercase tracking-wider text-[#b995b8]">
             Card {cardIndex + 1} of {POETIC_CARDS.length}
           </span>
-          <span className="text-[11px] text-[#82738a]">Swipe or tap controls</span>
+          <span className="text-[11px] text-[#82738a]">Use buttons or arrow keys</span>
         </div>
 
-        <motion.div
-          key={cardIndex}
-          drag="x"
-          dragConstraints={{ left: 0, right: 0 }}
-          onDragEnd={(_, info) => {
-            if (info.offset.x < -35) nextCard();
-            else if (info.offset.x > 35) prevCard();
-          }}
-          initial={{ opacity: 0, scale: 0.98 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.2 }}
+        <div
+          role="region"
+          aria-live="polite"
+          aria-label={`Reflection card ${cardIndex + 1} of ${POETIC_CARDS.length}`}
           className="ios-surface-elevated p-5 sm:p-6 min-h-[260px] flex flex-col justify-between"
         >
           <div className="flex items-center justify-between">
@@ -154,20 +177,22 @@ export default function StoryTab() {
             <button
               type="button"
               onClick={prevCard}
-              className="flex items-center gap-1 hover:text-[#f0eaf0] transition-colors touch-target"
+              aria-label="Previous card"
+              className="flex items-center gap-1 hover:text-[#f0eaf0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] rounded px-1.5 transition-colors touch-target"
             >
               <ChevronLeft className="w-4 h-4" /> Previous
             </button>
             <button
               type="button"
               onClick={nextCard}
-              className="flex items-center gap-1 hover:text-[#f0eaf0] transition-colors touch-target"
+              aria-label="Next card"
+              className="flex items-center gap-1 hover:text-[#f0eaf0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] rounded px-1.5 transition-colors touch-target"
             >
               Next <ChevronRight className="w-4 h-4" />
             </button>
           </div>
-        </motion.div>
-      </div>
+        </div>
+      </section>
     </div>
   );
 }

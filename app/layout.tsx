@@ -20,7 +20,15 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: "for fatima 💜",
   description: "A private digital universe crafted with care, patience, and respect.",
-  robots: { index: false, follow: false },
+  robots: {
+    index: false,
+    follow: false,
+    googleBot: {
+      index: false,
+      follow: false,
+      noimageindex: true,
+    },
+  },
 };
 
 export const viewport: Viewport = {

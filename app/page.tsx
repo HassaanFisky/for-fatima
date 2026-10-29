@@ -41,11 +41,19 @@ export default function Home() {
 
       {/* ─── Mobile-First Main Content Container ─── */}
       <main className="relative z-10 max-w-[420px] mx-auto px-3.5 sm:px-4 pt-3 sm:pt-5">
-        {activeTab === "story" && <StoryTab />}
-        {activeTab === "details" && <DetailsTab />}
-        {activeTab === "truth" && <TruthTab />}
-        {activeTab === "smile" && <SmileTab />}
-        {activeTab === "stars" && <ConstellationTab />}
+        <div
+          role="tabpanel"
+          id={`panel-${activeTab}`}
+          aria-labelledby={`tab-${activeTab}`}
+          tabIndex={0}
+          className="focus:outline-none"
+        >
+          {activeTab === "story" && <StoryTab />}
+          {activeTab === "details" && <DetailsTab />}
+          {activeTab === "truth" && <TruthTab />}
+          {activeTab === "smile" && <SmileTab />}
+          {activeTab === "stars" && <ConstellationTab />}
+        </div>
 
         {/* Discreet Micro-Footer */}
         <footer className="pt-8 pb-3 text-center space-y-0.5">

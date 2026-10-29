@@ -107,16 +107,16 @@ export const POETIC_CARDS: PoeticCard[] = [
     badge: "Respect & Peace",
   },
   {
-    tag: "TELEPATHY MOMENT",
+    tag: "SHARED MOMENT",
     line: "Phir se jeena chahta hun...",
-    sub: "Wohi line jo tum gaa rahi thi aur maine usi pal note ki thi. Dil ke taar pehle se jude hue the.",
-    badge: "Unspoken Bond",
+    sub: "Wohi line jo tum gunguna rahi thi aur maine usi pal note ki thi—kuch chhotay lamhay hamesha zehen mein thehar jaate hain.",
+    badge: "A Quiet Memory",
   },
   {
-    tag: "THE SECRET HOOK",
+    tag: "THE PENDING GIFT",
     line: "Bracelet toh behad pyara tha... par woh ek kami abhi bhi baqi hai 😉",
-    sub: "Aur woh kami chat ya screen par nahi, sirf samne aane par nazar aayegi.",
-    badge: "15 Oct Surprise",
+    sub: "Aur woh baat screen par nahi—jab bhi kabhi munasib waqt ho, tab wazeh hogi.",
+    badge: "Pending Wish",
   },
   {
     tag: "MIDNIGHT OBSERVATION",
@@ -174,16 +174,16 @@ export const PULSE_TILES: PulseTile[] = [
   {
     id: 3,
     emoji: "🎂",
-    title: "15 Oct • Libra Queen",
-    subtitle: "Pending Belated Chapter",
-    reveal: "Yousuf Plaza ke 1400 flats mein courier nahi bheja—kyunke woh surprise sirf mere hath se tumhare hath mein aane ke liye bana hai.",
+    title: "15th October",
+    subtitle: "A Belated Thought",
+    reveal: "Bina kisi formality ke—ek chhota sa gift jo sahi waqt par baghair kisi shor ke tum tak pohnch jayega.",
   },
   {
     id: 4,
-    emoji: "📱",
-    title: "Side Pe Rakh Ke Sona",
-    subtitle: "Woh 5:14 AM ka sach",
-    reveal: "'Phone pass rakh ke soti thi aur feel karti aap call pe hain.' Kuch ehsaas lafzon se kahin zyada gehre hote hain.",
+    emoji: "🌙",
+    title: "Late Night Calm",
+    subtitle: "Khamosh ghantay",
+    reveal: "Raat ke un ghanton mein jab sab so rahe hotay hain, woh thehri hui baatein aur sukoon hamesha zehen mein rehta hai.",
   },
 ];
 

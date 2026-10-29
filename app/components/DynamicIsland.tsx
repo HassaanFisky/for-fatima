@@ -41,8 +41,8 @@ export default function DynamicIsland({ timeGreeting }: DynamicIslandProps) {
           <button
             type="button"
             onClick={toggleSound}
-            aria-label={isPlaying ? "Mute audio" : "Play subtle ambient audio"}
-            className={`w-9 h-9 rounded-full shrink-0 flex items-center justify-center transition-colors touch-target ${
+            aria-label={isPlaying ? "Mute ambient audio" : "Play subtle ambient audio (optional)"}
+            className={`w-9 h-9 rounded-full shrink-0 flex items-center justify-center transition-colors touch-target focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] ${
               isPlaying
                 ? "bg-[#362c3d] text-[#f0eaf0]"
                 : "bg-white/5 text-[#b7aabf] hover:bg-white/10"
@@ -58,7 +58,7 @@ export default function DynamicIsland({ timeGreeting }: DynamicIslandProps) {
           <div className="min-w-0 text-left leading-tight">
             <div className="flex items-center gap-1.5 truncate">
               {isPlaying && (
-                <span className="w-1.5 h-1.5 rounded-full bg-[#b995b8] shrink-0" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#b995b8] shrink-0" aria-hidden="true" />
               )}
               <p className="text-[11px] font-medium tracking-wide truncate text-[#f0eaf0]">
                 {audioMode === "acoustic"
@@ -73,11 +73,16 @@ export default function DynamicIsland({ timeGreeting }: DynamicIslandProps) {
         </div>
 
         {/* Apple Segmented Switcher */}
-        <div className="flex items-center bg-white/5 rounded-full p-0.5 text-[10px] shrink-0 font-medium">
+        <div 
+          role="group" 
+          aria-label="Audio theme switcher"
+          className="flex items-center bg-white/5 rounded-full p-0.5 text-[10px] shrink-0 font-medium"
+        >
           <button
             type="button"
             onClick={() => switchMode("acoustic")}
-            className={`px-2.5 py-1 rounded-full transition-colors ${
+            aria-pressed={audioMode === "acoustic"}
+            className={`px-2.5 py-1 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] ${
               audioMode === "acoustic"
                 ? "bg-[#2b2230] text-[#f0eaf0] font-semibold"
                 : "text-[#b7aabf] hover:text-[#f0eaf0]"
@@ -88,7 +93,8 @@ export default function DynamicIsland({ timeGreeting }: DynamicIslandProps) {
           <button
             type="button"
             onClick={() => switchMode("dream")}
-            className={`px-2.5 py-1 rounded-full transition-colors ${
+            aria-pressed={audioMode === "dream"}
+            className={`px-2.5 py-1 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] ${
               audioMode === "dream"
                 ? "bg-[#2b2230] text-[#f0eaf0] font-semibold"
                 : "text-[#b7aabf] hover:text-[#f0eaf0]"

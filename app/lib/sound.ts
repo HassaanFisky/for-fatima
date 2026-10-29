@@ -17,10 +17,16 @@ export class GentleAudioEngine {
         window.AudioContext ||
         (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       if (AudioCtx) {
-        this.ctx = new AudioCtx();
-        this.masterGain = this.ctx.createGain();
-        this.masterGain.gain.setValueAtTime(0.065, this.ctx.currentTime);
-        this.masterGain.connect(this.ctx.destination);
+        try {
+          this.ctx = new AudioCtx();
+          this.masterGain = this.ctx.createGain();
+          this.masterGain.gain.setValueAtTime(0.065, this.ctx.currentTime);
+          this.masterGain.connect(this.ctx.destination);
+        } catch {
+          // Graceful fallback if Web Audio is unsupported/blocked
+          this.ctx = null;
+          this.masterGain = null;
+        }
       }
     }
     if (this.ctx && this.ctx.state === "suspended") {
@@ -49,7 +55,7 @@ export class GentleAudioEngine {
       osc.start(t);
       osc.stop(t + 0.2);
     } catch {
-      // Ignore
+      // Ignore unsupported browser errors gracefully
     }
   }
 
@@ -89,11 +95,11 @@ export class GentleAudioEngine {
       osc1.stop(t + duration);
       osc2.stop(t + duration);
     } catch {
-      // Ignore
+      // Ignore unsupported browser errors gracefully
     }
   }
 
-  /** Harmonic chime for milestone interactions (star unlock / constellation) */
+  /** Harmonic chime for milestone interactions */
   playChimeChord() {
     [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => {
       setTimeout(() => this.playPluck(f, 2.2, 1.1), i * 110);
@@ -137,6 +143,15 @@ export class GentleAudioEngine {
     this.mode = newMode;
     if (this.isPlaying) {
       this.startLoop();
+    }
+  }
+
+  dispose() {
+    this.stopLoop();
+    if (this.ctx && this.ctx.state !== "closed") {
+      this.ctx.close().catch(() => {});
+      this.ctx = null;
+      this.masterGain = null;
     }
   }
 }

@@ -21,26 +21,37 @@ export default function AppleDock({ activeTab, onTabChange }: AppleDockProps) {
   ];
 
   return (
-    <nav className="fixed bottom-2.5 sm:bottom-4 inset-x-0 z-50 px-3 flex justify-center pointer-events-auto">
-      <div className="ios-dock rounded-full p-1 shadow-xl flex items-center justify-between max-w-[420px] w-full">
+    <nav 
+      aria-label="Primary navigation" 
+      className="fixed bottom-2.5 sm:bottom-4 inset-x-0 z-50 px-3 flex justify-center pointer-events-auto"
+    >
+      <div 
+        role="tablist" 
+        aria-label="Site sections"
+        className="ios-dock rounded-full p-1 shadow-xl flex items-center justify-between max-w-[420px] w-full"
+      >
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const active = activeTab === tab.id;
           return (
             <button
               type="button"
+              role="tab"
+              id={`tab-${tab.id}`}
+              aria-selected={active}
+              aria-controls={`panel-${tab.id}`}
               key={tab.id}
               onClick={() => {
                 audioEngine.playHaptic(active ? 660 : 540);
                 onTabChange(tab.id);
               }}
-              className={`flex-1 py-1.5 px-1 rounded-full flex flex-col items-center justify-center gap-0.5 transition-colors touch-target ${
+              className={`flex-1 py-1.5 px-1 rounded-full flex flex-col items-center justify-center gap-0.5 transition-colors touch-target focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] ${
                 active
                   ? "bg-[#362c3d] text-[#f0eaf0]"
                   : "text-[#82738a] hover:text-[#b7aabf]"
               }`}
             >
-              <Icon className={`w-4 h-4 ${active ? "text-[#b995b8]" : ""}`} />
+              <Icon className={`w-4 h-4 ${active ? "text-[#b995b8]" : ""}`} aria-hidden="true" />
               <span className="text-[10px] font-medium tracking-wide">
                 {tab.label}
               </span>
