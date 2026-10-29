@@ -38,7 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="en"
       className={`${jakarta.variable} ${playfair.variable} antialiased selection:bg-[#362c3d] selection:text-[#f0eaf0]`}
     >
-      <body className="min-h-screen bg-[#17131b] text-[#f0eaf0] font-sans">
+      <body className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans">
         {children}
       </body>
     </html>

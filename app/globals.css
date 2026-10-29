@@ -1,23 +1,43 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: var(--font-sans), -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, sans-serif;
-  --font-serif: var(--font-serif), Georgia, serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "SF Pro", var(--font-sans), system-ui, sans-serif;
+  --font-serif: "New York", -apple-system-ui-serif, var(--font-serif), Georgia, serif;
+
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-bg-interactive: var(--bg-interactive);
+  
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  
+  --color-accent-plum: var(--accent-plum);
+  --color-accent: var(--accent);
 }
 
-/* ─── Apple HIG Centralized Low-Luminance Tokens ─── */
+/* ─── Apple HIG Centralized Low-Luminance Design Tokens ─── */
 :root {
+  /* Surfaces */
   --bg-primary: #17131b;
   --bg-secondary: #211a26;
   --bg-elevated: #2b2230;
   --bg-interactive: #362c3d;
-  --border-subtle: rgba(183, 170, 191, 0.12);
-  --border-prominent: rgba(185, 149, 184, 0.28);
+
+  /* Typography */
   --text-primary: #f0eaf0;
   --text-secondary: #b7aabf;
   --text-muted: #82738a;
-  --accent: #b995b8;
+
+  /* Accents */
+  --accent-plum: #b995b8;
+  --accent: var(--accent-plum);
   --accent-soft: rgba(185, 149, 184, 0.14);
+
+  /* Materials & Borders */
+  --border-subtle: rgba(183, 170, 191, 0.12);
+  --border-prominent: rgba(185, 149, 184, 0.28);
 }
 
 html {
@@ -31,11 +51,69 @@ html {
 body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   overflow-x: hidden;
   padding-bottom: env(safe-area-inset-bottom, 24px);
 }
+
+/* ─── Official Apple Typography Hierarchy ─── */
+.apple-title-1 {
+  font-size: 1.75rem;
+  line-height: 2.125rem;
+  font-weight: 600;
+  letter-spacing: -0.022em;
+}
+
+.apple-headline {
+  font-size: 1.0625rem;
+  line-height: 1.375rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.apple-body {
+  font-size: 0.9375rem;
+  line-height: 1.375rem;
+  letter-spacing: -0.01em;
+}
+
+.apple-callout {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  letter-spacing: -0.006em;
+}
+
+.apple-subheadline {
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
+  letter-spacing: 0;
+}
+
+.apple-footnote {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  letter-spacing: 0.012em;
+}
+
+.apple-caption {
+  font-size: 0.6875rem;
+  line-height: 0.875rem;
+  letter-spacing: 0.018em;
+  color: var(--text-muted);
+}
+
+/* ─── Apple Color Direct Utility Classes ─── */
+.bg-apple-primary { background-color: var(--bg-primary); }
+.bg-apple-secondary { background-color: var(--bg-secondary); }
+.bg-apple-elevated { background-color: var(--bg-elevated); }
+.text-apple-primary { color: var(--text-primary); }
+.text-apple-secondary { color: var(--text-secondary); }
+.text-apple-muted { color: var(--text-muted); }
+.text-apple-plum { color: var(--accent-plum); }
 
 /* ─── Apple Native Material Surfaces ─── */
 .ios-surface {
