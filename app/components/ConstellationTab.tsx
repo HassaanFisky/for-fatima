@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useCallback } from "react";
-import { motion } from "framer-motion";
-import { Star, RotateCcw, Sparkles } from "lucide-react";
+import { Star, RotateCcw } from "lucide-react";
 import { CONSTELLATION_POINTS } from "../config/personal";
 import { audioEngine } from "../lib/sound";
 
@@ -54,27 +53,27 @@ export default function ConstellationTab() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-5">
       <div className="text-center space-y-1">
-        <span className="text-[10px] font-bold tracking-widest uppercase text-purple-400 bg-purple-500/10 px-3 py-1 rounded-full border border-purple-400/20">
+        <span className="text-[10px] font-semibold tracking-wider uppercase text-[#b995b8] bg-[#211a26] px-3 py-1 rounded-full border border-[var(--border-subtle)]">
           Chapter 04 • Signature Interaction
         </span>
-        <h2 className="text-2xl font-bold tracking-tight text-[#f5f3f9]">
+        <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[#f0eaf0]">
           A Tiny Constellation
         </h2>
-        <p className="text-xs text-[#ad9fc0]">
+        <p className="text-xs text-[#b7aabf]">
           Tap or drag across the stars to connect the heart ({connectedIds.length}/
           {CONSTELLATION_POINTS.length}).
         </p>
       </div>
 
-      {/* ─── Apple Midnight Constellation Box ─── */}
-      <div className="apple-glass-card rounded-[32px] p-6 shadow-2xl border border-purple-400/20 relative overflow-hidden">
+      {/* ─── Constellation Box ─── */}
+      <div className="ios-surface-elevated p-4 sm:p-5 relative overflow-hidden">
         <div
           ref={containerRef}
           onPointerDown={handlePointerMove}
           onPointerMove={handlePointerMove}
-          className="relative w-full h-[310px] select-none touch-none rounded-2xl bg-black/40 border border-white/5"
+          className="relative w-full h-[280px] sm:h-[300px] select-none touch-none rounded-xl bg-[#17131b] border border-[var(--border-subtle)]"
         >
           {/* SVG Connection Lines */}
           <svg
@@ -97,10 +96,10 @@ export default function ConstellationTab() {
                     y1={prev.y}
                     x2={curr.x}
                     y2={curr.y}
-                    stroke="#c084fc"
+                    stroke="#b995b8"
                     strokeWidth="0.8"
                     strokeDasharray="1.5 1"
-                    strokeOpacity="0.85"
+                    strokeOpacity="0.8"
                   />
                 );
               })}
@@ -108,14 +107,14 @@ export default function ConstellationTab() {
             {isComplete && (
               <polygon
                 points={CONSTELLATION_POINTS.map((p) => `${p.x},${p.y}`).join(" ")}
-                fill="rgba(192, 132, 252, 0.12)"
-                stroke="#e9d5ff"
-                strokeWidth="0.9"
+                fill="rgba(185, 149, 184, 0.12)"
+                stroke="#b995b8"
+                strokeWidth="0.8"
               />
             )}
           </svg>
 
-          {/* Star Buttons */}
+          {/* Star Buttons (Touch targets 44px) */}
           {CONSTELLATION_POINTS.map((pt) => {
             const isLit = connectedIds.includes(pt.id);
             return (
@@ -125,18 +124,18 @@ export default function ConstellationTab() {
                 onClick={() => connectStar(pt.id, pt.freq)}
                 style={{ left: `${pt.x}%`, top: `${pt.y}%` }}
                 aria-label={`Star ${pt.label}`}
-                className="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group focus:outline-none"
+                className="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group focus:outline-none touch-target justify-center"
               >
                 <span
-                  className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
+                  className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors ${
                     isLit
-                      ? "bg-purple-300 text-[#09060f] scale-110 shadow-lg shadow-purple-400/50"
-                      : "bg-white/10 text-white/70 hover:bg-white/20"
+                      ? "bg-[#b995b8] text-[#17131b]"
+                      : "bg-white/10 text-[#b7aabf] hover:bg-white/15"
                   }`}
                 >
-                  <Star className={`w-3.5 h-3.5 ${isLit ? "fill-current" : ""}`} />
+                  <Star className={`w-3 h-3 ${isLit ? "fill-current" : ""}`} />
                 </span>
-                <span className="text-[9px] mt-1 text-purple-200/80 font-medium tracking-wide">
+                <span className="text-[9px] mt-0.5 text-[#82738a] font-medium tracking-wide">
                   {pt.label}
                 </span>
               </button>
@@ -145,23 +144,19 @@ export default function ConstellationTab() {
         </div>
 
         {/* Footer controls */}
-        <div className="pt-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+        <div className="pt-3.5 border-t border-[var(--border-subtle)] mt-3.5 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-center sm:text-left">
           {isComplete ? (
-            <motion.div
-              initial={{ opacity: 0, y: 5 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="space-y-0.5"
-            >
-              <p className="font-serif text-sm font-semibold text-purple-200">
+            <div className="space-y-0.5">
+              <p className="font-serif text-xs font-semibold text-[#f0eaf0]">
                 Made with care. Nothing expected in return. 💜
               </p>
-              <p className="text-[11px] text-[#ad9fc0]">
+              <p className="text-[10px] text-[#82738a]">
                 Every star connected—a quiet symbol of genuine effort.
               </p>
-            </motion.div>
+            </div>
           ) : (
-            <p className="text-xs text-[#ad9fc0]">
-              Tap all stars or use &ldquo;Auto-Connect&rdquo; to complete the heart.
+            <p className="text-[11px] text-[#82738a]">
+              Tap stars or tap &ldquo;Auto-Connect&rdquo; to complete the heart.
             </p>
           )}
 
@@ -170,16 +165,15 @@ export default function ConstellationTab() {
               <button
                 type="button"
                 onClick={autoConnect}
-                className="text-xs px-3.5 py-1.5 rounded-full bg-purple-500/20 hover:bg-purple-500/30 text-purple-200 border border-purple-400/30 transition-colors flex items-center gap-1.5"
+                className="text-xs px-3 py-1.5 rounded-lg bg-[#211a26] border border-[var(--border-prominent)] text-[#f0eaf0] transition-colors flex items-center gap-1.5 touch-target"
               >
-                <Sparkles className="w-3.5 h-3.5" />
                 <span>Auto-Connect</span>
               </button>
             )}
             <button
               type="button"
               onClick={resetConstellation}
-              className="text-xs px-3 py-1.5 rounded-full border border-white/15 text-[#b8afc4] hover:bg-white/10 transition-colors flex items-center gap-1"
+              className="text-xs px-2.5 py-1.5 rounded-lg border border-[var(--border-subtle)] text-[#b7aabf] hover:text-[#f0eaf0] transition-colors flex items-center gap-1 touch-target"
             >
               <RotateCcw className="w-3 h-3" />
               <span>Replay</span>
@@ -189,33 +183,33 @@ export default function ConstellationTab() {
       </div>
 
       {/* ─── Final Letter with No Expectations ─── */}
-      <div className="apple-glass-card rounded-[32px] p-7 sm:p-9 text-left space-y-4 border border-purple-400/20 shadow-xl">
-        <div className="flex items-center justify-between border-b border-white/10 pb-3">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-purple-400 font-mono">
+      <div className="ios-surface-elevated p-6 text-left space-y-3.5">
+        <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-2.5">
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-[#b995b8] font-mono">
             Final Chapter • With Peace
           </span>
-          <span className="text-xs text-[#746788]">No pressure to reply</span>
+          <span className="text-[11px] text-[#82738a]">No pressure to reply</span>
         </div>
 
-        <div className="space-y-4 font-serif text-sm sm:text-base text-[#e0d8ec] leading-relaxed">
-          <p className="font-medium text-purple-300">Fatima,</p>
+        <div className="space-y-3 font-serif text-xs sm:text-sm text-[#f0eaf0] leading-relaxed">
+          <p className="font-medium text-[#b995b8]">Fatima,</p>
           <p>
             I don&apos;t know what the future holds, and I don&apos;t want to pretend that a website can fix everything.
           </p>
           <p>
             I just wanted to do something different and put genuine effort into expressing what I couldn&apos;t always communicate properly.
           </p>
-          <p className="text-[#f5f3f9] font-medium">
+          <p className="text-[#f0eaf0] font-medium">
             You matter as a person, regardless of what happens between us.
           </p>
           <p>
             I hope life brings you peace, happiness, and the things you genuinely want for yourself.
           </p>
           <p>Take your time, live your life, and look after yourself.</p>
-          <p className="text-xs text-[#8e81a3] italic pt-1">
+          <p className="text-xs text-[#82738a] italic pt-1">
             No pressure to reply. Just something I made with care.
           </p>
-          <p className="pt-3 font-serif italic text-xl text-purple-300 font-medium">
+          <p className="pt-2 font-serif italic text-base sm:text-lg text-[#b995b8] font-medium">
             — Hassaan 💜
           </p>
         </div>

@@ -5,7 +5,7 @@ import "./globals.css";
 const jakarta = Plus_Jakarta_Sans({
   variable: "--font-sans",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "500", "600"],
   display: "swap",
 });
 
@@ -13,6 +13,7 @@ const playfair = Playfair_Display({
   variable: "--font-serif",
   subsets: ["latin"],
   style: ["normal", "italic"],
+  weight: ["400", "600"],
   display: "swap",
 });
 
@@ -23,10 +24,11 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#09060f",
+  themeColor: "#17131b",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
+  viewportFit: "cover",
   userScalable: false,
 };
 
@@ -34,9 +36,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${jakarta.variable} ${playfair.variable} antialiased selection:bg-purple-900/60 selection:text-purple-200`}
+      className={`${jakarta.variable} ${playfair.variable} antialiased selection:bg-[#362c3d] selection:text-[#f0eaf0]`}
     >
-      <body className="min-h-screen overflow-x-hidden bg-[#09060f] text-[#f5f3f9] font-sans">
+      <body className="min-h-screen bg-[#17131b] text-[#f0eaf0] font-sans">
         {children}
       </body>
     </html>

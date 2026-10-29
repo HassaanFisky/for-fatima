@@ -17,37 +17,35 @@ export default function TruthTab() {
   const getIcon = (name: string) => {
     switch (name) {
       case "Ear":
-        return <Ear className="w-5 h-5 text-purple-300" />;
+        return <Ear className="w-4 h-4 text-[#b995b8]" />;
       case "ShieldCheck":
-        return <ShieldCheck className="w-5 h-5 text-purple-300" />;
+        return <ShieldCheck className="w-4 h-4 text-[#b995b8]" />;
       default:
-        return <Compass className="w-5 h-5 text-purple-300" />;
+        return <Compass className="w-4 h-4 text-[#b995b8]" />;
     }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <div className="text-center space-y-1">
-        <span className="text-[10px] font-bold tracking-widest uppercase text-purple-400 bg-purple-500/10 px-3 py-1 rounded-full border border-purple-400/20">
+        <span className="text-[10px] font-semibold tracking-wider uppercase text-[#b995b8] bg-[#211a26] px-3 py-1 rounded-full border border-[var(--border-subtle)]">
           Chapter 02 • Sincere Accountability
         </span>
-        <h2 className="text-2xl font-bold tracking-tight text-[#f5f3f9]">
+        <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[#f0eaf0]">
           The Apology I Should Have Expressed Better
         </h2>
       </div>
 
       {/* ─── Exact Documented Apology Letter ─── */}
-      <div className="apple-glass-card rounded-[32px] p-7 sm:p-9 text-left space-y-4 border border-purple-400/20 shadow-xl relative overflow-hidden">
-        <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-purple-500/40 via-purple-400 to-pink-500/40" />
-
-        <div className="space-y-4 font-serif text-sm sm:text-base text-[#e0d8ec] leading-relaxed">
+      <div className="ios-surface-elevated p-6 text-left space-y-3.5 relative overflow-hidden">
+        <div className="space-y-3 font-serif text-xs sm:text-sm text-[#f0eaf0] leading-relaxed">
           <p>
             Fatima, I know there were moments when I didn&apos;t handle things the way I should have.
           </p>
           <p>
             I sometimes let my emotions take over instead of listening properly. I pushed conversations when I should have given you space, and there were times I didn&apos;t respect your boundaries the way I needed to.
           </p>
-          <p className="font-semibold text-purple-200">
+          <p className="font-semibold text-[#b995b8]">
             I&apos;m sorry for that.
           </p>
           <p>
@@ -56,60 +54,54 @@ export default function TruthTab() {
           <p>
             I can&apos;t ask you to trust me just because I say the right things. Trust takes time, consistency, and actions.
           </p>
-          <p className="text-purple-300 font-medium">
+          <p className="text-[#b7aabf]">
             I&apos;m working on understanding that better.
           </p>
-          <p className="text-xs text-[#8e81a3] italic pt-2 border-t border-white/10">
+          <p className="text-xs text-[#82738a] italic pt-2 border-t border-[var(--border-subtle)]">
             You don&apos;t owe me forgiveness, a reply, or another chance. I simply wanted to acknowledge my part honestly.
           </p>
         </div>
       </div>
 
       {/* ─── Chapter 03: The Things That Matter ─── */}
-      <div className="space-y-3 pt-2">
+      <div className="space-y-2.5 pt-1">
         <div className="text-left px-1">
-          <span className="text-[10px] font-bold tracking-widest uppercase text-purple-400">
-            Core Principles
-          </span>
-          <h3 className="text-xl font-bold text-[#f5f3f9]">
+          <h3 className="text-base sm:text-lg font-bold text-[#f0eaf0]">
             The Things That Matter
           </h3>
-          <p className="text-xs text-[#ad9fc0]">
+          <p className="text-xs text-[#b7aabf]">
             Tap any card to see the reflection underneath.
           </p>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2.5">
           {MATTER_CARDS.map((card) => {
             const isOpen = expandedId === card.id;
             return (
-              <motion.div
+              <div
                 key={card.id}
-                layout
                 onClick={() => toggleExpand(card.id)}
-                className={`apple-glass-card rounded-2xl p-5 cursor-pointer transition-all border ${
-                  isOpen
-                    ? "border-purple-400/40 shadow-lg shadow-purple-900/10"
-                    : "hover:border-white/20"
+                className={`ios-surface p-4 cursor-pointer transition-colors ${
+                  isOpen ? "bg-[#2b2230] border-[var(--border-prominent)]" : "active:bg-[#211a26]"
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-purple-500/15 flex items-center justify-center">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-lg bg-[#17131b] flex items-center justify-center shrink-0">
                       {getIcon(card.iconName)}
                     </div>
                     <div>
-                      <h4 className="font-serif text-base font-bold text-[#f5f3f9]">
+                      <h4 className="font-serif text-sm font-semibold text-[#f0eaf0]">
                         {card.title}
                       </h4>
-                      <p className="text-xs text-purple-300 font-medium">
+                      <p className="text-[11px] text-[#b7aabf]">
                         &ldquo;{card.quote}&rdquo;
                       </p>
                     </div>
                   </div>
                   <ChevronDown
-                    className={`w-4 h-4 text-[#8e81a3] transition-transform duration-200 shrink-0 ${
-                      isOpen ? "rotate-180 text-purple-300" : ""
+                    className={`w-4 h-4 text-[#82738a] transition-transform duration-200 shrink-0 ${
+                      isOpen ? "rotate-180 text-[#b995b8]" : ""
                     }`}
                   />
                 </div>
@@ -120,16 +112,16 @@ export default function TruthTab() {
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: "auto" }}
                       exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.25 }}
+                      transition={{ duration: 0.2 }}
                       className="overflow-hidden"
                     >
-                      <p className="text-xs text-[#b8afc4] leading-relaxed pt-3 mt-3 border-t border-white/10 font-light">
+                      <p className="text-xs text-[#b7aabf] leading-relaxed pt-2.5 mt-2.5 border-t border-[var(--border-subtle)] font-light">
                         {card.deep}
                       </p>
                     </motion.div>
                   )}
                 </AnimatePresence>
-              </motion.div>
+              </div>
             );
           })}
         </div>

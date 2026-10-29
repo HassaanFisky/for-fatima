@@ -1,116 +1,99 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: var(--font-sans), -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  --font-sans: var(--font-sans), -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, sans-serif;
   --font-serif: var(--font-serif), Georgia, serif;
 }
 
+/* ─── Apple HIG Centralized Low-Luminance Tokens ─── */
 :root {
-  --bg-deep: #09060f;
-  --bg-card: rgba(26, 18, 38, 0.65);
-  --border-glass: rgba(255, 255, 255, 0.08);
-  --border-glass-hover: rgba(255, 255, 255, 0.16);
-  --accent-purple: #c084fc;
-  --accent-pink: #f472b6;
-  --text-primary: #f5f3f9;
-  --text-secondary: #ad9fc0;
-  --text-muted: #746788;
+  --bg-primary: #17131b;
+  --bg-secondary: #211a26;
+  --bg-elevated: #2b2230;
+  --bg-interactive: #362c3d;
+  --border-subtle: rgba(183, 170, 191, 0.12);
+  --border-prominent: rgba(185, 149, 184, 0.28);
+  --text-primary: #f0eaf0;
+  --text-secondary: #b7aabf;
+  --text-muted: #82738a;
+  --accent: #b995b8;
+  --accent-soft: rgba(185, 149, 184, 0.14);
 }
 
 html {
   scroll-behavior: smooth;
   -webkit-tap-highlight-color: transparent;
-  background-color: var(--bg-deep);
+  background-color: var(--bg-primary);
   color: var(--text-primary);
+  color-scheme: dark;
 }
 
 body {
-  background-color: var(--bg-deep);
+  background-color: var(--bg-primary);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  padding-bottom: env(safe-area-inset-bottom, 24px);
 }
 
-/* ─── Apple Glassmorphism Surfaces ─── */
-.apple-glass {
-  background: rgba(24, 17, 36, 0.65);
-  backdrop-filter: blur(28px) saturate(180%);
-  -webkit-backdrop-filter: blur(28px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  box-shadow: 
-    0 20px 40px -15px rgba(0, 0, 0, 0.6),
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.12);
+/* ─── Apple Native Material Surfaces ─── */
+.ios-surface {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
 }
 
-.apple-glass-card {
-  background: linear-gradient(135deg, rgba(32, 22, 48, 0.7) 0%, rgba(18, 12, 28, 0.6) 100%);
-  backdrop-filter: blur(24px) saturate(170%);
-  -webkit-backdrop-filter: blur(24px) saturate(170%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 
-    0 16px 36px -12px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+.ios-surface-elevated {
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 24px;
 }
 
-.apple-glass-card:hover {
-  border-color: rgba(192, 132, 252, 0.25);
-  box-shadow: 
-    0 20px 45px -12px rgba(120, 50, 180, 0.15),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.18);
+.ios-surface-interactive {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 18px;
+  transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1), background-color 0.15s ease, border-color 0.15s ease;
 }
 
-.apple-glass-dock {
-  background: rgba(20, 14, 30, 0.82);
-  backdrop-filter: blur(32px) saturate(200%);
-  -webkit-backdrop-filter: blur(32px) saturate(200%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 
-    0 24px 50px -12px rgba(0, 0, 0, 0.8),
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.15);
+.ios-surface-interactive:active {
+  transform: scale(0.98);
+  background-color: var(--bg-interactive);
+  border-color: var(--border-prominent);
 }
 
-.apple-glass-pill {
-  background: rgba(14, 9, 22, 0.92);
-  backdrop-filter: blur(30px) saturate(210%);
-  -webkit-backdrop-filter: blur(30px) saturate(210%);
-  border: 1px solid rgba(255, 255, 255, 0.13);
-  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.7);
+.ios-pill {
+  background-color: rgba(33, 26, 38, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle);
 }
 
-/* ─── Apple Ambient Glow Orbs ─── */
-@keyframes ambientDrift {
-  0%, 100% {
-    transform: translate(0, 0) scale(1);
-    opacity: 0.28;
-  }
-  50% {
-    transform: translate(15px, -20px) scale(1.06);
-    opacity: 0.38;
-  }
+.ios-dock {
+  background-color: rgba(27, 21, 32, 0.88);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
 }
 
-.ambient-glow-1 {
-  animation: ambientDrift 14s ease-in-out infinite alternate;
-}
-
-.ambient-glow-2 {
-  animation: ambientDrift 18s ease-in-out infinite alternate-reverse;
+/* ─── Touch Target Minimums ─── */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
 }
 
 /* ─── Custom Scrollbar ─── */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 4px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(183, 170, 191, 0.2);
   border-radius: 9999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.25);
 }
 
 @media (prefers-reduced-motion: reduce) {

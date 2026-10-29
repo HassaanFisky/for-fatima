@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
 import { Sparkles, Layers, ShieldCheck, Heart, Star } from "lucide-react";
 import { audioEngine } from "../lib/sound";
 
@@ -18,12 +17,12 @@ export default function AppleDock({ activeTab, onTabChange }: AppleDockProps) {
     { id: "details" as TabId, label: "Notes", icon: Layers },
     { id: "truth" as TabId, label: "Truth", icon: ShieldCheck },
     { id: "smile" as TabId, label: "Smile", icon: Heart },
-    { id: "stars" as TabId, label: "Constellation", icon: Star },
+    { id: "stars" as TabId, label: "Stars", icon: Star },
   ];
 
   return (
-    <nav className="fixed bottom-4 inset-x-0 z-50 px-4 flex justify-center pointer-events-auto">
-      <div className="apple-glass-dock rounded-full p-1.5 shadow-2xl flex items-center justify-between max-w-md w-full border border-white/10">
+    <nav className="fixed bottom-2.5 sm:bottom-4 inset-x-0 z-50 px-3 flex justify-center pointer-events-auto">
+      <div className="ios-dock rounded-full p-1 shadow-xl flex items-center justify-between max-w-[420px] w-full">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const active = activeTab === tab.id;
@@ -35,19 +34,14 @@ export default function AppleDock({ activeTab, onTabChange }: AppleDockProps) {
                 audioEngine.playHaptic(active ? 660 : 540);
                 onTabChange(tab.id);
               }}
-              className={`flex-1 py-2 px-1 rounded-full flex flex-col items-center gap-0.5 transition-all duration-200 relative ${
-                active ? "text-white" : "text-[#8e81a3] hover:text-[#d3c7e4]"
+              className={`flex-1 py-1.5 px-1 rounded-full flex flex-col items-center justify-center gap-0.5 transition-colors touch-target ${
+                active
+                  ? "bg-[#362c3d] text-[#f0eaf0]"
+                  : "text-[#82738a] hover:text-[#b7aabf]"
               }`}
             >
-              {active && (
-                <motion.div
-                  layoutId="activeDockIndicator"
-                  className="absolute inset-0 rounded-full bg-white/15 border border-white/10 -z-10 shadow-sm"
-                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                />
-              )}
-              <Icon className={`w-4 h-4 ${active ? "text-purple-300" : ""}`} />
-              <span className="text-[10px] font-semibold tracking-wide">
+              <Icon className={`w-4 h-4 ${active ? "text-[#b995b8]" : ""}`} />
+              <span className="text-[10px] font-medium tracking-wide">
                 {tab.label}
               </span>
             </button>

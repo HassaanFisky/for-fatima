@@ -1,7 +1,6 @@
 /**
  * Configurable data source for Fatima's private experience.
- * Merges Option A's tactile hooks and Option B's deep keepsakes and reflections.
- * All writing is original, respectful, and free of pressure.
+ * Sincere, original, personal, and free of emotional pressure.
  */
 
 export interface DetailObject {
@@ -17,7 +16,6 @@ export interface PoeticCard {
   line: string;
   sub: string;
   badge: string;
-  bgGradient: string;
 }
 
 export interface MatterCard {
@@ -100,43 +98,37 @@ export const POETIC_CARDS: PoeticCard[] = [
     tag: "LATE NIGHT REFLECTION",
     line: "Muskura de agar tu, ye be-noor shehar thora thehar jata hai...",
     sub: "Gham chupaye inn aankhon mein, wo toh hamesha hasti rahi hai.",
-    badge: "Acoustic Vibe 💜",
-    bgGradient: "from-purple-900/30 via-purple-950/20 to-black/40",
+    badge: "Acoustic Vibe",
   },
   {
     tag: "UNSPOKEN TRUTH",
     line: "Jahan khushbuein gulaab ki hon, wahan yaad tera naam le...",
     sub: "Ghalti meri thi jab maine waqt maangne par lafzon ka shor machaya. Sabr ka matlab ab samjh aaya hai.",
-    badge: "Respect & Peace ✨",
-    bgGradient: "from-rose-900/25 via-purple-950/20 to-black/40",
+    badge: "Respect & Peace",
   },
   {
     tag: "TELEPATHY MOMENT",
     line: "Phir se jeena chahta hun...",
     sub: "Wohi line jo tum gaa rahi thi aur maine usi pal note ki thi. Dil ke taar pehle se jude hue the.",
-    badge: "Unspoken Bond 🎵",
-    bgGradient: "from-amber-900/20 via-purple-950/20 to-black/40",
+    badge: "Unspoken Bond",
   },
   {
     tag: "THE SECRET HOOK",
     line: "Bracelet toh behad pyara tha... par woh ek kami abhi bhi baqi hai 😉",
     sub: "Aur woh kami chat ya screen par nahi, sirf samne aane par nazar aayegi.",
-    badge: "15 Oct Surprise 🎁",
-    bgGradient: "from-fuchsia-900/25 via-purple-950/20 to-black/40",
+    badge: "15 Oct Surprise",
   },
   {
     tag: "MIDNIGHT OBSERVATION",
     line: "Chaand ban ke chhup gayi hai peeche badalon ke...",
     sub: "Khud se saadgi ka waada, sarr pe hamesha hath Khuda ka.",
-    badge: "Pure Grace 🌙",
-    bgGradient: "from-indigo-900/30 via-purple-950/20 to-black/40",
+    badge: "Pure Grace",
   },
   {
     tag: "SUKOON FIRST",
     line: "Jab dimaag bhari ho ya thakan ho — Ice cream kha lena 🍦",
     sub: "Kyunke tumhara sukoon aur muskurahat har behas se hazaar guna zaroori hai.",
-    badge: "Zero Expectations 🤍",
-    bgGradient: "from-cyan-900/20 via-purple-950/20 to-black/40",
+    badge: "Zero Pressure",
   },
 ];
 

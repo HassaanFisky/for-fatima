@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion } from "framer-motion";
 import { VolumeX, Disc } from "lucide-react";
 import { audioEngine } from "../lib/sound";
 
@@ -12,7 +11,6 @@ interface DynamicIslandProps {
 export default function DynamicIsland({ timeGreeting }: DynamicIslandProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioMode, setAudioMode] = useState<"acoustic" | "dream">("acoustic");
-  const [isExpanded, setIsExpanded] = useState(false);
 
   const toggleSound = () => {
     audioEngine.playHaptic(640);
@@ -36,59 +34,53 @@ export default function DynamicIsland({ timeGreeting }: DynamicIslandProps) {
   };
 
   return (
-    <header className="sticky top-3.5 z-50 px-4 flex justify-center">
-      <motion.div
-        layout
-        transition={{ type: "spring", stiffness: 380, damping: 28 }}
-        className="apple-glass-pill rounded-full text-white shadow-2xl px-3 py-1.5 flex items-center justify-between gap-3 max-w-md w-full border border-white/10"
-      >
-        <div className="flex items-center gap-2.5 min-w-0">
+    <header className="sticky top-2 sm:top-3 z-50 px-3 flex justify-center w-full">
+      <div className="ios-pill rounded-full text-[#f0eaf0] px-3 py-1.5 flex items-center justify-between gap-2.5 max-w-[420px] w-full">
+        {/* Play/Mute Audio Button (Touch target 44px equivalent area) */}
+        <div className="flex items-center gap-2 min-w-0">
           <button
             type="button"
             onClick={toggleSound}
-            aria-label={isPlaying ? "Mute audio" : "Play ambient audio"}
-            className={`w-8 h-8 rounded-full shrink-0 flex items-center justify-center transition-all ${
+            aria-label={isPlaying ? "Mute audio" : "Play subtle ambient audio"}
+            className={`w-9 h-9 rounded-full shrink-0 flex items-center justify-center transition-colors touch-target ${
               isPlaying
-                ? "bg-purple-600/80 text-white shadow-lg shadow-purple-600/30"
-                : "bg-white/10 text-purple-300 hover:bg-white/15"
+                ? "bg-[#362c3d] text-[#f0eaf0]"
+                : "bg-white/5 text-[#b7aabf] hover:bg-white/10"
             }`}
           >
             {isPlaying ? (
-              <Disc className="w-4 h-4 animate-spin text-purple-200" />
+              <Disc className="w-4 h-4 animate-spin text-[#b995b8]" />
             ) : (
-              <VolumeX className="w-4 h-4" />
+              <VolumeX className="w-4 h-4 text-[#82738a]" />
             )}
           </button>
 
-          <div
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="cursor-pointer min-w-0 leading-tight text-left"
-          >
+          <div className="min-w-0 text-left leading-tight">
             <div className="flex items-center gap-1.5 truncate">
               {isPlaying && (
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#b995b8] shrink-0" />
               )}
-              <p className="text-[11px] font-semibold tracking-wide truncate text-[#f5f3f9]">
+              <p className="text-[11px] font-medium tracking-wide truncate text-[#f0eaf0]">
                 {audioMode === "acoustic"
-                  ? "Late Night Plucks (Acoustic)"
-                  : "Post You Vibe (Sunset Chords)"}
+                  ? "Acoustic Pluck (Lo-Fi)"
+                  : "Sunset Pad (Warm Tone)"}
               </p>
             </div>
-            <p className="text-[10px] text-[#ad9fc0] truncate">
+            <p className="text-[10px] text-[#82738a] truncate">
               {timeGreeting}
             </p>
           </div>
         </div>
 
         {/* Apple Segmented Switcher */}
-        <div className="flex items-center bg-white/10 rounded-full p-0.5 text-[10px] shrink-0 font-medium">
+        <div className="flex items-center bg-white/5 rounded-full p-0.5 text-[10px] shrink-0 font-medium">
           <button
             type="button"
             onClick={() => switchMode("acoustic")}
-            className={`px-2.5 py-1 rounded-full transition-all ${
+            className={`px-2.5 py-1 rounded-full transition-colors ${
               audioMode === "acoustic"
-                ? "bg-white/90 text-[#09060f] font-bold shadow-sm"
-                : "text-purple-200 hover:text-white"
+                ? "bg-[#2b2230] text-[#f0eaf0] font-semibold"
+                : "text-[#b7aabf] hover:text-[#f0eaf0]"
             }`}
           >
             Acoustic
@@ -96,16 +88,16 @@ export default function DynamicIsland({ timeGreeting }: DynamicIslandProps) {
           <button
             type="button"
             onClick={() => switchMode("dream")}
-            className={`px-2.5 py-1 rounded-full transition-all ${
+            className={`px-2.5 py-1 rounded-full transition-colors ${
               audioMode === "dream"
-                ? "bg-white/90 text-[#09060f] font-bold shadow-sm"
-                : "text-purple-200 hover:text-white"
+                ? "bg-[#2b2230] text-[#f0eaf0] font-semibold"
+                : "text-[#b7aabf] hover:text-[#f0eaf0]"
             }`}
           >
             Sunset
           </button>
         </div>
-      </motion.div>
+      </div>
     </header>
   );
 }
