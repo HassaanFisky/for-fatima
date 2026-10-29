@@ -5,23 +5,25 @@ import "./globals.css";
 const jakarta = Plus_Jakarta_Sans({
   variable: "--font-sans",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
 });
 
 const playfair = Playfair_Display({
   variable: "--font-serif",
   subsets: ["latin"],
   style: ["normal", "italic"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
   title: "for fatima 💜",
-  description: "A private digital universe crafted with care.",
+  description: "A private digital universe crafted with care, patience, and respect.",
   robots: { index: false, follow: false },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#FAF8FF",
+  themeColor: "#09060f",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -32,9 +34,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${jakarta.variable} ${playfair.variable} antialiased selection:bg-purple-100 selection:text-purple-900`}
+      className={`${jakarta.variable} ${playfair.variable} antialiased selection:bg-purple-900/60 selection:text-purple-200`}
     >
-      <body className="min-h-screen overflow-x-hidden bg-[#FAF8FF] text-[#1E162B] font-sans">
+      <body className="min-h-screen overflow-x-hidden bg-[#09060f] text-[#f5f3f9] font-sans">
         {children}
       </body>
     </html>

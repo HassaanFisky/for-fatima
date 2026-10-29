@@ -1,66 +1,116 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: var(--font-sans), -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  --font-sans: var(--font-sans), -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
   --font-serif: var(--font-serif), Georgia, serif;
+}
+
+:root {
+  --bg-deep: #09060f;
+  --bg-card: rgba(26, 18, 38, 0.65);
+  --border-glass: rgba(255, 255, 255, 0.08);
+  --border-glass-hover: rgba(255, 255, 255, 0.16);
+  --accent-purple: #c084fc;
+  --accent-pink: #f472b6;
+  --text-primary: #f5f3f9;
+  --text-secondary: #ad9fc0;
+  --text-muted: #746788;
 }
 
 html {
   scroll-behavior: smooth;
   -webkit-tap-highlight-color: transparent;
+  background-color: var(--bg-deep);
+  color: var(--text-primary);
 }
 
 body {
+  background-color: var(--bg-deep);
+  color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
-/* Apple Pro Glassmorphism & Highlights */
-.ios-glass {
-  background: rgba(255, 255, 255, 0.78);
-  backdrop-filter: blur(24px) saturate(190%);
-  -webkit-backdrop-filter: blur(24px) saturate(190%);
-  border: 1px solid rgba(255, 255, 255, 0.85);
-  box-shadow: 0 10px 30px -10px rgba(120, 50, 180, 0.08), 0 1px 2px rgba(0, 0, 0, 0.03);
+/* ─── Apple Glassmorphism Surfaces ─── */
+.apple-glass {
+  background: rgba(24, 17, 36, 0.65);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 
+    0 20px 40px -15px rgba(0, 0, 0, 0.6),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.12);
 }
 
-.ios-glass-dark {
-  background: rgba(24, 18, 36, 0.88);
-  backdrop-filter: blur(28px) saturate(210%);
-  -webkit-backdrop-filter: blur(28px) saturate(210%);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.45);
+.apple-glass-card {
+  background: linear-gradient(135deg, rgba(32, 22, 48, 0.7) 0%, rgba(18, 12, 28, 0.6) 100%);
+  backdrop-filter: blur(24px) saturate(170%);
+  -webkit-backdrop-filter: blur(24px) saturate(170%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 
+    0 16px 36px -12px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
 }
 
-/* Subtle Specular Sheen Effect */
-.sheen {
-  position: relative;
-  overflow: hidden;
-}
-.sheen::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -150%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-  transform: skewX(-20deg);
-  transition: 0.75s;
-  pointer-events: none;
-}
-.sheen:hover::after {
-  left: 150%;
+.apple-glass-card:hover {
+  border-color: rgba(192, 132, 252, 0.25);
+  box-shadow: 
+    0 20px 45px -12px rgba(120, 50, 180, 0.15),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.18);
 }
 
-/* Smooth Ambient Glow Animation */
-@keyframes ambientGlow {
-  0%, 100% { transform: translateY(0) scale(1); opacity: 0.45; }
-  50% { transform: translateY(-15px) scale(1.08); opacity: 0.65; }
+.apple-glass-dock {
+  background: rgba(20, 14, 30, 0.82);
+  backdrop-filter: blur(32px) saturate(200%);
+  -webkit-backdrop-filter: blur(32px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 
+    0 24px 50px -12px rgba(0, 0, 0, 0.8),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.15);
 }
 
-.ambient-orb {
-  animation: ambientGlow 9s ease-in-out infinite alternate;
+.apple-glass-pill {
+  background: rgba(14, 9, 22, 0.92);
+  backdrop-filter: blur(30px) saturate(210%);
+  -webkit-backdrop-filter: blur(30px) saturate(210%);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.7);
+}
+
+/* ─── Apple Ambient Glow Orbs ─── */
+@keyframes ambientDrift {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.28;
+  }
+  50% {
+    transform: translate(15px, -20px) scale(1.06);
+    opacity: 0.38;
+  }
+}
+
+.ambient-glow-1 {
+  animation: ambientDrift 14s ease-in-out infinite alternate;
+}
+
+.ambient-glow-2 {
+  animation: ambientDrift 18s ease-in-out infinite alternate-reverse;
+}
+
+/* ─── Custom Scrollbar ─── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
 }
 
 @media (prefers-reduced-motion: reduce) {

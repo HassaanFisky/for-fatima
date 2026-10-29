@@ -1,76 +1,144 @@
 /**
- * Tiny Web Audio chime synth. No audio files needed. OFF by default and
- * never plays until the visitor flips the sound toggle.
+ * High-Fidelity Apple-Caliber Web Audio Engine
+ * Zero external MP3 assets required. 100% private and offline-capable.
+ * Default state: OFF.
  */
-type Listener = (on: boolean) => void;
 
-let ctx: AudioContext | null = null;
-let enabled = false;
-const listeners = new Set<Listener>();
+export class GentleAudioEngine {
+  private ctx: AudioContext | null = null;
+  private masterGain: GainNode | null = null;
+  private intervalId: ReturnType<typeof setInterval> | null = null;
+  public isPlaying: boolean = false;
+  public mode: "acoustic" | "dream" = "acoustic";
 
-function getCtx(): AudioContext | null {
-  if (typeof window === "undefined") return null;
-  if (!ctx) {
-    const Ctor =
-      window.AudioContext ||
-      (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-    if (!Ctor) return null;
-    ctx = new Ctor();
+  private init() {
+    if (!this.ctx && typeof window !== "undefined") {
+      const AudioCtx =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      if (AudioCtx) {
+        this.ctx = new AudioCtx();
+        this.masterGain = this.ctx.createGain();
+        this.masterGain.gain.setValueAtTime(0.065, this.ctx.currentTime);
+        this.masterGain.connect(this.ctx.destination);
+      }
+    }
+    if (this.ctx && this.ctx.state === "suspended") {
+      this.ctx.resume().catch(() => {});
+    }
   }
-  if (ctx.state === "suspended") void ctx.resume();
-  return ctx;
-}
 
-export function isSoundOn() {
-  return enabled;
-}
+  /** Subtle haptic tick sound for buttons and tab switches */
+  playHaptic(freq = 580) {
+    try {
+      this.init();
+      if (!this.ctx || !this.masterGain) return;
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
 
-export function setSound(on: boolean) {
-  enabled = on;
-  listeners.forEach((l) => l(on));
-  if (on) chord();
-}
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, t);
 
-export function subscribeSound(l: Listener) {
-  listeners.add(l);
-  return () => {
-    listeners.delete(l);
-  };
-}
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.exponentialRampToValueAtTime(0.025, t + 0.012);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
 
-export function chime(freq = 523.25, duration = 1.4, volume = 0.06) {
-  if (!enabled) return;
-  const c = getCtx();
-  if (!c) return;
-  try {
-    const t = c.currentTime;
-    const osc = c.createOscillator();
-    const overtone = c.createOscillator();
-    const gain = c.createGain();
-    osc.type = "sine";
-    overtone.type = "triangle";
-    osc.frequency.setValueAtTime(freq, t);
-    overtone.frequency.setValueAtTime(freq * 2, t);
-    gain.gain.setValueAtTime(0.0001, t);
-    gain.gain.exponentialRampToValueAtTime(volume, t + 0.04);
-    gain.gain.exponentialRampToValueAtTime(0.0001, t + duration);
-    osc.connect(gain);
-    overtone.connect(gain);
-    gain.connect(c.destination);
-    osc.start(t);
-    overtone.start(t);
-    osc.stop(t + duration);
-    overtone.stop(t + duration);
-  } catch {
-    /* ignore audio failures on restricted devices */
+      osc.connect(gain);
+      gain.connect(this.masterGain);
+      osc.start(t);
+      osc.stop(t + 0.2);
+    } catch {
+      // Ignore
+    }
+  }
+
+  /** Warm resonant pluck note with custom lowpass biquad filter */
+  playPluck(freq: number, duration = 1.6, decay = 0.85) {
+    try {
+      this.init();
+      if (!this.ctx || !this.masterGain) return;
+      const t = this.ctx.currentTime;
+
+      const osc1 = this.ctx.createOscillator();
+      const osc2 = this.ctx.createOscillator();
+      const filter = this.ctx.createBiquadFilter();
+      const noteGain = this.ctx.createGain();
+
+      filter.type = "lowpass";
+      filter.frequency.setValueAtTime(1200, t);
+      filter.frequency.exponentialRampToValueAtTime(280, t + duration * 0.7);
+
+      osc1.type = this.mode === "acoustic" ? "triangle" : "sine";
+      osc2.type = "sine";
+
+      osc1.frequency.setValueAtTime(freq, t);
+      osc2.frequency.setValueAtTime(freq * 2, t);
+
+      noteGain.gain.setValueAtTime(0.0001, t);
+      noteGain.gain.exponentialRampToValueAtTime(0.05, t + 0.025);
+      noteGain.gain.exponentialRampToValueAtTime(0.0001, t + duration * decay);
+
+      osc1.connect(filter);
+      osc2.connect(filter);
+      filter.connect(noteGain);
+      noteGain.connect(this.masterGain);
+
+      osc1.start(t);
+      osc2.start(t);
+      osc1.stop(t + duration);
+      osc2.stop(t + duration);
+    } catch {
+      // Ignore
+    }
+  }
+
+  /** Harmonic chime for milestone interactions (star unlock / constellation) */
+  playChimeChord() {
+    [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => {
+      setTimeout(() => this.playPluck(f, 2.2, 1.1), i * 110);
+    });
+  }
+
+  startLoop() {
+    this.stopLoop();
+    this.isPlaying = true;
+    let step = 0;
+
+    // Mode 1: Introspective minor progression (A minor / C major warmth)
+    const acousticNotes = [220.0, 261.63, 329.63, 293.66, 196.0, 246.94, 329.63, 261.63];
+    // Mode 2: Dreamy sunset progression (E minor / G major chill lo-fi)
+    const dreamNotes = [261.63, 329.63, 392.0, 493.88, 349.23, 440.0, 523.25, 392.0];
+
+    const tick = () => {
+      if (!this.isPlaying) return;
+      const notes = this.mode === "acoustic" ? acousticNotes : dreamNotes;
+      const freq = notes[step % notes.length];
+      this.playPluck(freq, 2.0, 0.9);
+      if (step % 2 === 0) {
+        this.playPluck(freq * 0.5, 2.5, 1.1); // Sub octave bass note
+      }
+      step++;
+    };
+
+    tick();
+    this.intervalId = setInterval(tick, 980);
+  }
+
+  stopLoop() {
+    this.isPlaying = false;
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+      this.intervalId = null;
+    }
+  }
+
+  switchMode(newMode: "acoustic" | "dream") {
+    this.mode = newMode;
+    if (this.isPlaying) {
+      this.startLoop();
+    }
   }
 }
 
-const SCALE = [523.25, 587.33, 659.25, 783.99, 880.0, 1046.5];
-export function note(i: number) {
-  chime(SCALE[((i % SCALE.length) + SCALE.length) % SCALE.length]);
-}
-
-export function chord() {
-  [392, 523.25, 659.25, 783.99].forEach((f, i) => window.setTimeout(() => chime(f, 2, 0.05), i * 120));
-}
+export const audioEngine = new GentleAudioEngine();
