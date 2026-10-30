@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Sparkles } from "lucide-react";
 import { KEEPSAKE_ITEMS, EDITORIAL_NOTES } from "../config/personal";
 import { audioEngine } from "../lib/sound";
@@ -14,16 +15,16 @@ export default function DetailsTab() {
   };
 
   return (
-    <div className="space-y-6 sm:space-y-8 animate-fadeIn">
+    <div className="space-y-5 sm:space-y-6">
       {/* ─── Chapter Header ─── */}
       <section aria-label="Keepsakes header" className="text-left space-y-1.5 px-1">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#191124] border border-[var(--border-subtle)]">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#191124]/70 border border-[var(--border-subtle)] backdrop-blur-md">
           <Sparkles className="w-3 h-3 text-[#9878d1]" />
           <span className="editorial-kicker text-[10px] text-[#c6b4e5]">
             Chapter 01 • Curated Keepsakes
           </span>
         </div>
-        <h2 className="editorial-title text-2xl sm:text-3xl text-[#f4eff8]">
+        <h2 className="editorial-title text-2xl sm:text-3xl text-[#f5f0f8]">
           Six Quiet Reflections
         </h2>
         <p className="editorial-body text-xs sm:text-sm text-[#b8adc6]">
@@ -31,25 +32,31 @@ export default function DetailsTab() {
         </p>
       </section>
 
-      {/* ─── The Keepsake Collection (Direct & Accessible) ─── */}
+      {/* ─── The Keepsake Collection (Liquid Frosted Glass) ─── */}
       <section aria-label="Keepsakes collection" className="space-y-3">
         {KEEPSAKE_ITEMS.map((item) => {
           const isExpanded = expandedId === item.id;
           return (
-            <div
+            <motion.div
+              layout
+              transition={{
+                type: "spring",
+                stiffness: 400,
+                damping: 32,
+              }}
               key={item.id}
-              className={`luxury-card p-4 sm:p-5 transition-all text-left ${
-                isExpanded ? "border-[var(--border-prominent)] bg-[#191124]" : "hover:border-[var(--border-prominent)]"
+              className={`luxury-card p-4 sm:p-5 text-left transition-colors ${
+                isExpanded ? "border-[var(--border-prominent)] bg-[var(--bg-elevated)]" : ""
               }`}
             >
               <button
                 type="button"
                 onClick={() => toggleExpand(item.id)}
                 aria-expanded={isExpanded}
-                className="w-full flex items-center justify-between gap-3 text-left touch-target"
+                className="w-full flex items-center justify-between gap-3 text-left touch-target focus-visible:outline-none"
               >
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-10 h-10 rounded-xl bg-[#100b19] border border-[var(--border-subtle)] flex items-center justify-center shrink-0 text-lg text-[#9878d1]">
+                  <div className="w-10 h-10 rounded-2xl bg-[#100b19]/70 border border-[var(--border-subtle)] flex items-center justify-center shrink-0 text-lg text-[#9878d1] shadow-inner">
                     {item.iconSymbol}
                   </div>
                   <div className="min-w-0">
@@ -57,7 +64,7 @@ export default function DetailsTab() {
                       <span className="text-[10px] font-mono text-[#857896]">
                         {item.num}
                       </span>
-                      <h3 className="font-serif text-sm sm:text-base font-normal text-[#f4eff8] truncate">
+                      <h3 className="font-serif text-sm sm:text-base font-normal text-[#f5f0f8] truncate">
                         {item.title}
                       </h3>
                     </div>
@@ -72,22 +79,36 @@ export default function DetailsTab() {
                     {isExpanded ? "Close" : "Read"}
                   </span>
                   <ChevronDown
-                    className={`w-4 h-4 text-[#857896] transition-transform duration-200 ${
+                    className={`w-4 h-4 text-[#857896] transition-transform duration-300 ease-out ${
                       isExpanded ? "rotate-180 text-[#9878d1]" : ""
                     }`}
                   />
                 </div>
               </button>
 
-              {/* Reflection Content (Directly Accessible) */}
-              {isExpanded && (
-                <div className="mt-3.5 pt-3.5 border-t border-[var(--border-subtle)]">
-                  <p className="font-serif italic text-xs sm:text-sm text-[#f4eff8] leading-relaxed pl-2 border-l-2 border-[#9878d1]/40 font-light">
-                    &ldquo;{item.reflection}&rdquo;
-                  </p>
-                </div>
-              )}
-            </div>
+              {/* Reflection Content with Spring Physics */}
+              <AnimatePresence>
+                {isExpanded && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 450,
+                      damping: 34,
+                    }}
+                    className="overflow-hidden"
+                  >
+                    <div className="mt-3.5 pt-3.5 border-t border-[var(--border-subtle)]">
+                      <p className="font-serif italic text-xs sm:text-sm text-[#f5f0f8] leading-relaxed pl-2.5 border-l-2 border-[#9878d1]/40 font-light">
+                        &ldquo;{item.reflection}&rdquo;
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
           );
         })}
       </section>
@@ -110,7 +131,7 @@ export default function DetailsTab() {
                 <span>Note {note.number}</span>
                 <span className="text-[#9878d1]">For Fatima</span>
               </div>
-              <h4 className="font-serif text-sm font-normal text-[#f4eff8]">
+              <h4 className="font-serif text-sm font-normal text-[#f5f0f8]">
                 {note.headline}
               </h4>
               <p className="editorial-body text-xs text-[#b8adc6] font-light">

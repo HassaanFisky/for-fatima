@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import DynamicIsland from "./components/DynamicIsland";
 import AppleDock, { TabId } from "./components/AppleDock";
 import StoryTab from "./components/StoryTab";
@@ -35,11 +36,15 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen w-full bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans relative overflow-x-hidden">
-      {/* ─── Top Luxury Header ─── */}
+    <div className="min-h-screen w-full bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans relative overflow-x-hidden selection:bg-[#7050b8]/40 selection:text-[#f5f0f8]">
+      {/* ─── Apple Liquid Ambient Refraction Blobs ─── */}
+      <div className="liquid-orb-1" aria-hidden="true" />
+      <div className="liquid-orb-2" aria-hidden="true" />
+
+      {/* ─── Top Apple Glass Dynamic Island ─── */}
       <DynamicIsland timeGreeting={timeGreeting} />
 
-      {/* ─── Mobile-First Editorial Container ─── */}
+      {/* ─── Mobile-First Glassmorphic Container ─── */}
       <main className="relative z-10 w-full max-w-[420px] mx-auto px-3 sm:px-4 pt-3 sm:pt-4 box-border">
         <div
           role="tabpanel"
@@ -48,11 +53,27 @@ export default function Home() {
           tabIndex={0}
           className="focus:outline-none w-full"
         >
-          {activeTab === "story" && <StoryTab />}
-          {activeTab === "details" && <DetailsTab />}
-          {activeTab === "truth" && <TruthTab />}
-          {activeTab === "smile" && <SmileTab />}
-          {activeTab === "stars" && <ConstellationTab />}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 12, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.98 }}
+              transition={{
+                type: "spring",
+                stiffness: 380,
+                damping: 30,
+                mass: 0.7,
+              }}
+              className="w-full"
+            >
+              {activeTab === "story" && <StoryTab />}
+              {activeTab === "details" && <DetailsTab />}
+              {activeTab === "truth" && <TruthTab />}
+              {activeTab === "smile" && <SmileTab />}
+              {activeTab === "stars" && <ConstellationTab />}
+            </motion.div>
+          </AnimatePresence>
         </div>
 
         {/* Discreet Micro-Footer */}
@@ -61,12 +82,12 @@ export default function Home() {
             Crafted for Fatima Kamran • With quiet patience & care
           </p>
           <p className="text-[9px] uppercase font-mono tracking-widest text-[#564966]">
-            Quiet Luxury • Private Gift
+            Quiet Luxury • Apple Glass Specification
           </p>
         </footer>
       </main>
 
-      {/* ─── Editorial Bottom Navigation ─── */}
+      {/* ─── Apple Frosted Liquid Dock ─── */}
       <AppleDock activeTab={activeTab} onTabChange={setActiveTab} />
     </div>
   );

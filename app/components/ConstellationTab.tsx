@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { motion } from "framer-motion";
 import { Sparkles, Moon } from "lucide-react";
 import { audioEngine } from "../lib/sound";
 
@@ -67,27 +68,28 @@ export default function ConstellationTab() {
           {STARS.map((star) => {
             const isLit = activeStarId === star.id;
             return (
-              <button
+              <motion.button
                 type="button"
                 key={star.id}
+                whileTap={{ scale: 0.8 }}
                 onClick={() => handleStarTouch(star)}
                 style={{ left: `${star.x}%`, top: `${star.y}%` }}
                 aria-label={`Star of ${star.label}`}
-                className="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group touch-target justify-center"
+                className="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group touch-target justify-center focus-visible:outline-none"
               >
                 <span
-                  className={`w-6 h-6 rounded-full flex items-center justify-center transition-all ${
+                  className={`w-7 h-7 rounded-full flex items-center justify-center transition-all duration-300 ${
                     isLit
-                      ? "bg-[#c6b4e5] text-[#100b19] scale-125 shadow-[0_0_16px_#c6b4e5]"
-                      : "bg-white/10 text-[#c6b4e5] hover:bg-white/20"
+                      ? "bg-[#c6b4e5] text-[#100b19] scale-125 shadow-[0_0_20px_#c6b4e5,0_0_35px_rgba(152,120,209,0.8)]"
+                      : "bg-white/10 text-[#c6b4e5] hover:bg-white/20 active:scale-90"
                   }`}
                 >
-                  <Sparkles className="w-2.5 h-2.5" />
+                  <Sparkles className="w-3 h-3" />
                 </span>
-                <span className="text-[9px] mt-1 text-[#857896] font-mono">
+                <span className="text-[9px] mt-1 text-[#857896] font-mono group-hover:text-[#c6b4e5] transition-colors">
                   {star.label}
                 </span>
-              </button>
+              </motion.button>
             );
           })}
         </div>

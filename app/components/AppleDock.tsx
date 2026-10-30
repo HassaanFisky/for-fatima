@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { motion } from "framer-motion";
 import { BookOpen, Layers, ShieldCheck, Heart, Moon } from "lucide-react";
 import { audioEngine } from "../lib/sound";
 
@@ -28,7 +29,7 @@ export default function AppleDock({ activeTab, onTabChange }: AppleDockProps) {
       <div 
         role="tablist" 
         aria-label="Gift chapters"
-        className="luxury-dock rounded-full p-1.5 flex items-center justify-between max-w-[400px] w-full"
+        className="luxury-dock rounded-full p-1.5 flex items-center justify-between max-w-[400px] w-full relative"
       >
         {tabs.map((tab) => {
           const Icon = tab.icon;
@@ -45,14 +46,33 @@ export default function AppleDock({ activeTab, onTabChange }: AppleDockProps) {
                 audioEngine.playHaptic(active ? 660 : 540);
                 onTabChange(tab.id);
               }}
-              className={`flex-1 py-1.5 px-0.5 rounded-full flex flex-col items-center justify-center min-w-0 transition-all touch-target ${
-                active
-                  ? "bg-[#7050b8] text-[#f4eff8] shadow-[0_2px_12px_rgba(112,80,184,0.4)]"
-                  : "text-[#857896] hover:text-[#b8adc6]"
-              }`}
+              className="relative flex-1 py-1.5 px-0.5 rounded-full flex flex-col items-center justify-center min-w-0 transition-transform active:scale-95 duration-150 touch-target focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9878d1]"
             >
-              <Icon className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-              <span className="text-[9px] font-medium tracking-tight truncate w-full text-center mt-0.5">
+              {/* Apple Sliding Liquid Spring Pill */}
+              {active && (
+                <motion.div
+                  layoutId="appleDockActivePill"
+                  className="absolute inset-0 bg-gradient-to-b from-[#7e58cf] to-[#603eb0] rounded-full shadow-[inset_0_1px_1.5px_rgba(255,255,255,0.28),0_4px_16px_rgba(112,80,184,0.45)] border border-[rgba(214,198,245,0.3)]"
+                  transition={{
+                    type: "spring",
+                    stiffness: 480,
+                    damping: 32,
+                    mass: 0.8,
+                  }}
+                />
+              )}
+
+              <Icon
+                className={`w-3.5 h-3.5 shrink-0 z-10 transition-colors duration-200 ${
+                  active ? "text-[#f5f0f8]" : "text-[#857896] hover:text-[#b8adc6]"
+                }`}
+                aria-hidden="true"
+              />
+              <span
+                className={`text-[9px] font-medium tracking-tight truncate w-full text-center mt-0.5 z-10 transition-colors duration-200 ${
+                  active ? "text-[#f5f0f8] font-semibold" : "text-[#857896]"
+                }`}
+              >
                 {tab.label}
               </span>
             </button>

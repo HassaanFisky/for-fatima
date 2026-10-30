@@ -93,10 +93,15 @@ export default function StoryTab() {
         <AnimatePresence mode="wait">
           <motion.div
             key={current.id}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.2 }}
+            initial={{ opacity: 0, y: 10, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.98 }}
+            transition={{
+              type: "spring",
+              stiffness: 420,
+              damping: 30,
+              mass: 0.8,
+            }}
             className="my-2.5 space-y-2.5"
           >
             <blockquote className="font-serif text-base sm:text-lg font-normal text-[#f4eff8] leading-snug break-words">
@@ -108,13 +113,13 @@ export default function StoryTab() {
           </motion.div>
         </AnimatePresence>
 
-        {/* Refined Navigation Controls */}
+        {/* Refined Navigation Controls with Tactile Apple Springs */}
         <div className="flex items-center justify-between pt-2.5 border-t border-[var(--border-subtle)]">
           <button
             type="button"
             onClick={prevReflection}
             aria-label="Previous reflection"
-            className="flex items-center gap-1 text-xs text-[#b8adc6] hover:text-[#f4eff8] transition-colors py-1 px-2.5 rounded-lg hover:bg-white/5 touch-target"
+            className="flex items-center gap-1 text-xs text-[#b8adc6] hover:text-[#f4eff8] active:scale-95 transition-transform duration-150 py-1.5 px-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/5 touch-target"
           >
             <ChevronLeft className="w-3.5 h-3.5 text-[#9878d1]" />
             <span>Previous</span>
@@ -124,7 +129,7 @@ export default function StoryTab() {
             type="button"
             onClick={nextReflection}
             aria-label="Next reflection"
-            className="flex items-center gap-1 text-xs text-[#c6b4e5] hover:text-[#f4eff8] transition-colors py-1 px-2.5 rounded-lg hover:bg-white/5 touch-target font-medium"
+            className="flex items-center gap-1 text-xs text-[#c6b4e5] hover:text-[#f4eff8] active:scale-95 transition-transform duration-150 py-1.5 px-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/5 touch-target font-medium"
           >
             <span>Next</span>
             <ChevronRight className="w-3.5 h-3.5 text-[#9878d1]" />

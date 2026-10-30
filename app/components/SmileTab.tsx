@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Heart } from "lucide-react";
 import { COMFORT_NOTES } from "../config/personal";
 import { audioEngine } from "../lib/sound";
@@ -67,18 +68,27 @@ export default function SmileTab() {
         </span>
 
         <div className="py-2 flex flex-col items-center justify-center">
-          <button
+          <motion.button
             type="button"
+            whileTap={{ scale: 0.94 }}
+            animate={
+              isHoldingHeart
+                ? {
+                    scale: [1, 1.12, 1],
+                    transition: { repeat: Infinity, duration: 0.72, ease: "easeInOut" },
+                  }
+                : { scale: 1 }
+            }
             onMouseDown={startHeartbeat}
             onMouseUp={stopHeartbeat}
             onMouseLeave={stopHeartbeat}
             onTouchStart={startHeartbeat}
             onTouchEnd={stopHeartbeat}
             aria-label="Hold to feel the quiet heartbeat pulse"
-            className={`w-24 h-24 rounded-full border flex flex-col items-center justify-center transition-all duration-300 touch-target ${
+            className={`w-24 h-24 rounded-full border flex flex-col items-center justify-center transition-colors duration-300 touch-target ${
               isHoldingHeart
-                ? "scale-110 bg-[#7050b8]/20 border-[#c6b4e5] shadow-[0_0_28px_rgba(152,120,209,0.35)]"
-                : "scale-100 bg-[#100b19] border-[var(--border-subtle)] hover:border-[var(--border-prominent)]"
+                ? "bg-[#7050b8]/25 border-[#c6b4e5] shadow-[0_0_36px_rgba(152,120,209,0.45),inset_0_1px_2px_rgba(255,255,255,0.3)]"
+                : "bg-[#100b19]/80 border-[var(--border-subtle)] hover:border-[var(--border-prominent)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]"
             }`}
           >
             <Heart
@@ -89,7 +99,7 @@ export default function SmileTab() {
             <span className="text-[9px] font-mono uppercase tracking-wider text-[#857896] mt-1">
               {isHoldingHeart ? "Beating..." : "Hold me"}
             </span>
-          </button>
+          </motion.button>
         </div>
 
         <p className="editorial-body text-xs text-[#b8adc6] max-w-xs mx-auto leading-relaxed">
@@ -110,10 +120,10 @@ export default function SmileTab() {
                 key={note.id}
                 onClick={() => handleSelectNote(note.id)}
                 aria-pressed={isSelected}
-                className={`p-3.5 sm:p-4 rounded-2xl text-left transition-all touch-target border ${
+                className={`p-3.5 sm:p-4 rounded-2xl text-left transition-transform active:scale-95 duration-150 touch-target border backdrop-blur-xl ${
                   isSelected
-                    ? "bg-[#241832] border-[var(--border-prominent)] shadow-md"
-                    : "bg-[#191124] border-[var(--border-subtle)] hover:border-[var(--border-prominent)]"
+                    ? "bg-[#241832]/85 border-[var(--border-prominent)] shadow-[0_4px_16px_rgba(112,80,184,0.3)]"
+                    : "bg-[#191124]/60 border-[var(--border-subtle)] hover:border-[var(--border-prominent)]"
                 }`}
               >
                 <span className="text-[9px] font-mono uppercase tracking-widest text-[#9878d1]">
@@ -140,9 +150,22 @@ export default function SmileTab() {
               Observed with care
             </span>
           </div>
-          <p className="editorial-body text-xs sm:text-sm text-[#f4eff8] font-light leading-relaxed">
-            {activeNote.body}
-          </p>
+          <AnimatePresence mode="wait">
+            <motion.p
+              key={activeNote.id}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{
+                type: "spring",
+                stiffness: 420,
+                damping: 32,
+              }}
+              className="editorial-body text-xs sm:text-sm text-[#f4eff8] font-light leading-relaxed"
+            >
+              {activeNote.body}
+            </motion.p>
+          </AnimatePresence>
         </div>
       </section>
 

@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { ChevronDown, ShieldCheck, HeartHandshake } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronDown, HeartHandshake } from "lucide-react";
 import { CORE_PILLARS } from "../config/personal";
 import { audioEngine } from "../lib/sound";
 
@@ -14,16 +15,16 @@ export default function TruthTab() {
   };
 
   return (
-    <div className="space-y-6 sm:space-y-8 animate-fadeIn">
+    <div className="space-y-5 sm:space-y-6">
       {/* ─── Chapter Header ─── */}
       <section aria-label="Accountability header" className="text-left space-y-1.5 px-1">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#191124] border border-[var(--border-subtle)]">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#191124]/70 border border-[var(--border-subtle)] backdrop-blur-md">
           <HeartHandshake className="w-3 h-3 text-[#9878d1]" />
           <span className="editorial-kicker text-[10px] text-[#c6b4e5]">
             Chapter 02 • Sincere Accountability
           </span>
         </div>
-        <h2 className="editorial-title text-2xl sm:text-3xl text-[#f4eff8]">
+        <h2 className="editorial-title text-2xl sm:text-3xl text-[#f5f0f8]">
           The Honest Truth
         </h2>
         <p className="editorial-body text-xs sm:text-sm text-[#b8adc6]">
@@ -31,12 +32,12 @@ export default function TruthTab() {
         </p>
       </section>
 
-      {/* ─── Direct Apology Letter (Dignified & Honest) ─── */}
+      {/* ─── Direct Apology Letter (Glass Specular Elevation) ─── */}
       <section 
         aria-label="Apology letter"
         className="luxury-card-elevated p-6 sm:p-7 text-left space-y-4 relative overflow-hidden"
       >
-        <div className="space-y-3 font-serif text-xs sm:text-sm text-[#f4eff8] leading-relaxed">
+        <div className="space-y-3 font-serif text-xs sm:text-sm text-[#f5f0f8] leading-relaxed">
           <p>
             Fatima, I know there were moments when I didn&apos;t handle things the way I should have.
           </p>
@@ -49,7 +50,7 @@ export default function TruthTab() {
           <p className="text-[#b8adc6] font-light">
             You deserved to have your words heard without having to repeat yourself or feel overwhelmed.
           </p>
-          <p className="text-[#f4eff8]">
+          <p className="text-[#f5f0f8]">
             I can&apos;t ask you to trust me just because I say the right things. Trust takes time, quiet consistency, and actions.
           </p>
           <p className="text-[#b8adc6] font-light">
@@ -76,24 +77,30 @@ export default function TruthTab() {
           {CORE_PILLARS.map((pillar) => {
             const isOpen = expandedId === pillar.id;
             return (
-              <div
+              <motion.div
+                layout
+                transition={{
+                  type: "spring",
+                  stiffness: 400,
+                  damping: 32,
+                }}
                 key={pillar.id}
-                className={`luxury-card p-4 transition-all text-left ${
-                  isOpen ? "border-[var(--border-prominent)] bg-[#191124]" : ""
+                className={`luxury-card p-4 transition-colors text-left ${
+                  isOpen ? "border-[var(--border-prominent)] bg-[var(--bg-elevated)]" : ""
                 }`}
               >
                 <button
                   type="button"
                   onClick={() => toggleExpand(pillar.id)}
                   aria-expanded={isOpen}
-                  className="w-full flex items-center justify-between text-left touch-target"
+                  className="w-full flex items-center justify-between text-left touch-target focus-visible:outline-none"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#100b19] border border-[var(--border-subtle)] flex items-center justify-center shrink-0 font-serif text-xs font-semibold text-[#c6b4e5]">
+                    <div className="w-8 h-8 rounded-xl bg-[#100b19]/70 border border-[var(--border-subtle)] flex items-center justify-center shrink-0 font-serif text-xs font-semibold text-[#c6b4e5] shadow-inner">
                       {pillar.number}
                     </div>
                     <div>
-                      <h4 className="font-serif text-sm font-normal text-[#f4eff8]">
+                      <h4 className="font-serif text-sm font-normal text-[#f5f0f8]">
                         {pillar.title}
                       </h4>
                       <p className="text-[11px] text-[#b8adc6] font-light">
@@ -103,20 +110,34 @@ export default function TruthTab() {
                   </div>
 
                   <ChevronDown
-                    className={`w-4 h-4 text-[#857896] transition-transform duration-200 shrink-0 ${
+                    className={`w-4 h-4 text-[#857896] transition-transform duration-300 ease-out shrink-0 ${
                       isOpen ? "rotate-180 text-[#9878d1]" : ""
                     }`}
                   />
                 </button>
 
-                {isOpen && (
-                  <div className="mt-3 pt-3 border-t border-[var(--border-subtle)]">
-                    <p className="editorial-body text-xs text-[#b8adc6] font-light leading-relaxed pl-1">
-                      {pillar.detail}
-                    </p>
-                  </div>
-                )}
-              </div>
+                <AnimatePresence>
+                  {isOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 450,
+                        damping: 34,
+                      }}
+                      className="overflow-hidden"
+                    >
+                      <div className="mt-3 pt-3 border-t border-[var(--border-subtle)]">
+                        <p className="editorial-body text-xs text-[#b8adc6] font-light leading-relaxed pl-1">
+                          {pillar.detail}
+                        </p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
             );
           })}
         </div>
