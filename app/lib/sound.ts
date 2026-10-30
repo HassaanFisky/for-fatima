@@ -1,7 +1,7 @@
 /**
- * High-Fidelity Apple-Caliber Web Audio Engine
- * Zero external MP3 assets required. 100% private and offline-capable.
- * Default state: OFF.
+ * Quiet Luxury Ambient Sound Engine
+ * Zero external audio assets required. 100% private, offline, and lightweight.
+ * Default state: Strictly OFF / Muted.
  */
 
 export class GentleAudioEngine {
@@ -20,10 +20,9 @@ export class GentleAudioEngine {
         try {
           this.ctx = new AudioCtx();
           this.masterGain = this.ctx.createGain();
-          this.masterGain.gain.setValueAtTime(0.065, this.ctx.currentTime);
+          this.masterGain.gain.setValueAtTime(0.045, this.ctx.currentTime);
           this.masterGain.connect(this.ctx.destination);
         } catch {
-          // Graceful fallback if Web Audio is unsupported/blocked
           this.ctx = null;
           this.masterGain = null;
         }
@@ -34,8 +33,8 @@ export class GentleAudioEngine {
     }
   }
 
-  /** Subtle haptic tick sound for buttons and tab switches */
-  playHaptic(freq = 580) {
+  /** Subtle haptic tick sound for buttons and navigation */
+  playHaptic(freq = 560) {
     try {
       this.init();
       if (!this.ctx || !this.masterGain) return;
@@ -47,20 +46,20 @@ export class GentleAudioEngine {
       osc.frequency.setValueAtTime(freq, t);
 
       gain.gain.setValueAtTime(0.0001, t);
-      gain.gain.exponentialRampToValueAtTime(0.025, t + 0.012);
-      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
+      gain.gain.exponentialRampToValueAtTime(0.02, t + 0.012);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.16);
 
       osc.connect(gain);
       gain.connect(this.masterGain);
       osc.start(t);
-      osc.stop(t + 0.2);
+      osc.stop(t + 0.18);
     } catch {
-      // Ignore unsupported browser errors gracefully
+      // Graceful fallback
     }
   }
 
-  /** Warm resonant pluck note with custom lowpass biquad filter */
-  playPluck(freq: number, duration = 1.6, decay = 0.85) {
+  /** Warm resonant pluck note with lowpass biquad filter */
+  playPluck(freq: number, duration = 1.8, decay = 0.85) {
     try {
       this.init();
       if (!this.ctx || !this.masterGain) return;
@@ -72,8 +71,8 @@ export class GentleAudioEngine {
       const noteGain = this.ctx.createGain();
 
       filter.type = "lowpass";
-      filter.frequency.setValueAtTime(1200, t);
-      filter.frequency.exponentialRampToValueAtTime(280, t + duration * 0.7);
+      filter.frequency.setValueAtTime(950, t);
+      filter.frequency.exponentialRampToValueAtTime(240, t + duration * 0.7);
 
       osc1.type = this.mode === "acoustic" ? "triangle" : "sine";
       osc2.type = "sine";
@@ -82,7 +81,7 @@ export class GentleAudioEngine {
       osc2.frequency.setValueAtTime(freq * 2, t);
 
       noteGain.gain.setValueAtTime(0.0001, t);
-      noteGain.gain.exponentialRampToValueAtTime(0.05, t + 0.025);
+      noteGain.gain.exponentialRampToValueAtTime(0.045, t + 0.025);
       noteGain.gain.exponentialRampToValueAtTime(0.0001, t + duration * decay);
 
       osc1.connect(filter);
@@ -95,14 +94,14 @@ export class GentleAudioEngine {
       osc1.stop(t + duration);
       osc2.stop(t + duration);
     } catch {
-      // Ignore unsupported browser errors gracefully
+      // Graceful fallback
     }
   }
 
-  /** Harmonic chime for milestone interactions */
+  /** Harmonic chime chord */
   playChimeChord() {
     [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => {
-      setTimeout(() => this.playPluck(f, 2.2, 1.1), i * 110);
+      setTimeout(() => this.playPluck(f, 2.4, 1.2), i * 120);
     });
   }
 
@@ -111,24 +110,22 @@ export class GentleAudioEngine {
     this.isPlaying = true;
     let step = 0;
 
-    // Mode 1: Introspective minor progression (A minor / C major warmth)
     const acousticNotes = [220.0, 261.63, 329.63, 293.66, 196.0, 246.94, 329.63, 261.63];
-    // Mode 2: Dreamy sunset progression (E minor / G major chill lo-fi)
     const dreamNotes = [261.63, 329.63, 392.0, 493.88, 349.23, 440.0, 523.25, 392.0];
 
     const tick = () => {
       if (!this.isPlaying) return;
       const notes = this.mode === "acoustic" ? acousticNotes : dreamNotes;
       const freq = notes[step % notes.length];
-      this.playPluck(freq, 2.0, 0.9);
+      this.playPluck(freq, 2.2, 0.95);
       if (step % 2 === 0) {
-        this.playPluck(freq * 0.5, 2.5, 1.1); // Sub octave bass note
+        this.playPluck(freq * 0.5, 2.8, 1.2);
       }
       step++;
     };
 
     tick();
-    this.intervalId = setInterval(tick, 980);
+    this.intervalId = setInterval(tick, 1050);
   }
 
   stopLoop() {

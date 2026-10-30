@@ -1,209 +1,125 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { X, List, Grid } from "lucide-react";
-import { SIX_OBJECTS, KEEPSAKE_NOTES, DetailObject } from "../config/personal";
+import React, { useState } from "react";
+import { ChevronDown, Sparkles } from "lucide-react";
+import { KEEPSAKE_ITEMS, EDITORIAL_NOTES } from "../config/personal";
 import { audioEngine } from "../lib/sound";
 
 export default function DetailsTab() {
-  const [selectedObject, setSelectedObject] = useState<DetailObject | null>(null);
-  const [showAllAsList, setShowAllAsList] = useState(false);
-  const closeBtnRef = useRef<HTMLButtonElement>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const openObject = (obj: DetailObject) => {
-    audioEngine.playPluck(620, 1.4);
-    setSelectedObject(obj);
+  const toggleExpand = (id: string) => {
+    audioEngine.playHaptic(expandedId === id ? 480 : 620);
+    setExpandedId((prev) => (prev === id ? null : id));
   };
-
-  const closeObject = () => {
-    audioEngine.playHaptic(440);
-    setSelectedObject(null);
-  };
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && selectedObject) {
-        closeObject();
-      }
-    };
-    if (selectedObject) {
-      window.addEventListener("keydown", handleKeyDown);
-      closeBtnRef.current?.focus();
-    }
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedObject]);
 
   return (
-    <div className="space-y-5">
-      <div className="text-center space-y-1">
-        <span className="text-[10px] font-semibold tracking-wider uppercase text-[#b995b8] bg-[#211a26] px-3 py-1 rounded-full border border-[var(--border-subtle)]">
-          Chapter 01 • Interactive Keepsakes
-        </span>
-        <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[#f0eaf0]">
-          The Six Little Details
+    <div className="space-y-6 sm:space-y-8 animate-fadeIn">
+      {/* ─── Chapter Header ─── */}
+      <section aria-label="Keepsakes header" className="text-left space-y-1.5 px-1">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#191124] border border-[var(--border-subtle)]">
+          <Sparkles className="w-3 h-3 text-[#9878d1]" />
+          <span className="editorial-kicker text-[10px] text-[#c6b4e5]">
+            Chapter 01 • Curated Keepsakes
+          </span>
+        </div>
+        <h2 className="editorial-title text-2xl sm:text-3xl text-[#f4eff8]">
+          Six Quiet Reflections
         </h2>
-        <div className="flex items-center justify-center gap-3 pt-1">
-          <p className="text-xs text-[#b7aabf]">
-            {showAllAsList ? "Reading all reflections quietly." : "Tap each object to unfold a reflection."}
-          </p>
-          <button
-            type="button"
-            onClick={() => {
-              audioEngine.playHaptic(500);
-              setShowAllAsList(!showAllAsList);
-            }}
-            className="text-[11px] text-[#b995b8] hover:text-[#f0eaf0] flex items-center gap-1 underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] rounded touch-target"
-            aria-label={showAllAsList ? "Switch to grid icons" : "View all as continuous list"}
-          >
-            {showAllAsList ? (
-              <>
-                <Grid className="w-3.5 h-3.5" /> <span>Grid icons</span>
-              </>
-            ) : (
-              <>
-                <List className="w-3.5 h-3.5" /> <span>List all</span>
-              </>
-            )}
-          </button>
-        </div>
-      </div>
+        <p className="editorial-body text-xs sm:text-sm text-[#b8adc6]">
+          Thoughts kept with care, written directly for you without noise or rush.
+        </p>
+      </section>
 
-      {/* ─── Mode A: 6 Interactive Object Buttons ─── */}
-      {!showAllAsList ? (
-        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2" role="region" aria-label="Keepsake objects grid">
-          {SIX_OBJECTS.map((obj) => (
-            <button
-              type="button"
-              key={obj.id}
-              onClick={() => openObject(obj)}
-              aria-haspopup="dialog"
-              aria-label={`Open keepsake: ${obj.title}`}
-              className="ios-surface-interactive p-3 text-center flex flex-col items-center justify-center gap-1.5 min-h-[72px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8]"
-            >
-              <span className="text-2xl text-[#b995b8]" aria-hidden="true">
-                {obj.symbol}
-              </span>
-              <span className="text-[11px] font-medium text-[#f0eaf0] line-clamp-1">
-                {obj.title}
-              </span>
-              <span className="text-[9px] text-[#82738a] uppercase tracking-wider">
-                Tap
-              </span>
-            </button>
-          ))}
-        </div>
-      ) : (
-        /* ─── Mode B: Autonomy-first continuous list (No popups needed) ─── */
-        <div className="space-y-3" role="region" aria-label="Continuous keepsake reflections list">
-          {SIX_OBJECTS.map((obj) => (
-            <div key={obj.id} className="ios-surface p-4 text-left space-y-2 border border-[var(--border-subtle)]">
-              <div className="flex items-center gap-2">
-                <span className="text-xl text-[#b995b8]">{obj.symbol}</span>
-                <div>
-                  <span className="text-[10px] uppercase font-mono text-[#b995b8]">{obj.kicker}</span>
-                  <h3 className="font-serif text-sm font-semibold text-[#f0eaf0]">{obj.title}</h3>
-                </div>
-              </div>
-              <p className="font-serif italic text-xs sm:text-sm text-[#b7aabf] leading-relaxed pl-1 border-l-2 border-[#b995b8]/30">
-                &ldquo;{obj.thought}&rdquo;
-              </p>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* ─── Apple Modal Sheet for Revealed Object ─── */}
-      <AnimatePresence>
-        {selectedObject && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm"
-            onClick={closeObject}
-            role="presentation"
-          >
-            <motion.div
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="dialog-title"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.2 }}
-              onClick={(e) => e.stopPropagation()}
-              className="ios-surface-elevated p-6 max-w-sm w-full relative text-left space-y-3.5 shadow-2xl border border-[var(--border-prominent)]"
+      {/* ─── The Keepsake Collection (Direct & Accessible) ─── */}
+      <section aria-label="Keepsakes collection" className="space-y-3">
+        {KEEPSAKE_ITEMS.map((item) => {
+          const isExpanded = expandedId === item.id;
+          return (
+            <div
+              key={item.id}
+              className={`luxury-card p-4 sm:p-5 transition-all text-left ${
+                isExpanded ? "border-[var(--border-prominent)] bg-[#191124]" : "hover:border-[var(--border-prominent)]"
+              }`}
             >
               <button
-                ref={closeBtnRef}
                 type="button"
-                onClick={closeObject}
-                className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/5 text-[#f0eaf0] flex items-center justify-center hover:bg-white/10 active:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] transition-colors touch-target"
-                aria-label="Close dialog"
+                onClick={() => toggleExpand(item.id)}
+                aria-expanded={isExpanded}
+                className="w-full flex items-center justify-between gap-3 text-left touch-target"
               >
-                <X className="w-4 h-4" />
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-10 h-10 rounded-xl bg-[#100b19] border border-[var(--border-subtle)] flex items-center justify-center shrink-0 text-lg text-[#9878d1]">
+                    {item.iconSymbol}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-mono text-[#857896]">
+                        {item.num}
+                      </span>
+                      <h3 className="font-serif text-sm sm:text-base font-normal text-[#f4eff8] truncate">
+                        {item.title}
+                      </h3>
+                    </div>
+                    <p className="text-[11px] text-[#b8adc6] font-light truncate">
+                      {item.subtitle}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <span className="text-[10px] text-[#857896] uppercase font-mono hidden sm:inline">
+                    {isExpanded ? "Close" : "Read"}
+                  </span>
+                  <ChevronDown
+                    className={`w-4 h-4 text-[#857896] transition-transform duration-200 ${
+                      isExpanded ? "rotate-180 text-[#9878d1]" : ""
+                    }`}
+                  />
+                </div>
               </button>
 
-              <div className="flex items-center gap-2.5">
-                <span className="text-2xl text-[#b995b8]">
-                  {selectedObject.symbol}
-                </span>
-                <div>
-                  <p className="text-[10px] uppercase tracking-wider text-[#b995b8] font-mono">
-                    {selectedObject.kicker}
+              {/* Reflection Content (Directly Accessible) */}
+              {isExpanded && (
+                <div className="mt-3.5 pt-3.5 border-t border-[var(--border-subtle)]">
+                  <p className="font-serif italic text-xs sm:text-sm text-[#f4eff8] leading-relaxed pl-2 border-l-2 border-[#9878d1]/40 font-light">
+                    &ldquo;{item.reflection}&rdquo;
                   </p>
-                  <h3 id="dialog-title" className="text-base font-serif font-bold text-[#f0eaf0]">
-                    {selectedObject.title}
-                  </h3>
                 </div>
-              </div>
+              )}
+            </div>
+          );
+        })}
+      </section>
 
-              <div className="border-t border-[var(--border-subtle)] pt-3">
-                <p className="font-serif italic text-sm text-[#f0eaf0] leading-relaxed">
-                  &ldquo;{selectedObject.thought}&rdquo;
-                </p>
-              </div>
-
-              <div className="pt-2 text-right">
-                <button
-                  type="button"
-                  onClick={closeObject}
-                  className="px-4 py-2 rounded-xl bg-[#211a26] border border-[var(--border-subtle)] text-xs font-medium text-[#f0eaf0] active:bg-[#362c3d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] touch-target"
-                >
-                  Done
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* ─── The Keepsake Shelf ─── */}
-      <div className="space-y-2.5 pt-2">
-        <div className="flex items-center gap-2 px-1">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-[#b995b8]">
-            The Keepsake Shelf
+      {/* ─── Editorial Plaques (The Keepsake Shelf) ─── */}
+      <section aria-label="Quiet reflections shelf" className="space-y-3 pt-2">
+        <div className="px-1">
+          <h3 className="editorial-kicker text-[10px] text-[#c6b4e5]">
+            Quiet Reminders
           </h3>
         </div>
 
-        <div className="space-y-2.5">
-          {KEEPSAKE_NOTES.map((note, idx) => (
+        <div className="grid grid-cols-1 gap-2.5">
+          {EDITORIAL_NOTES.map((note) => (
             <div
-              key={idx}
-              className="ios-surface p-4 text-left space-y-1"
+              key={note.number}
+              className="luxury-card p-4 text-left space-y-1.5"
             >
-              <div className="flex items-center justify-between text-[10px] uppercase font-mono text-[#82738a]">
-                <span>{note.eyebrow}</span>
-                <span>Self Reflection</span>
+              <div className="flex items-center justify-between text-[9px] uppercase font-mono text-[#857896]">
+                <span>Note {note.number}</span>
+                <span className="text-[#9878d1]">For Fatima</span>
               </div>
-              <h4 className="font-serif text-sm font-semibold text-[#f0eaf0]">
-                {note.title}
+              <h4 className="font-serif text-sm font-normal text-[#f4eff8]">
+                {note.headline}
               </h4>
-              <p className="text-xs text-[#b7aabf] leading-relaxed font-light">
-                {note.body}
+              <p className="editorial-body text-xs text-[#b8adc6] font-light">
+                {note.content}
               </p>
             </div>
           ))}
         </div>
-      </div>
+      </section>
     </div>
   );
 }

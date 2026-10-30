@@ -10,16 +10,16 @@ import SmileTab from "./components/SmileTab";
 import ConstellationTab from "./components/ConstellationTab";
 
 function getKarachiTime() {
-  if (typeof window === "undefined") return "Karachi • Calm Hours 💜";
+  if (typeof window === "undefined") return "Karachi • Calm Hours";
   const hrs = new Date().getHours();
   if (hrs >= 1 && hrs < 6) {
-    return "Karachi • 3 AM Quiet Hours 🌙";
+    return "Karachi • 3 AM Stillness";
   } else if (hrs >= 6 && hrs < 12) {
-    return "Karachi • Morning Light ☀️";
+    return "Karachi • Morning Light";
   } else if (hrs >= 12 && hrs < 18) {
-    return "Karachi • Afternoon Calm 🌸";
+    return "Karachi • Afternoon Peace";
   } else {
-    return "Karachi • Evening Peace 💜";
+    return "Karachi • Evening Stillness";
   }
 }
 
@@ -35,18 +35,18 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#17131b] text-[#f0eaf0] font-sans selection:bg-[#362c3d] selection:text-[#f0eaf0] relative overflow-x-hidden pb-28 sm:pb-32">
-      {/* ─── Top Dynamic Island Header ─── */}
+    <div className="min-h-screen w-full bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans relative overflow-x-hidden pb-24 sm:pb-28">
+      {/* ─── Top Luxury Header ─── */}
       <DynamicIsland timeGreeting={timeGreeting} />
 
-      {/* ─── Mobile-First Main Content Container ─── */}
-      <main className="relative z-10 max-w-[420px] mx-auto px-3.5 sm:px-4 pt-3 sm:pt-5">
+      {/* ─── Mobile-First Editorial Container ─── */}
+      <main className="relative z-10 w-full max-w-[420px] mx-auto px-3 sm:px-4 pt-3 sm:pt-4 box-border">
         <div
           role="tabpanel"
           id={`panel-${activeTab}`}
           aria-labelledby={`tab-${activeTab}`}
           tabIndex={0}
-          className="focus:outline-none"
+          className="focus:outline-none w-full"
         >
           {activeTab === "story" && <StoryTab />}
           {activeTab === "details" && <DetailsTab />}
@@ -56,17 +56,17 @@ export default function Home() {
         </div>
 
         {/* Discreet Micro-Footer */}
-        <footer className="pt-8 pb-3 text-center space-y-0.5">
-          <p className="font-serif italic text-[11px] text-[#82738a]">
-            Crafted specifically for Fatima Kamran • Pure care, zero pressure
+        <footer className="pt-8 pb-3 text-center space-y-1">
+          <p className="font-serif italic text-xs text-[#857896]">
+            Crafted for Fatima Kamran • With quiet patience & care
           </p>
-          <p className="text-[9px] text-[#594d61]">
-            iOS Native Standards • Web Audio Haptics
+          <p className="text-[9px] uppercase font-mono tracking-widest text-[#564966]">
+            Quiet Luxury • Private Gift
           </p>
         </footer>
       </main>
 
-      {/* ─── Apple Glass Bottom Dock ─── */}
+      {/* ─── Editorial Bottom Navigation ─── */}
       <AppleDock activeTab={activeTab} onTabChange={setActiveTab} />
     </div>
   );

@@ -1,247 +1,153 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion } from "framer-motion";
-import { Heart, Activity, Sparkles, ChevronDown } from "lucide-react";
-import { PULSE_TILES } from "../config/personal";
+import { Sparkles, Heart } from "lucide-react";
+import { COMFORT_NOTES } from "../config/personal";
 import { audioEngine } from "../lib/sound";
 
 export default function SmileTab() {
-  const [flowerStage, setFlowerStage] = useState(1);
-  const [starIndex, setStarIndex] = useState(0);
-  const [bpm, setBpm] = useState(78);
-  const [heartPulsing, setHeartPulsing] = useState(false);
-  const [activeTileId, setActiveTileId] = useState<number>(1);
-  const [isMysteryOpen, setIsMysteryOpen] = useState(false);
+  const [selectedNoteId, setSelectedNoteId] = useState<number>(1);
+  const [isBreathing, setIsBreathing] = useState(false);
 
-  const starMoods = [
-    { face: "✨", label: "Quietly shining", desc: "Always here in peace." },
-    { face: "🌟", label: "Smiling gently", desc: "That smile looks good on the universe." },
-    { face: "💫", label: "Little orbit", desc: "Orbiting quietly for Fatima." },
-    { face: "🌙", label: "Keeping watch", desc: "Making sure you rest well." },
-  ];
+  const activeNote = COMFORT_NOTES.find((n) => n.id === selectedNoteId) || COMFORT_NOTES[0];
 
-  const handleBloomTap = () => {
-    const next = flowerStage < 5 ? flowerStage + 1 : 1;
-    setFlowerStage(next);
-    audioEngine.playPluck(480 + next * 60, 1.2);
+  const handleSelectNote = (id: number) => {
+    audioEngine.playHaptic(540);
+    setSelectedNoteId(id);
   };
 
-  const handleStarTap = () => {
-    const next = (starIndex + 1) % starMoods.length;
-    setStarIndex(next);
-    audioEngine.playHaptic(680);
-  };
-
-  const handleHeartSensor = () => {
-    audioEngine.playPluck(bpm > 95 ? 659.25 : 523.25, 0.45, 0.6);
-    setHeartPulsing(true);
-    setBpm((b) => (b < 118 ? b + 6 : 76));
-    setTimeout(() => setHeartPulsing(false), 240);
-  };
-
-  const toggleMystery = () => {
-    audioEngine.playHaptic(isMysteryOpen ? 460 : 640);
-    setIsMysteryOpen(!isMysteryOpen);
+  const toggleBreath = () => {
+    audioEngine.playHaptic(600);
+    setIsBreathing(!isBreathing);
   };
 
   return (
-    <div className="space-y-4 sm:space-y-5">
-      <div className="text-center space-y-1">
-        <span className="text-[10px] font-semibold tracking-wider uppercase text-[#b995b8] bg-[#211a26] px-3 py-1 rounded-full border border-[var(--border-subtle)]">
-          Chapter 03 • Playful Experiences
-        </span>
-        <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[#f0eaf0]">
-          A Small Reason to Smile
+    <div className="space-y-6 sm:space-y-8 animate-fadeIn">
+      {/* ─── Chapter Header ─── */}
+      <section aria-label="Comforts header" className="text-left space-y-1.5 px-1">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#191124] border border-[var(--border-subtle)]">
+          <Heart className="w-3 h-3 text-[#9878d1]" />
+          <span className="editorial-kicker text-[10px] text-[#c6b4e5]">
+            Chapter 03 • Gentle Comforts
+          </span>
+        </div>
+        <h2 className="editorial-title text-2xl sm:text-3xl text-[#f4eff8]">
+          Reasons to Smile
         </h2>
-        <p className="text-xs text-[#b7aabf]">
-          Interactive corners built to give you a quiet boost anytime you visit.
+        <p className="editorial-body text-xs sm:text-sm text-[#b8adc6]">
+          Quiet observant details and small comforts, kept without pressure.
         </p>
-      </div>
+      </section>
 
-      {/* ─── Row 1: Flower & Star ─── */}
-      <div className="grid grid-cols-2 gap-2.5">
-        {/* Blooming Flower */}
-        <div className="ios-surface p-3.5 sm:p-4 text-center flex flex-col justify-between items-center space-y-2">
-          <span className="text-[10px] font-medium text-[#b995b8] uppercase">
-            Bloom ({flowerStage}/5)
-          </span>
-
-          <button
-            type="button"
-            onClick={handleBloomTap}
-            aria-label="Tap to cycle blooming flower"
-            className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#17131b] border border-[var(--border-subtle)] flex items-center justify-center active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] transition-transform touch-target"
-          >
-            <motion.span
-              key={flowerStage}
-              initial={{ scale: 0.7 }}
-              animate={{ scale: 1 }}
-              className="text-3xl select-none"
-              aria-hidden="true"
-            >
-              {flowerStage === 1 && "🌱"}
-              {flowerStage === 2 && "🌿"}
-              {flowerStage === 3 && "🌷"}
-              {flowerStage === 4 && "🌸"}
-              {flowerStage === 5 && "💐"}
-            </motion.span>
-          </button>
-
-          <div>
-            <h4 className="font-serif text-xs font-semibold text-[#f0eaf0]">
-              {flowerStage < 5 ? "Tap to bloom" : "Full Bloom 💜"}
-            </h4>
-            <p className="text-[10px] text-[#82738a]">
-              {flowerStage < 5 ? "Patience & care" : "A gentle bouquet"}
-            </p>
-          </div>
+      {/* ─── Four Observant Tiles (Direct & Clean) ─── */}
+      <section aria-label="Observant comfort notes" className="space-y-3">
+        <div className="grid grid-cols-2 gap-2 sm:gap-2.5">
+          {COMFORT_NOTES.map((note) => {
+            const isSelected = selectedNoteId === note.id;
+            return (
+              <button
+                type="button"
+                key={note.id}
+                onClick={() => handleSelectNote(note.id)}
+                aria-pressed={isSelected}
+                className={`p-3.5 sm:p-4 rounded-2xl text-left transition-all touch-target border ${
+                  isSelected
+                    ? "bg-[#241832] border-[var(--border-prominent)] shadow-md"
+                    : "bg-[#191124] border-[var(--border-subtle)] hover:border-[var(--border-prominent)]"
+                }`}
+              >
+                <span className="text-[9px] font-mono uppercase tracking-widest text-[#9878d1]">
+                  {note.tag}
+                </span>
+                <p className="font-serif text-xs sm:text-sm text-[#f4eff8] mt-1 font-normal leading-snug">
+                  {note.label}
+                </p>
+                <p className="text-[10px] text-[#857896] mt-0.5 truncate">
+                  {note.heading}
+                </p>
+              </button>
+            );
+          })}
         </div>
 
-        {/* Mood Star */}
-        <div className="ios-surface p-3.5 sm:p-4 text-center flex flex-col justify-between items-center space-y-2">
-          <span className="text-[10px] font-medium text-[#b995b8] uppercase">
-            Mood Star
-          </span>
-
-          <button
-            type="button"
-            onClick={handleStarTap}
-            aria-label="Tap to cycle star mood"
-            className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#17131b] border border-[var(--border-subtle)] flex items-center justify-center active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] transition-transform touch-target"
-          >
-            <span className="text-3xl select-none" aria-hidden="true">
-              {starMoods[starIndex].face}
+        {/* Selected Detail Content */}
+        <div className="luxury-card p-4 sm:p-5 text-left space-y-2 border-[var(--border-prominent)]">
+          <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-2">
+            <span className="editorial-kicker text-[10px] text-[#c6b4e5]">
+              {activeNote.heading}
             </span>
-          </button>
-
-          <div>
-            <h4 className="font-serif text-xs font-semibold text-[#f0eaf0]">
-              {starMoods[starIndex].label}
-            </h4>
-            <p className="text-[10px] text-[#82738a] truncate max-w-[120px]">
-              {starMoods[starIndex].desc}
-            </p>
+            <span className="text-[9px] font-mono text-[#857896]">
+              Observed with care
+            </span>
           </div>
-        </div>
-      </div>
-
-      {/* ─── Row 2: Heart Vitals Sensor ─── */}
-      <div className="ios-surface-elevated p-4 flex items-center justify-between">
-        <div className="space-y-0.5 text-left">
-          <span className="text-[10px] font-semibold tracking-wider uppercase text-[#b995b8]">
-            Vitals Check
-          </span>
-          <h3 className="text-lg font-bold text-[#f0eaf0] flex items-center gap-2">
-            <span>{bpm} BPM</span>
-            <Activity className="w-4 h-4 text-[#b995b8]" />
-          </h3>
-          <p className="text-[11px] text-[#b7aabf]">
-            {bpm > 95
-              ? "A gentle reminder to take a deep breath and relax."
-              : "Tap heart sensor for a steady calming rhythm."}
+          <p className="editorial-body text-xs sm:text-sm text-[#f4eff8] font-light leading-relaxed">
+            {activeNote.body}
           </p>
         </div>
+      </section>
+
+      {/* ─── The Pending Gift Note (Direct & Respectful, Zero Gating) ─── */}
+      <section 
+        aria-label="Pending gift note"
+        className="luxury-card-elevated p-5 sm:p-6 text-left space-y-3 relative overflow-hidden"
+      >
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-[#100b19] border border-[var(--border-subtle)] text-[#9878d1] flex items-center justify-center">
+            <Sparkles className="w-4 h-4" />
+          </div>
+          <div>
+            <span className="editorial-kicker text-[10px] text-[#c6b4e5]">
+              A Quiet Inside Note
+            </span>
+            <h3 className="font-serif text-sm font-normal text-[#f4eff8]">
+              The October Thought
+            </h3>
+          </div>
+        </div>
+
+        <div className="space-y-2 text-xs sm:text-sm text-[#b8adc6] font-light leading-relaxed border-t border-[var(--border-subtle)] pt-3">
+          <p>
+            Bracelet wali baat aur pending birthday wish kisi screen par show karne ke liye nahi hai.
+          </p>
+          <p className="text-[#f4eff8] font-normal italic">
+            Koi shart, koi formality, ya koi dabao nahi hai. Jab bhi kabhi munasib waqt hua, yeh baat wahi poori hogi. Hamesha tumhara sukoon aur tumhari marzi pehle. 💜
+          </p>
+        </div>
+      </section>
+
+      {/* ─── Calming Breath Space (Genuine Utility for Busy Medical Routine) ─── */}
+      <section 
+        aria-label="Calming breath space"
+        className="luxury-card p-5 text-center space-y-3 relative overflow-hidden"
+      >
+        <span className="editorial-kicker text-[10px] text-[#c6b4e5]">
+          A Quiet Moment For You
+        </span>
+
+        <div className="py-2 flex flex-col items-center justify-center">
+          <div 
+            className={`w-20 h-20 rounded-full border border-[#9878d1]/30 flex items-center justify-center transition-all duration-1000 ${
+              isBreathing ? "scale-125 bg-[#9878d1]/10 border-[#9878d1]" : "scale-100 bg-transparent"
+            }`}
+          >
+            <span className="text-[11px] font-serif italic text-[#c6b4e5]">
+              {isBreathing ? "Exhale..." : "Inhale..."}
+            </span>
+          </div>
+        </div>
+
+        <p className="editorial-body text-xs text-[#b8adc6] max-w-xs mx-auto">
+          Jab bhi din bhari lage ya thakan ho, bas ek pal thehar jao aur lamba saans lo.
+        </p>
 
         <button
           type="button"
-          onClick={handleHeartSensor}
-          aria-label="Tap heart sensor for calming rhythm"
-          className={`w-12 h-12 rounded-xl bg-[#211a26] border border-[var(--border-prominent)] text-[#f0eaf0] flex items-center justify-center transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] touch-target ${
-            heartPulsing ? "scale-110" : "scale-100"
-          }`}
+          onClick={toggleBreath}
+          className="text-xs py-1.5 px-4 rounded-full bg-[#100b19] border border-[var(--border-subtle)] text-[#c6b4e5] hover:text-[#f4eff8] transition-colors touch-target"
         >
-          <Heart className="w-6 h-6 fill-current text-[#b995b8]" />
+          {isBreathing ? "Pause" : "Start calming rhythm"}
         </button>
-      </div>
-
-      {/* ─── Row 3: Detail Tiles ─── */}
-      <div className="grid grid-cols-2 gap-2" role="region" aria-label="Personal reflections tiles">
-        {PULSE_TILES.map((tile) => {
-          const isSelected = activeTileId === tile.id;
-          return (
-            <button
-              type="button"
-              key={tile.id}
-              onClick={() => {
-                audioEngine.playHaptic(540);
-                setActiveTileId(tile.id);
-              }}
-              aria-pressed={isSelected}
-              className={`p-3 rounded-xl text-left border transition-colors touch-target focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] ${
-                isSelected
-                  ? "bg-[#2b2230] text-[#f0eaf0] border-[var(--border-prominent)]"
-                  : "bg-[#211a26] text-[#b7aabf] border-[var(--border-subtle)] hover:text-[#f0eaf0]"
-              }`}
-            >
-              <span className="text-xl" aria-hidden="true">{tile.emoji}</span>
-              <p className="text-xs font-semibold mt-1 leading-snug">{tile.title}</p>
-              <p className="text-[10px] text-[#82738a] mt-0.5">
-                {tile.subtitle}
-              </p>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Tile Reveal Note */}
-      {PULSE_TILES.map(
-        (tile) =>
-          tile.id === activeTileId && (
-            <div
-              key={tile.id}
-              role="region"
-              aria-live="polite"
-              className="ios-surface p-3.5 text-left space-y-1"
-            >
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-[#b995b8]">
-                {tile.title}
-              </p>
-              <p className="text-xs text-[#f0eaf0] leading-relaxed font-light">
-                {tile.reveal}
-              </p>
-            </div>
-          )
-      )}
-
-      {/* ─── Row 4: Secret Hook (Autonomy-first, zero gating) ─── */}
-      <div className="ios-surface-elevated p-5 text-left space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[#17131b] border border-[var(--border-subtle)] text-[#b995b8] flex items-center justify-center">
-              <Sparkles className="w-4 h-4" />
-            </div>
-            <div>
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-[#b995b8]">
-                A Quiet Inside Note
-              </span>
-              <h3 className="text-sm font-bold text-[#f0eaf0]">
-                Woh Ek Baat...
-              </h3>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={toggleMystery}
-            aria-expanded={isMysteryOpen}
-            className="text-xs px-3 py-1.5 rounded-lg bg-[#211a26] border border-[var(--border-subtle)] text-[#b7aabf] hover:text-[#f0eaf0] flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] touch-target"
-          >
-            <span>{isMysteryOpen ? "Hide" : "Read note"}</span>
-            <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isMysteryOpen ? "rotate-180" : ""}`} />
-          </button>
-        </div>
-
-        {isMysteryOpen && (
-          <div className="ios-surface p-3.5 text-left space-y-2 border border-[var(--border-prominent)] mt-2">
-            <p className="text-xs font-serif italic text-[#f0eaf0] leading-relaxed">
-              Bracelet wali baat aur pending birthday wish screen par nahi—jab bhi kabhi munasib waqt hua, tab wazeh hogi.
-            </p>
-            <p className="text-xs text-[#b995b8] font-medium">
-              Koi shart ya dabao nahi hai. Hamesha izzat aur sukoon pehle. 💜
-            </p>
-          </div>
-        )}
-      </div>
+      </section>
     </div>
   );
 }

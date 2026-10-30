@@ -9,35 +9,42 @@
   --color-bg-elevated: var(--bg-elevated);
   --color-bg-interactive: var(--bg-interactive);
   
+  --color-accent-royal: var(--accent-royal);
+  --color-accent-amethyst: var(--accent-amethyst);
+  --color-accent-lavender: var(--accent-lavender);
+  
   --color-text-primary: var(--text-primary);
   --color-text-secondary: var(--text-secondary);
   --color-text-muted: var(--text-muted);
-  
-  --color-accent-plum: var(--accent-plum);
-  --color-accent: var(--accent);
 }
 
-/* ─── Apple HIG Centralized Low-Luminance Design Tokens ─── */
+/* ─── Quiet Luxury × Deep Purple Editorial Tokens ─── */
 :root {
   /* Surfaces */
-  --bg-primary: #17131b;
-  --bg-secondary: #211a26;
-  --bg-elevated: #2b2230;
-  --bg-interactive: #362c3d;
+  --bg-primary: #100b19;        /* Deepest royal velvet night */
+  --bg-secondary: #191124;      /* Deep amethyst container */
+  --bg-elevated: #241832;       /* Subtle muted plum sheet */
+  --bg-interactive: #2f2042;    /* Pressed/hover state */
+
+  /* Purple Hierarchy */
+  --accent-royal: #7050b8;       /* Royal violet */
+  --accent-amethyst: #9878d1;    /* Luminous amethyst */
+  --accent-lavender: #c6b4e5;    /* Silky soft lavender */
+  --accent-soft: rgba(152, 120, 209, 0.12);
 
   /* Typography */
-  --text-primary: #f0eaf0;
-  --text-secondary: #b7aabf;
-  --text-muted: #82738a;
+  --text-primary: #f4eff8;      /* Warm soft ivory */
+  --text-secondary: #b8adc6;    /* Muted silver-lavender */
+  --text-muted: #857896;        /* Subtle footnote text */
 
-  /* Accents */
-  --accent-plum: #b995b8;
-  --accent: var(--accent-plum);
-  --accent-soft: rgba(185, 149, 184, 0.14);
+  /* Hairline Borders & Materials */
+  --border-subtle: rgba(152, 120, 209, 0.14);
+  --border-prominent: rgba(198, 180, 229, 0.26);
+  --border-active: rgba(152, 120, 209, 0.5);
 
-  /* Materials & Borders */
-  --border-subtle: rgba(183, 170, 191, 0.12);
-  --border-prominent: rgba(185, 149, 184, 0.28);
+  /* Luxury Lighting & Shadows */
+  --shadow-luxury: 0 16px 40px -12px rgba(16, 11, 25, 0.8), 0 0 24px -6px rgba(112, 80, 184, 0.16);
+  --shadow-glow: 0 0 30px rgba(152, 120, 209, 0.18);
 }
 
 html {
@@ -57,118 +64,96 @@ body {
   text-rendering: optimizeLegibility;
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   overflow-x: hidden;
-  padding-bottom: env(safe-area-inset-bottom, 24px);
+  padding-bottom: env(safe-area-inset-bottom, 28px);
 }
 
-/* ─── Official Apple Typography Hierarchy ─── */
-.apple-title-1 {
-  font-size: 1.75rem;
-  line-height: 2.125rem;
-  font-weight: 600;
-  letter-spacing: -0.022em;
+/* ─── Luxury Editorial Typography ─── */
+.editorial-title {
+  font-family: var(--font-serif);
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  color: var(--text-primary);
 }
 
-.apple-headline {
-  font-size: 1.0625rem;
-  line-height: 1.375rem;
-  font-weight: 600;
-  letter-spacing: -0.015em;
+.editorial-subhead {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.125rem;
+  line-height: 1.625rem;
+  color: var(--accent-lavender);
 }
 
-.apple-body {
-  font-size: 0.9375rem;
-  line-height: 1.375rem;
-  letter-spacing: -0.01em;
-}
-
-.apple-callout {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  letter-spacing: -0.006em;
-}
-
-.apple-subheadline {
-  font-size: 0.8125rem;
-  line-height: 1.125rem;
-  letter-spacing: 0;
-}
-
-.apple-footnote {
-  font-size: 0.75rem;
-  line-height: 1rem;
-  letter-spacing: 0.012em;
-}
-
-.apple-caption {
+.editorial-kicker {
+  font-family: var(--font-sans);
   font-size: 0.6875rem;
-  line-height: 0.875rem;
-  letter-spacing: 0.018em;
-  color: var(--text-muted);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--accent-amethyst);
 }
 
-/* ─── Apple Color Direct Utility Classes ─── */
-.bg-apple-primary { background-color: var(--bg-primary); }
-.bg-apple-secondary { background-color: var(--bg-secondary); }
-.bg-apple-elevated { background-color: var(--bg-elevated); }
-.text-apple-primary { color: var(--text-primary); }
-.text-apple-secondary { color: var(--text-secondary); }
-.text-apple-muted { color: var(--text-muted); }
-.text-apple-plum { color: var(--accent-plum); }
-
-/* ─── Apple Native Material Surfaces ─── */
-.ios-surface {
-  background-color: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
-  border-radius: 20px;
+.editorial-body {
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  line-height: 1.5rem;
+  color: var(--text-secondary);
+  font-weight: 350;
 }
 
-.ios-surface-elevated {
-  background-color: var(--bg-elevated);
+/* ─── Bespoke Luxury Surfaces ─── */
+.luxury-card {
+  background: linear-gradient(180deg, rgba(25, 17, 36, 0.95) 0%, rgba(20, 13, 30, 0.98) 100%);
   border: 1px solid var(--border-subtle);
   border-radius: 24px;
+  box-shadow: var(--shadow-luxury);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
-.ios-surface-interactive {
-  background-color: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
-  border-radius: 18px;
-  transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1), background-color 0.15s ease, border-color 0.15s ease;
+.luxury-card-elevated {
+  background: linear-gradient(180deg, rgba(36, 24, 50, 0.96) 0%, rgba(27, 18, 38, 0.98) 100%);
+  border: 1px solid var(--border-prominent);
+  border-radius: 28px;
+  box-shadow: var(--shadow-luxury);
 }
 
-.ios-surface-interactive:active {
-  transform: scale(0.98);
-  background-color: var(--bg-interactive);
-  border-color: var(--border-prominent);
-}
-
-.ios-pill {
-  background-color: rgba(33, 26, 38, 0.92);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--border-subtle);
-}
-
-.ios-dock {
-  background-color: rgba(27, 21, 32, 0.88);
+.luxury-pill {
+  background: rgba(25, 17, 36, 0.88);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border: 1px solid var(--border-subtle);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
 }
 
-/* ─── Touch Target Minimums ─── */
+.luxury-dock {
+  background: rgba(20, 13, 30, 0.88);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6), 0 0 20px rgba(112, 80, 184, 0.12);
+}
+
+/* ─── Touch Target Minimums (Apple Standard) ─── */
 .touch-target {
   min-height: 44px;
   min-width: 44px;
 }
 
-/* ─── Visible Focus Indicators (WCAG 2.1 AA) ─── */
+/* ─── Accessible Focus Rings (WCAG 2.1 AA) ─── */
 :focus-visible {
-  outline: 2px solid var(--accent-plum);
+  outline: 2px solid var(--accent-amethyst);
   outline-offset: 2px;
 }
 
-/* ─── Custom Scrollbar ─── */
+/* ─── Restrained Ambient Glow ─── */
+.amethyst-glow {
+  position: absolute;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(152, 120, 209, 0.08) 0%, rgba(16, 11, 25, 0) 70%);
+}
+
+/* ─── Minimal Custom Scrollbar ─── */
 ::-webkit-scrollbar {
   width: 4px;
 }
@@ -176,7 +161,7 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(183, 170, 191, 0.2);
+  background: rgba(152, 120, 209, 0.2);
   border-radius: 9999px;
 }
 

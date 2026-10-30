@@ -1,196 +1,134 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mail, ChevronRight, ChevronLeft, BookOpen, X } from "lucide-react";
-import { POETIC_CARDS } from "../config/personal";
+import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
+import { POETIC_REFLECTIONS } from "../config/personal";
 import { audioEngine } from "../lib/sound";
 
 export default function StoryTab() {
-  const [envelopeOpen, setEnvelopeOpen] = useState(false);
-  const [cardIndex, setCardIndex] = useState(0);
+  const [reflectionIndex, setReflectionIndex] = useState(0);
 
-  const nextCard = useCallback(() => {
+  const nextReflection = () => {
     audioEngine.playHaptic(600);
-    setCardIndex((prev) => (prev + 1) % POETIC_CARDS.length);
-  }, []);
+    setReflectionIndex((prev) => (prev + 1) % POETIC_REFLECTIONS.length);
+  };
 
-  const prevCard = useCallback(() => {
+  const prevReflection = () => {
     audioEngine.playHaptic(520);
-    setCardIndex((prev) => (prev - 1 + POETIC_CARDS.length) % POETIC_CARDS.length);
-  }, []);
+    setReflectionIndex((prev) => (prev - 1 + POETIC_REFLECTIONS.length) % POETIC_REFLECTIONS.length);
+  };
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "ArrowRight") nextCard();
-      if (e.key === "ArrowLeft") prevCard();
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [nextCard, prevCard]);
+  const current = POETIC_REFLECTIONS[reflectionIndex];
 
   return (
-    <div className="space-y-4 sm:space-y-5">
-      {/* ─── Apple Letter Envelope (Autonomy-First) ─── */}
+    <div className="space-y-5 sm:space-y-6 animate-fadeIn">
+      {/* ─── Hero Editorial Opening (Direct, Dignified, Sincere) ─── */}
       <section 
-        aria-label="Welcome note" 
-        className="ios-surface-elevated p-5 sm:p-6 text-center relative overflow-hidden"
+        aria-label="Welcome and opening letter"
+        className="luxury-card-elevated p-5 sm:p-7 text-left relative overflow-hidden space-y-4"
       >
-        <AnimatePresence mode="wait">
-          {!envelopeOpen ? (
-            <motion.div
-              key="closed"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0, scale: 0.98 }}
-              className="space-y-3.5"
-            >
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#17131b] border border-[var(--border-subtle)] text-[11px] text-[#b7aabf]">
-                <span>Made specifically for Fatima</span>
-              </div>
+        {/* Subtle Amethyst Ambient Glow */}
+        <div className="amethyst-glow -top-16 -right-16 w-48 h-48 rounded-full" />
 
-              <h1 className="font-serif text-2xl sm:text-3xl text-[#f0eaf0] font-normal tracking-tight">
-                for fatima <span className="text-[#b995b8]">💜</span>
-              </h1>
+        {/* Editorial Header */}
+        <div className="space-y-1.5 relative z-10 border-b border-[var(--border-subtle)] pb-3.5">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#100b19] border border-[var(--border-subtle)]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#9878d1]" />
+            <span className="text-[9px] uppercase font-mono tracking-widest text-[#c6b4e5]">
+              Personal Gift • October 2026
+            </span>
+          </div>
 
-              <p className="text-xs sm:text-sm text-[#b7aabf] leading-relaxed max-w-xs mx-auto font-light">
-                I made you a little something...
-                <br />
-                <span className="italic text-[#f0eaf0]">
-                  no pressure, just a little piece of my heart.
-                </span>
-              </p>
+          <h1 className="editorial-title text-2xl sm:text-3xl text-[#f4eff8] font-normal tracking-tight">
+            for fatima kamran.
+          </h1>
 
-              <div className="flex flex-col sm:flex-row gap-2 max-w-xs mx-auto pt-1">
-                <button
-                  type="button"
-                  onClick={() => {
-                    audioEngine.playChimeChord();
-                    setEnvelopeOpen(true);
-                  }}
-                  className="w-full py-3 px-4 rounded-xl bg-[#211a26] border border-[var(--border-prominent)] text-xs font-medium text-[#f0eaf0] flex items-center justify-center gap-2 active:bg-[#362c3d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] transition-colors touch-target"
-                >
-                  <Mail className="w-4 h-4 text-[#b995b8]" />
-                  <span>Unseal the envelope</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setEnvelopeOpen(true)}
-                  className="w-full py-2.5 px-4 rounded-xl bg-transparent border border-[var(--border-subtle)] text-xs text-[#b7aabf] hover:text-[#f0eaf0] flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] transition-colors touch-target"
-                >
-                  <BookOpen className="w-3.5 h-3.5 text-[#82738a]" />
-                  <span>Read note directly</span>
-                </button>
-              </div>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="opened"
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.25 }}
-              className="space-y-3.5 text-left"
-            >
-              <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-2.5">
-                <span className="font-serif italic text-base text-[#b995b8]">
-                  hey fatima...
-                </span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    audioEngine.playHaptic(480);
-                    setEnvelopeOpen(false);
-                  }}
-                  aria-label="Fold note closed"
-                  className="w-8 h-8 rounded-full bg-white/5 text-[#b7aabf] hover:text-[#f0eaf0] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] touch-target"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              </div>
-
-              <div className="space-y-2.5 font-serif text-xs sm:text-sm text-[#f0eaf0] leading-relaxed">
-                <p>
-                  I wanted to make something instead of simply sending another long message.
-                </p>
-                <p>
-                  Something I could put real thought into, with quiet patience and no noise.
-                </p>
-                <p className="text-[#b7aabf]">
-                  You don&apos;t have to respond to this. I just wanted to build a peaceful space, and I hope it gives you a small reason to smile.
-                </p>
-              </div>
-
-              <div className="pt-2 flex items-center justify-between">
-                <button
-                  type="button"
-                  onClick={() => {
-                    audioEngine.playHaptic(480);
-                    setEnvelopeOpen(false);
-                  }}
-                  className="text-[11px] text-[#82738a] hover:text-[#f0eaf0] underline underline-offset-4 touch-target inline-flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8]"
-                >
-                  Fold note closed
-                </button>
-                <span className="text-xs font-serif italic text-[#b995b8]">
-                  — Hassaan
-                </span>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </section>
-
-      {/* ─── Poetic Card Deck (Accessible & Non-Trapping) ─── */}
-      <section aria-label="Poetic reflections deck" className="space-y-2.5">
-        <div className="flex items-center justify-between px-1">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-[#b995b8]">
-            Card {cardIndex + 1} of {POETIC_CARDS.length}
-          </span>
-          <span className="text-[11px] text-[#82738a]">Use buttons or arrow keys</span>
+          <p className="editorial-subhead text-xs sm:text-sm text-[#c6b4e5]">
+            a quiet space crafted with patience, care, and no expectations.
+          </p>
         </div>
 
-        <div
-          role="region"
-          aria-live="polite"
-          aria-label={`Reflection card ${cardIndex + 1} of ${POETIC_CARDS.length}`}
-          className="ios-surface-elevated p-5 sm:p-6 min-h-[260px] flex flex-col justify-between"
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#17131b] text-[#b7aabf] border border-[var(--border-subtle)]">
-              {POETIC_CARDS[cardIndex].tag}
-            </span>
-            <span className="text-[11px] text-[#b995b8] font-medium">
-              {POETIC_CARDS[cardIndex].badge}
-            </span>
-          </div>
+        {/* The Direct Personal Letter */}
+        <div className="space-y-3 font-serif text-xs sm:text-sm text-[#f4eff8] leading-relaxed relative z-10 break-words">
+          <p>
+            Hey Fatima,
+          </p>
+          <p className="text-[#b8adc6] font-light">
+            I wanted to make something tangible instead of sending another long, fleeting screen message. Something I could pour real craftsmanship and quiet patience into, without any of the daily digital noise.
+          </p>
+          <p className="text-[#f4eff8] font-normal pl-2.5 border-l-2 border-[#9878d1]/40 italic">
+            You don&apos;t have to respond to this. You don&apos;t have to carry any expectations. I simply wanted to build a peaceful sanctuary for you, and I hope it gives you a gentle, genuine reason to smile.
+          </p>
+        </div>
 
-          <div className="my-4 space-y-2">
-            <p className="text-lg sm:text-xl font-serif font-semibold text-[#f0eaf0] leading-snug">
-              &ldquo;{POETIC_CARDS[cardIndex].line}&rdquo;
-            </p>
-            <p className="text-xs sm:text-sm text-[#b7aabf] leading-relaxed font-light">
-              {POETIC_CARDS[cardIndex].sub}
-            </p>
-          </div>
+        {/* Signature */}
+        <div className="pt-2 flex items-center justify-between border-t border-[var(--border-subtle)] text-xs relative z-10">
+          <span className="text-[10px] text-[#857896] uppercase font-mono tracking-wider">
+            With quiet respect
+          </span>
+          <span className="font-serif italic text-sm sm:text-base text-[#c6b4e5]">
+            — Hassaan 💜
+          </span>
+        </div>
+      </section>
 
-          <div className="flex items-center justify-between pt-3 border-t border-[var(--border-subtle)] text-xs font-medium text-[#b995b8]">
-            <button
-              type="button"
-              onClick={prevCard}
-              aria-label="Previous card"
-              className="flex items-center gap-1 hover:text-[#f0eaf0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] rounded px-1.5 transition-colors touch-target"
-            >
-              <ChevronLeft className="w-4 h-4" /> Previous
-            </button>
-            <button
-              type="button"
-              onClick={nextCard}
-              aria-label="Next card"
-              className="flex items-center gap-1 hover:text-[#f0eaf0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] rounded px-1.5 transition-colors touch-target"
-            >
-              Next <ChevronRight className="w-4 h-4" />
-            </button>
+      {/* ─── Editorial Poetic Reflections (Curated, Elegant, Unforced) ─── */}
+      <section 
+        aria-label="Poetic reflections"
+        className="luxury-card p-5 sm:p-6 relative overflow-hidden space-y-3.5"
+      >
+        <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-2">
+          <div className="flex items-center gap-1.5">
+            <Sparkles className="w-3 h-3 text-[#9878d1]" />
+            <span className="editorial-kicker text-[9px] text-[#c6b4e5]">
+              {current.kicker}
+            </span>
           </div>
+          <span className="text-[9px] font-mono text-[#857896]">
+            {reflectionIndex + 1} / {POETIC_REFLECTIONS.length}
+          </span>
+        </div>
+
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={current.id}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.2 }}
+            className="my-2.5 space-y-2.5"
+          >
+            <blockquote className="font-serif text-base sm:text-lg font-normal text-[#f4eff8] leading-snug break-words">
+              &ldquo;{current.quote}&rdquo;
+            </blockquote>
+            <p className="text-xs text-[#b8adc6] leading-relaxed font-light break-words">
+              {current.context}
+            </p>
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Refined Navigation Controls */}
+        <div className="flex items-center justify-between pt-2.5 border-t border-[var(--border-subtle)]">
+          <button
+            type="button"
+            onClick={prevReflection}
+            aria-label="Previous reflection"
+            className="flex items-center gap-1 text-xs text-[#b8adc6] hover:text-[#f4eff8] transition-colors py-1 px-2.5 rounded-lg hover:bg-white/5 touch-target"
+          >
+            <ChevronLeft className="w-3.5 h-3.5 text-[#9878d1]" />
+            <span>Previous</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={nextReflection}
+            aria-label="Next reflection"
+            className="flex items-center gap-1 text-xs text-[#c6b4e5] hover:text-[#f4eff8] transition-colors py-1 px-2.5 rounded-lg hover:bg-white/5 touch-target font-medium"
+          >
+            <span>Next</span>
+            <ChevronRight className="w-3.5 h-3.5 text-[#9878d1]" />
+          </button>
         </div>
       </section>
     </div>

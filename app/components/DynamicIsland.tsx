@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { VolumeX, Disc } from "lucide-react";
+import { Volume2, VolumeX, Moon } from "lucide-react";
 import { audioEngine } from "../lib/sound";
 
 interface DynamicIslandProps {
@@ -23,10 +23,11 @@ export default function DynamicIsland({ timeGreeting }: DynamicIslandProps) {
     }
   };
 
-  const switchMode = (mode: "acoustic" | "dream") => {
+  const switchMode = () => {
+    const nextMode = audioMode === "acoustic" ? "dream" : "acoustic";
     audioEngine.playHaptic(720);
-    setAudioMode(mode);
-    audioEngine.switchMode(mode);
+    setAudioMode(nextMode);
+    audioEngine.switchMode(nextMode);
     if (!isPlaying) {
       audioEngine.startLoop();
       setIsPlaying(true);
@@ -34,73 +35,46 @@ export default function DynamicIsland({ timeGreeting }: DynamicIslandProps) {
   };
 
   return (
-    <header className="sticky top-2 sm:top-3 z-50 px-3 flex justify-center w-full">
-      <div className="ios-pill rounded-full text-[#f0eaf0] px-3 py-1.5 flex items-center justify-between gap-2.5 max-w-[420px] w-full">
-        {/* Play/Mute Audio Button (Touch target 44px equivalent area) */}
-        <div className="flex items-center gap-2 min-w-0">
+    <header className="sticky top-2 sm:top-3 z-50 px-2.5 sm:px-3 flex justify-center w-full">
+      <div className="luxury-pill rounded-full text-[#f4eff8] px-3 py-1.5 flex items-center justify-between gap-2 max-w-[420px] w-full">
+        {/* Left: Time Greeting */}
+        <div className="flex items-center gap-1.5 min-w-0">
+          <div className="w-6 h-6 rounded-full bg-[#100b19] border border-[var(--border-subtle)] flex items-center justify-center shrink-0 text-[#9878d1]">
+            <Moon className="w-3 h-3" />
+          </div>
+          <p className="text-[11px] font-medium tracking-wide text-[#f4eff8] truncate">
+            {timeGreeting}
+          </p>
+        </div>
+
+        {/* Right: Ambient Sound Controls */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          {/* Mode Switcher */}
+          <button
+            type="button"
+            onClick={switchMode}
+            aria-label={`Current sound theme: ${audioMode === "acoustic" ? "Acoustic" : "Sunset"}. Tap to switch.`}
+            className="px-2 py-0.5 rounded-full text-[9px] font-medium tracking-wider uppercase bg-[#100b19] border border-[var(--border-subtle)] text-[#c6b4e5] hover:text-[#f4eff8] transition-colors"
+          >
+            {audioMode === "acoustic" ? "Acoustic" : "Sunset"}
+          </button>
+
+          {/* Mute/Play Audio Button */}
           <button
             type="button"
             onClick={toggleSound}
-            aria-label={isPlaying ? "Mute ambient audio" : "Play subtle ambient audio (optional)"}
-            className={`w-9 h-9 rounded-full shrink-0 flex items-center justify-center transition-colors touch-target focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] ${
+            aria-label={isPlaying ? "Mute ambient audio" : "Play subtle ambient sound"}
+            className={`w-7 h-7 rounded-full shrink-0 flex items-center justify-center transition-all ${
               isPlaying
-                ? "bg-[#362c3d] text-[#f0eaf0]"
-                : "bg-white/5 text-[#b7aabf] hover:bg-white/10"
+                ? "bg-[#7050b8] text-[#f4eff8] shadow-[0_0_12px_rgba(152,120,209,0.4)]"
+                : "bg-[#100b19] border border-[var(--border-subtle)] text-[#857896] hover:text-[#b8adc6]"
             }`}
           >
             {isPlaying ? (
-              <Disc className="w-4 h-4 animate-spin text-[#b995b8]" />
+              <Volume2 className="w-3.5 h-3.5" />
             ) : (
-              <VolumeX className="w-4 h-4 text-[#82738a]" />
+              <VolumeX className="w-3.5 h-3.5" />
             )}
-          </button>
-
-          <div className="min-w-0 text-left leading-tight">
-            <div className="flex items-center gap-1.5 truncate">
-              {isPlaying && (
-                <span className="w-1.5 h-1.5 rounded-full bg-[#b995b8] shrink-0" aria-hidden="true" />
-              )}
-              <p className="text-[11px] font-medium tracking-wide truncate text-[#f0eaf0]">
-                {audioMode === "acoustic"
-                  ? "Acoustic Pluck (Lo-Fi)"
-                  : "Sunset Pad (Warm Tone)"}
-              </p>
-            </div>
-            <p className="text-[10px] text-[#82738a] truncate">
-              {timeGreeting}
-            </p>
-          </div>
-        </div>
-
-        {/* Apple Segmented Switcher */}
-        <div 
-          role="group" 
-          aria-label="Audio theme switcher"
-          className="flex items-center bg-white/5 rounded-full p-0.5 text-[10px] shrink-0 font-medium"
-        >
-          <button
-            type="button"
-            onClick={() => switchMode("acoustic")}
-            aria-pressed={audioMode === "acoustic"}
-            className={`px-2.5 py-1 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] ${
-              audioMode === "acoustic"
-                ? "bg-[#2b2230] text-[#f0eaf0] font-semibold"
-                : "text-[#b7aabf] hover:text-[#f0eaf0]"
-            }`}
-          >
-            Acoustic
-          </button>
-          <button
-            type="button"
-            onClick={() => switchMode("dream")}
-            aria-pressed={audioMode === "dream"}
-            className={`px-2.5 py-1 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] ${
-              audioMode === "dream"
-                ? "bg-[#2b2230] text-[#f0eaf0] font-semibold"
-                : "text-[#b7aabf] hover:text-[#f0eaf0]"
-            }`}
-          >
-            Sunset
           </button>
         </div>
       </div>

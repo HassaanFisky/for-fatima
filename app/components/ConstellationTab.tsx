@@ -1,244 +1,135 @@
 "use client";
 
-import React, { useState, useRef, useCallback } from "react";
-import { Star, RotateCcw, ArrowDown } from "lucide-react";
-import { CONSTELLATION_POINTS } from "../config/personal";
+import React, { useState } from "react";
+import { Sparkles, Moon } from "lucide-react";
 import { audioEngine } from "../lib/sound";
 
+interface StarPoint {
+  id: number;
+  x: number;
+  y: number;
+  label: string;
+  freq: number;
+}
+
+const STARS: StarPoint[] = [
+  { id: 1, x: 20, y: 35, label: "Patience", freq: 523.25 },
+  { id: 2, x: 50, y: 20, label: "Grace", freq: 587.33 },
+  { id: 3, x: 80, y: 35, label: "Warmth", freq: 659.25 },
+  { id: 4, x: 35, y: 65, label: "Trust", freq: 698.46 },
+  { id: 5, x: 65, y: 65, label: "Peace", freq: 783.99 },
+];
+
 export default function ConstellationTab() {
-  const [connectedIds, setConnectedIds] = useState<number[]>([]);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [activeStarId, setActiveStarId] = useState<number | null>(null);
 
-  const isComplete = connectedIds.length === CONSTELLATION_POINTS.length;
-
-  const connectStar = useCallback(
-    (id: number, freq: number) => {
-      if (!connectedIds.includes(id)) {
-        const next = [...connectedIds, id];
-        setConnectedIds(next);
-        audioEngine.playPluck(freq, 1.4, 0.9);
-        if (next.length === CONSTELLATION_POINTS.length) {
-          setTimeout(() => audioEngine.playChimeChord(), 250);
-        }
-      }
-    },
-    [connectedIds]
-  );
-
-  const handlePointerMove = (e: React.PointerEvent) => {
-    if (e.pointerType === "mouse" && e.buttons === 0) return;
-    const rect = containerRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    const px = ((e.clientX - rect.left) / rect.width) * 100;
-    const py = ((e.clientY - rect.top) / rect.height) * 100;
-
-    CONSTELLATION_POINTS.forEach((pt) => {
-      if (!connectedIds.includes(pt.id)) {
-        const dist = Math.hypot(pt.x - px, pt.y - py);
-        if (dist < 10) {
-          connectStar(pt.id, pt.freq);
-        }
-      }
-    });
-  };
-
-  const autoConnect = () => {
-    audioEngine.playChimeChord();
-    setConnectedIds(CONSTELLATION_POINTS.map((p) => p.id));
-  };
-
-  const resetConstellation = () => {
-    audioEngine.playHaptic(420);
-    setConnectedIds([]);
-  };
-
-  const scrollToLetter = () => {
-    audioEngine.playHaptic(500);
-    const el = document.getElementById("closing-letter");
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-    }
+  const handleStarTouch = (star: StarPoint) => {
+    setActiveStarId(star.id);
+    audioEngine.playPluck(star.freq, 2.0, 0.9);
+    setTimeout(() => setActiveStarId(null), 800);
   };
 
   return (
-    <div className="space-y-4 sm:space-y-5">
-      <div className="text-center space-y-1">
-        <span className="text-[10px] font-semibold tracking-wider uppercase text-[#b995b8] bg-[#211a26] px-3 py-1 rounded-full border border-[var(--border-subtle)]">
-          Chapter 04 • Quiet Night & Closing Note
-        </span>
-        <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[#f0eaf0]">
-          A Tiny Constellation
-        </h2>
-        <p className="text-xs text-[#b7aabf]">
-          An optional interactive canvas, or skip straight to the closing note.
-        </p>
-
-        {/* Autonomy-First Direct Jump */}
-        <div className="pt-1.5 flex justify-center">
-          <button
-            type="button"
-            onClick={scrollToLetter}
-            className="inline-flex items-center gap-1.5 text-xs text-[#b995b8] hover:text-[#f0eaf0] bg-[#211a26] border border-[var(--border-subtle)] px-3 py-1.5 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] transition-colors touch-target"
-          >
-            <ArrowDown className="w-3.5 h-3.5" />
-            <span>Read closing letter directly</span>
-          </button>
+    <div className="space-y-6 sm:space-y-8 animate-fadeIn">
+      {/* ─── Chapter Header ─── */}
+      <section aria-label="Closing note header" className="text-left space-y-1.5 px-1">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#191124] border border-[var(--border-subtle)]">
+          <Moon className="w-3 h-3 text-[#9878d1]" />
+          <span className="editorial-kicker text-[10px] text-[#c6b4e5]">
+            Final Chapter • With Peace
+          </span>
         </div>
-      </div>
+        <h2 className="editorial-title text-2xl sm:text-3xl text-[#f4eff8]">
+          Under Midnight Skies
+        </h2>
+        <p className="editorial-body text-xs sm:text-sm text-[#b8adc6]">
+          A closing letter written with patience, respect, and no expectations.
+        </p>
+      </section>
 
-      {/* ─── Constellation Box (Optional Interaction) ─── */}
+      {/* ─── Serene Interactive Starfield (Optional & Atmospheric, Not a Game) ─── */}
       <section 
-        aria-label="Interactive constellation canvas" 
-        className="ios-surface-elevated p-4 sm:p-5 relative overflow-hidden"
+        aria-label="Ambient starry sky"
+        className="luxury-card p-5 relative overflow-hidden text-center"
       >
-        <div
-          ref={containerRef}
-          onPointerDown={handlePointerMove}
-          onPointerMove={handlePointerMove}
-          className="relative w-full h-[280px] sm:h-[300px] select-none touch-none rounded-xl bg-[#17131b] border border-[var(--border-subtle)]"
-        >
-          {/* SVG Connection Lines */}
-          <svg
-            viewBox="0 0 100 100"
-            preserveAspectRatio="none"
-            className="w-full h-full absolute inset-0 pointer-events-none"
-            aria-hidden="true"
-          >
-            {connectedIds.length > 1 &&
-              connectedIds.map((id, idx) => {
-                if (idx === 0) return null;
-                const prev = CONSTELLATION_POINTS.find(
-                  (p) => p.id === connectedIds[idx - 1]
-                );
-                const curr = CONSTELLATION_POINTS.find((p) => p.id === id);
-                if (!prev || !curr) return null;
-                return (
-                  <line
-                    key={`${prev.id}-${curr.id}`}
-                    x1={prev.x}
-                    y1={prev.y}
-                    x2={curr.x}
-                    y2={curr.y}
-                    stroke="#b995b8"
-                    strokeWidth="0.8"
-                    strokeDasharray="1.5 1"
-                    strokeOpacity="0.8"
-                  />
-                );
-              })}
+        <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-2 mb-3">
+          <span className="text-[10px] font-mono uppercase tracking-wider text-[#857896]">
+            Karachi Starlight
+          </span>
+          <span className="text-[10px] text-[#9878d1] font-mono">
+            Touch any star
+          </span>
+        </div>
 
-            {isComplete && (
-              <polygon
-                points={CONSTELLATION_POINTS.map((p) => `${p.x},${p.y}`).join(" ")}
-                fill="rgba(185, 149, 184, 0.12)"
-                stroke="#b995b8"
-                strokeWidth="0.8"
-              />
-            )}
-          </svg>
+        <div className="relative w-full h-[180px] rounded-2xl bg-[#100b19] border border-[var(--border-subtle)] overflow-hidden flex items-center justify-center">
+          <div className="amethyst-glow inset-0 m-auto w-32 h-32 rounded-full opacity-30" />
 
-          {/* Star Buttons (Touch targets 44px with keyboard activation) */}
-          {CONSTELLATION_POINTS.map((pt) => {
-            const isLit = connectedIds.includes(pt.id);
+          {STARS.map((star) => {
+            const isLit = activeStarId === star.id;
             return (
               <button
                 type="button"
-                key={pt.id}
-                onClick={() => connectStar(pt.id, pt.freq)}
-                style={{ left: `${pt.x}%`, top: `${pt.y}%` }}
-                aria-pressed={isLit}
-                aria-label={`Connect ${pt.label} star`}
-                className="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] rounded-full touch-target justify-center"
+                key={star.id}
+                onClick={() => handleStarTouch(star)}
+                style={{ left: `${star.x}%`, top: `${star.y}%` }}
+                aria-label={`Star of ${star.label}`}
+                className="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group touch-target justify-center"
               >
                 <span
-                  className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors ${
+                  className={`w-6 h-6 rounded-full flex items-center justify-center transition-all ${
                     isLit
-                      ? "bg-[#b995b8] text-[#17131b]"
-                      : "bg-white/10 text-[#b7aabf] hover:bg-white/15"
+                      ? "bg-[#c6b4e5] text-[#100b19] scale-125 shadow-[0_0_16px_#c6b4e5]"
+                      : "bg-white/10 text-[#c6b4e5] hover:bg-white/20"
                   }`}
                 >
-                  <Star className={`w-3 h-3 ${isLit ? "fill-current" : ""}`} />
+                  <Sparkles className="w-2.5 h-2.5" />
                 </span>
-                <span className="text-[9px] mt-0.5 text-[#82738a] font-medium tracking-wide">
-                  {pt.label}
+                <span className="text-[9px] mt-1 text-[#857896] font-mono">
+                  {star.label}
                 </span>
               </button>
             );
           })}
         </div>
-
-        {/* Footer controls */}
-        <div className="pt-3.5 border-t border-[var(--border-subtle)] mt-3.5 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-center sm:text-left">
-          {isComplete ? (
-            <div className="space-y-0.5">
-              <p className="font-serif text-xs font-semibold text-[#f0eaf0]">
-                Made with care. Nothing expected in return. 💜
-              </p>
-              <p className="text-[10px] text-[#82738a]">
-                A quiet symbol of genuine effort.
-              </p>
-            </div>
-          ) : (
-            <p className="text-[11px] text-[#82738a]">
-              Tap stars or tap &ldquo;Auto-Connect&rdquo; to light them all.
-            </p>
-          )}
-
-          <div className="flex items-center gap-2">
-            {!isComplete && (
-              <button
-                type="button"
-                onClick={autoConnect}
-                className="text-xs px-3 py-1.5 rounded-lg bg-[#211a26] border border-[var(--border-prominent)] text-[#f0eaf0] hover:bg-[#2b2230] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] transition-colors flex items-center gap-1.5 touch-target"
-              >
-                <span>Auto-Connect</span>
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={resetConstellation}
-              className="text-xs px-2.5 py-1.5 rounded-lg border border-[var(--border-subtle)] text-[#b7aabf] hover:text-[#f0eaf0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b995b8] transition-colors flex items-center gap-1 touch-target"
-            >
-              <RotateCcw className="w-3 h-3" />
-              <span>Reset</span>
-            </button>
-          </div>
-        </div>
       </section>
 
-      {/* ─── Final Letter with No Expectations (Always Directly Accessible) ─── */}
-      <section
-        id="closing-letter"
-        tabIndex={-1}
-        aria-label="Final letter to Fatima"
-        className="ios-surface-elevated p-6 text-left space-y-3.5 scroll-mt-20 focus:outline-none"
+      {/* ─── Final Letter with Dignity & Zero Pressure ─── */}
+      <section 
+        aria-label="Final closing letter"
+        className="luxury-card-elevated p-6 sm:p-8 text-left space-y-4 relative overflow-hidden"
       >
-        <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-2.5">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-[#b995b8] font-mono">
-            Final Chapter • With Peace
+        <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-3">
+          <span className="text-[10px] uppercase font-mono tracking-widest text-[#c6b4e5]">
+            Closing Words
           </span>
-          <span className="text-[11px] text-[#82738a]">No pressure to reply</span>
+          <span className="text-[10px] text-[#857896]">
+            No pressure to reply
+          </span>
         </div>
 
-        <div className="space-y-3 font-serif text-xs sm:text-sm text-[#f0eaf0] leading-relaxed">
-          <p className="font-medium text-[#b995b8]">Fatima,</p>
-          <p>
+        <div className="space-y-3.5 font-serif text-sm sm:text-[15px] text-[#f4eff8] leading-relaxed">
+          <p className="font-medium text-[#c6b4e5]">
+            Fatima,
+          </p>
+          <p className="text-[#b8adc6] font-light">
             I don&apos;t know what the future holds, and I don&apos;t want to pretend that a website can fix everything.
           </p>
-          <p>
+          <p className="text-[#b8adc6] font-light">
             I just wanted to do something different and put genuine effort into expressing what I couldn&apos;t always communicate properly.
           </p>
-          <p className="text-[#f0eaf0] font-medium">
+          <p className="text-[#f4eff8] font-normal pl-3 border-l-2 border-[#9878d1]/40">
             You matter as a person, regardless of what happens between us.
           </p>
-          <p>
-            I hope life brings you peace, happiness, and the things you genuinely want for yourself.
+          <p className="text-[#b8adc6] font-light">
+            I genuinely hope life brings you peace, happiness, and the things you want for yourself.
           </p>
-          <p>Take your time, live your life, and look after yourself.</p>
-          <p className="text-xs text-[#82738a] italic pt-1">
+          <p className="text-[#f4eff8] font-light">
+            Take your time, live your life, and look after yourself.
+          </p>
+          <p className="text-[11px] text-[#857896] italic pt-2 border-t border-[var(--border-subtle)] font-sans">
             No pressure to reply. Just something I made with care.
           </p>
-          <p className="pt-2 font-serif italic text-base sm:text-lg text-[#b995b8] font-medium">
+          <p className="pt-2 font-serif italic text-base sm:text-lg text-[#c6b4e5]">
             — Hassaan 💜
           </p>
         </div>
