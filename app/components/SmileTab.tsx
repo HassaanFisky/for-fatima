@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Sparkles, Heart } from "lucide-react";
 import { COMFORT_NOTES } from "../config/personal";
 import { audioEngine } from "../lib/sound";
@@ -8,6 +8,8 @@ import { audioEngine } from "../lib/sound";
 export default function SmileTab() {
   const [selectedNoteId, setSelectedNoteId] = useState<number>(1);
   const [isBreathing, setIsBreathing] = useState(false);
+  const [isHoldingHeart, setIsHoldingHeart] = useState(false);
+  const heartbeatTimer = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const activeNote = COMFORT_NOTES.find((n) => n.id === selectedNoteId) || COMFORT_NOTES[0];
 
@@ -19,6 +21,22 @@ export default function SmileTab() {
   const toggleBreath = () => {
     audioEngine.playHaptic(600);
     setIsBreathing(!isBreathing);
+  };
+
+  const startHeartbeat = () => {
+    setIsHoldingHeart(true);
+    audioEngine.triggerHeartbeatPulse();
+    heartbeatTimer.current = setInterval(() => {
+      audioEngine.triggerHeartbeatPulse();
+    }, 720);
+  };
+
+  const stopHeartbeat = () => {
+    setIsHoldingHeart(false);
+    if (heartbeatTimer.current) {
+      clearInterval(heartbeatTimer.current);
+      heartbeatTimer.current = null;
+    }
   };
 
   return (
@@ -36,6 +54,48 @@ export default function SmileTab() {
         </h2>
         <p className="editorial-body text-xs sm:text-sm text-[#b8adc6]">
           Quiet observant details and small comforts, kept without pressure.
+        </p>
+      </section>
+
+      {/* ─── Apple iOS 27 Haptic Pulse: "The Touch of Love" ─── */}
+      <section 
+        aria-label="Tactile heartbeat connection"
+        className="luxury-card-elevated p-6 text-center space-y-3.5 relative overflow-hidden transition-all duration-500"
+      >
+        <span className="editorial-kicker text-[10px] text-[#c6b4e5]">
+          Acoustic Tactile Pulse • Hold to Feel
+        </span>
+
+        <div className="py-2 flex flex-col items-center justify-center">
+          <button
+            type="button"
+            onMouseDown={startHeartbeat}
+            onMouseUp={stopHeartbeat}
+            onMouseLeave={stopHeartbeat}
+            onTouchStart={startHeartbeat}
+            onTouchEnd={stopHeartbeat}
+            aria-label="Hold to feel the quiet heartbeat pulse"
+            className={`w-24 h-24 rounded-full border flex flex-col items-center justify-center transition-all duration-300 touch-target ${
+              isHoldingHeart
+                ? "scale-110 bg-[#7050b8]/20 border-[#c6b4e5] shadow-[0_0_28px_rgba(152,120,209,0.35)]"
+                : "scale-100 bg-[#100b19] border-[var(--border-subtle)] hover:border-[var(--border-prominent)]"
+            }`}
+          >
+            <Heart
+              className={`w-8 h-8 transition-transform duration-300 ${
+                isHoldingHeart ? "scale-125 text-[#f4eff8] fill-current" : "text-[#9878d1]"
+              }`}
+            />
+            <span className="text-[9px] font-mono uppercase tracking-wider text-[#857896] mt-1">
+              {isHoldingHeart ? "Beating..." : "Hold me"}
+            </span>
+          </button>
+        </div>
+
+        <p className="editorial-body text-xs text-[#b8adc6] max-w-xs mx-auto leading-relaxed">
+          {isHoldingHeart
+            ? "Ek khamosh dharkan jo hamesha tumhare sukoon ke sath thehri hui hai. 💜"
+            : "Press and hold for a quiet sub-bass heartbeat pulse and haptic warmth."}
         </p>
       </section>
 

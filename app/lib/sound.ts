@@ -1,12 +1,14 @@
 /**
- * Quiet Luxury Ambient Sound Engine
+ * Apple Spatial Audio & Heart Resonance Engine (iOS 27 Bespoke Spec)
  * Zero external audio assets required. 100% private, offline, and lightweight.
- * Default state: Strictly OFF / Muted.
+ * Default state: Strictly OFF / Muted until user interacts.
  */
 
-export class GentleAudioEngine {
+export class AppleSpatialAudioEngine {
   private ctx: AudioContext | null = null;
   private masterGain: GainNode | null = null;
+  private ambientOsc: OscillatorNode | null = null;
+  private ambientGain: GainNode | null = null;
   private intervalId: ReturnType<typeof setInterval> | null = null;
   public isPlaying: boolean = false;
   public mode: "acoustic" | "dream" = "acoustic";
@@ -33,7 +35,7 @@ export class GentleAudioEngine {
     }
   }
 
-  /** Subtle haptic tick sound for buttons and navigation */
+  /** Subtle Apple Taptic Engine click */
   playHaptic(freq = 560) {
     try {
       this.init();
@@ -53,6 +55,35 @@ export class GentleAudioEngine {
       gain.connect(this.masterGain);
       osc.start(t);
       osc.stop(t + 0.18);
+    } catch {
+      // Graceful fallback
+    }
+  }
+
+  /** Deep acoustic tactile heartbeat thump (46Hz Sub-bass resonance) */
+  triggerHeartbeatPulse() {
+    try {
+      this.init();
+      if (!this.ctx || !this.masterGain) return;
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(48, t);
+      osc.frequency.exponentialRampToValueAtTime(14, t + 0.22);
+
+      gain.gain.setValueAtTime(0.28, t);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.26);
+
+      osc.connect(gain);
+      gain.connect(this.masterGain);
+      osc.start(t);
+      osc.stop(t + 0.26);
+
+      if (typeof window !== "undefined" && navigator.vibrate) {
+        navigator.vibrate(18);
+      }
     } catch {
       // Graceful fallback
     }
@@ -153,4 +184,4 @@ export class GentleAudioEngine {
   }
 }
 
-export const audioEngine = new GentleAudioEngine();
+export const audioEngine = new AppleSpatialAudioEngine();
