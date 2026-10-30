@@ -23,12 +23,12 @@ export default function AppleDock({ activeTab, onTabChange }: AppleDockProps) {
   return (
     <nav 
       aria-label="Editorial chapters navigation" 
-      className="fixed bottom-2 sm:bottom-3.5 inset-x-0 z-50 px-2 sm:px-3 flex justify-center pointer-events-auto"
+      className="fixed bottom-0 inset-x-0 z-50 px-3 pb-[max(env(safe-area-inset-bottom,0px),10px)] pt-2 flex justify-center pointer-events-auto"
     >
       <div 
         role="tablist" 
         aria-label="Gift chapters"
-        className="luxury-dock rounded-full p-1 flex items-center justify-between max-w-[400px] w-full"
+        className="luxury-dock rounded-full p-1.5 flex items-center justify-between max-w-[400px] w-full"
       >
         {tabs.map((tab) => {
           const Icon = tab.icon;

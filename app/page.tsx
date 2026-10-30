@@ -35,7 +35,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen w-full bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans relative overflow-x-hidden pb-24 sm:pb-28">
+    <div className="min-h-screen w-full bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans relative overflow-x-hidden">
       {/* ─── Top Luxury Header ─── */}
       <DynamicIsland timeGreeting={timeGreeting} />
 
