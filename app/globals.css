@@ -1,253 +1,275 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "SF Pro", var(--font-sans), system-ui, sans-serif;
-  --font-serif: "New York", -apple-system-ui-serif, var(--font-serif), Georgia, serif;
+  --font-display: var(--font-display), "Zen Maru Gothic", "Hiragino Maru Gothic ProN", sans-serif;
+  --font-sans: var(--font-sans), "Nunito", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-handwritten: var(--font-handwritten), "Klee One", cursive, sans-serif;
 
-  --color-bg-primary: var(--bg-primary);
-  --color-bg-secondary: var(--bg-secondary);
-  --color-bg-elevated: var(--bg-elevated);
-  --color-bg-interactive: var(--bg-interactive);
-  
-  --color-accent-royal: var(--accent-royal);
-  --color-accent-amethyst: var(--accent-amethyst);
-  --color-accent-lavender: var(--accent-lavender);
-  
-  --color-text-primary: var(--text-primary);
-  --color-text-secondary: var(--text-secondary);
-  --color-text-muted: var(--text-muted);
+  --color-sky-top: var(--color-sky-top);
+  --color-sky-mid: var(--color-sky-mid);
+  --color-sky-horizon: var(--color-sky-horizon);
+  --color-paper-cream: var(--color-paper-cream);
+  --color-paper-lavender: var(--color-paper-lavender);
+  --color-paper-border: var(--color-paper-border);
+  --color-ink-plum: var(--color-ink-plum);
+  --color-ink-muted: var(--color-ink-muted);
+  --color-royal-violet: var(--color-royal-violet);
+  --color-periwinkle: var(--color-periwinkle);
+  --color-sakura-pink: var(--color-sakura-pink);
+  --color-sakura-deep: var(--color-sakura-deep);
+  --color-butter-star: var(--color-butter-star);
+  --color-peach-glow: var(--color-peach-glow);
+  --color-mint-leaf: var(--color-mint-leaf);
 }
 
-/* ─── Apple iOS Liquid Glassmorphism & Quiet Luxury Tokens ─── */
+/* ─── Registered Custom Properties for Smooth Sky Interpolation ─── */
+@property --sky-top {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #171233;
+}
+
+@property --sky-middle {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #2A1F55;
+}
+
+@property --sky-horizon {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #5B48A0;
+}
+
+/* ─── Master Palette 1: Konpeitō Night Tokens ─── */
 :root {
-  /* Surfaces */
-  --bg-primary: #0d0815;        /* Deep obsidian velvet night */
-  --bg-secondary: rgba(24, 16, 36, 0.65); /* Translucent amethyst frosted glass */
-  --bg-elevated: rgba(34, 22, 51, 0.72);  /* Elevated liquid glass */
-  --bg-interactive: rgba(48, 32, 70, 0.78);
+  /* Sky (Environment) */
+  --color-sky-top: #171233;
+  --color-sky-mid: #2A1F55;
+  --color-sky-horizon: #5B48A0;
+  --color-dusk-lavender: #5B48A0;
 
-  /* Purple Hierarchy */
-  --accent-royal: #7050b8;       /* Royal violet */
-  --accent-amethyst: #9878d1;    /* Luminous amethyst */
-  --accent-lavender: #c6b4e5;    /* Silky soft lavender */
-  --accent-soft: rgba(152, 120, 209, 0.14);
+  /* Paper (Reading Surfaces) */
+  --color-paper-cream: #FFF8F1;
+  --color-cream-paper: #FFF8F1;
+  --color-paper-lavender: #F4EEFF;
+  --color-lavender-paper: #F4EEFF;
+  --color-paper-border: #E5D9FA;
+  --color-paper-line: #E8E0F5;
 
-  /* Typography */
-  --text-primary: #f5f0f8;      /* Warm soft ivory */
-  --text-secondary: #b8adc6;    /* Muted silver-lavender */
-  --text-muted: #857896;        /* Subtle footnote text */
+  /* Ink (Typography) */
+  --color-ink-plum: #2E2452;
+  --color-ink-violet: #2E2452;
+  --color-ink-muted: #6B628A;
+  --color-dusty-violet: #6B628A;
 
-  /* Apple Specular Borders & Highlights */
-  --border-subtle: rgba(198, 180, 229, 0.16);
-  --border-prominent: rgba(214, 198, 245, 0.32);
-  --border-active: rgba(152, 120, 209, 0.6);
+  /* Accents & Illustration Fills */
+  --color-royal-violet: #5E3FB8;
+  --color-amethyst-dream: #9B7BE8;
+  --color-periwinkle: #B9C4FF;
+  --color-sakura-pink: #F6B8CF;
+  --color-sakura-deep: #E5789E;
+  --color-butter-star: #FFE9A8;
+  --color-butter-yellow: #FFE9A8;
+  --color-starlight: #FFF4D6;
+  --color-peach-glow: #FFD3BF;
+  --color-soft-peach: #FFD3BF;
+  --color-mint-leaf: #A8DEC9;
 
-  /* Apple Liquid Glass Rim & Inner Specular Lighting */
-  --glass-rim: inset 0 1px 1px 0 rgba(255, 255, 255, 0.18);
-  --glass-rim-elevated: inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.24);
-  --glass-glow: inset 0 0 20px 0 rgba(152, 120, 209, 0.08);
-
-  /* Shadows */
-  --shadow-luxury: 0 18px 44px -12px rgba(0, 0, 0, 0.6), 0 0 24px -4px rgba(112, 80, 184, 0.16);
-  --shadow-glow: 0 0 32px rgba(152, 120, 209, 0.24);
+  /* Character Two-Tone Tokens (Mochi & Yume) */
+  --color-mochi-base: #FFF3DF;
+  --color-mochi-shadow: #F1DDBE;
+  --color-yume-base: #D8CCF7;
+  --color-yume-shadow: #BFB0EA;
 }
 
 html {
   scroll-behavior: smooth;
   -webkit-tap-highlight-color: transparent;
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  color-scheme: dark;
+  background-color: var(--color-sky-top);
+  color: var(--color-ink-plum);
 }
 
 body {
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
+  background-color: var(--color-sky-top);
+  color: var(--color-ink-plum);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   overflow-x: hidden;
-  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 84px);
 }
 
-/* ─── Luxury Editorial Typography ─── */
-.editorial-title {
-  font-family: var(--font-serif);
-  font-size: 1.875rem;
-  line-height: 2.25rem;
-  font-weight: 400;
-  letter-spacing: -0.025em;
-  color: var(--text-primary);
+/* ─── Font Utility Classes ─── */
+.font-display {
+  font-family: var(--font-display), "Zen Maru Gothic", sans-serif;
 }
 
-.editorial-subhead {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 1.125rem;
-  line-height: 1.625rem;
-  color: var(--accent-lavender);
+.font-sans {
+  font-family: var(--font-sans), "Nunito", sans-serif;
 }
 
-.editorial-kicker {
-  font-family: var(--font-sans);
-  font-size: 0.6875rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  font-weight: 600;
-  color: var(--accent-amethyst);
+.font-handwritten {
+  font-family: var(--font-handwritten), "Klee One", cursive, sans-serif;
 }
 
-.editorial-body {
-  font-family: var(--font-sans);
-  font-size: 0.9375rem;
-  line-height: 1.5rem;
-  color: var(--text-secondary);
-  font-weight: 350;
+/* ─── Sky Living Backdrop ─── */
+.sky-living-backdrop {
+  background: linear-gradient(
+    180deg,
+    var(--sky-top) 0%,
+    var(--sky-middle) 54%,
+    var(--sky-horizon) 100%
+  );
+  transition: --sky-top 1.2s ease, --sky-middle 1.2s ease, --sky-horizon 1.2s ease;
 }
 
-/* ─── Apple Frosted Glass Materials & Spring Tactility ─── */
-.luxury-card {
-  background: var(--bg-secondary);
-  backdrop-filter: blur(32px) saturate(190%);
-  -webkit-backdrop-filter: blur(32px) saturate(190%);
-  border: 1px solid var(--border-subtle);
-  border-radius: 26px;
-  box-shadow: var(--glass-rim), var(--glass-glow), var(--shadow-luxury);
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.25s ease, box-shadow 0.25s ease;
+/* ─── Paper Surfaces (Opaque, Crisp 1px Border, Single Warm Shadow) ─── */
+.paper-card-cream {
+  background-color: var(--color-paper-cream);
+  border: 1px solid var(--color-paper-border);
+  box-shadow: 0 12px 32px rgba(23, 18, 51, 0.24);
 }
 
-.luxury-card:hover {
-  border-color: var(--border-prominent);
-  box-shadow: var(--glass-rim), var(--glass-glow), 0 22px 48px -12px rgba(0, 0, 0, 0.65), 0 0 32px -4px rgba(152, 120, 209, 0.22);
+.paper-card-lavender {
+  background-color: var(--color-paper-lavender);
+  border: 1px solid var(--color-paper-border);
+  box-shadow: 0 12px 32px rgba(23, 18, 51, 0.24);
 }
 
-.luxury-card:active {
-  transform: scale(0.985);
-  transition-duration: 0.12s;
+.paper-pill-surface {
+  background-color: var(--color-paper-cream);
+  border: 1px solid var(--color-paper-border);
+  box-shadow: 0 6px 18px rgba(23, 18, 51, 0.2);
 }
 
-.luxury-card-elevated {
-  background: var(--bg-elevated);
-  backdrop-filter: blur(36px) saturate(200%);
-  -webkit-backdrop-filter: blur(36px) saturate(200%);
-  border: 1px solid var(--border-prominent);
-  border-radius: 28px;
-  box-shadow: var(--glass-rim-elevated), var(--glass-glow), 0 24px 52px -12px rgba(0, 0, 0, 0.7), 0 0 36px -4px rgba(112, 80, 184, 0.22);
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+/* ─── Single Frosted Bookmark Navigation Pill (Only backdrop-filter element on page) ─── */
+.nav-frosted-bookmark {
+  background-color: rgba(255, 248, 241, 0.92);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-paper-border);
+  box-shadow: 0 10px 28px rgba(23, 18, 51, 0.28);
 }
 
-.luxury-pill {
-  background: rgba(20, 13, 30, 0.72);
-  backdrop-filter: blur(30px) saturate(190%);
-  -webkit-backdrop-filter: blur(30px) saturate(190%);
-  border: 1px solid var(--border-subtle);
-  box-shadow: var(--glass-rim), 0 8px 26px rgba(0, 0, 0, 0.5), 0 0 18px rgba(112, 80, 184, 0.14);
+/* ─── Contained Night-Sky Window for the Constellation Section ─── */
+.constellation-night-window {
+  background: linear-gradient(
+    180deg,
+    var(--color-sky-top) 0%,
+    var(--color-sky-mid) 56%,
+    var(--color-sky-horizon) 100%
+  );
+  border: 1px solid var(--color-paper-border);
+  box-shadow: 0 16px 40px rgba(23, 18, 51, 0.34);
 }
 
-.luxury-dock {
-  background: rgba(18, 11, 28, 0.76);
-  backdrop-filter: blur(36px) saturate(210%);
-  -webkit-backdrop-filter: blur(36px) saturate(210%);
-  border: 1px solid var(--border-prominent);
-  box-shadow: var(--glass-rim-elevated), 0 16px 44px rgba(0, 0, 0, 0.7), 0 0 28px rgba(112, 80, 184, 0.22);
+/* ─── Ambient Star Twinkle Classes (4 CSS classes max) ─── */
+@keyframes konpeito-twinkle {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(0.92);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
 }
 
-/* ─── Apple Spring Physics Micro-Interactions ─── */
-.apple-spring {
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease, border-color 0.2s ease;
+.star-twinkle-1 {
+  animation: konpeito-twinkle 4.2s ease-in-out infinite;
+}
+.star-twinkle-2 {
+  animation: konpeito-twinkle 5.4s ease-in-out infinite;
+}
+.star-twinkle-3 {
+  animation: konpeito-twinkle 6.1s ease-in-out infinite;
+}
+.star-twinkle-4 {
+  animation: konpeito-twinkle 4.8s ease-in-out infinite;
 }
 
-.apple-spring:active {
-  transform: scale(0.92);
-  transition-duration: 0.1s;
+/* ─── Cloud Drift Animations (Transform-only) ─── */
+@keyframes cloud-drift-x {
+  0%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(14px, 0, 0);
+  }
 }
 
-/* ─── Touch Target Minimums (Apple Standard) ─── */
-.touch-target {
-  min-height: 44px;
-  min-width: 44px;
+.cloud-drift-slow {
+  animation: cloud-drift-x 38s ease-in-out infinite;
 }
 
-/* ─── Accessible Focus Rings (WCAG 2.1 AA) ─── */
+.cloud-drift-mid {
+  animation: cloud-drift-x 30s ease-in-out infinite reverse;
+}
+
+/* ─── Bubble & Sakura Drift Keyframes (Transform + Opacity only) ─── */
+@keyframes bubble-rise {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.9);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.78;
+  }
+  85% {
+    opacity: 0.72;
+  }
+  100% {
+    transform: translate3d(12px, -96vh, 0) scale(1.04);
+    opacity: 0;
+  }
+}
+
+.bubble-float-up {
+  animation-name: bubble-rise;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes sakura-fall {
+  0% {
+    transform: translate3d(0, -24px, 0) rotate(0deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.85;
+  }
+  85% {
+    opacity: 0.75;
+  }
+  100% {
+    transform: translate3d(-28px, 96vh, 0) rotate(220deg);
+    opacity: 0;
+  }
+}
+
+.sakura-drift-down {
+  animation-name: sakura-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+/* ─── Accessible Focus Ring ─── */
 :focus-visible {
-  outline: 2px solid var(--accent-amethyst);
+  outline: 2px solid var(--color-royal-violet);
   outline-offset: 2px;
 }
 
-/* ─── Liquid Ambient Refraction Blobs ─── */
-@keyframes liquid-drift-1 {
-  0%, 100% {
-    transform: translate(0, 0) scale(1);
-  }
-  33% {
-    transform: translate(30px, -25px) scale(1.15);
-  }
-  66% {
-    transform: translate(-25px, 20px) scale(0.92);
-  }
-}
-
-@keyframes liquid-drift-2 {
-  0%, 100% {
-    transform: translate(0, 0) scale(1.08);
-  }
-  33% {
-    transform: translate(-30px, 25px) scale(0.92);
-  }
-  66% {
-    transform: translate(20px, -30px) scale(1.14);
-  }
-}
-
-.liquid-orb-1 {
-  position: fixed;
-  top: 15%;
-  left: 20%;
-  width: 280px;
-  height: 280px;
-  border-radius: 9999px;
-  background: radial-gradient(circle, rgba(152, 120, 209, 0.15) 0%, rgba(112, 80, 184, 0.05) 50%, transparent 70%);
-  filter: blur(48px);
-  pointer-events: none;
-  z-index: 0;
-  animation: liquid-drift-1 14s ease-in-out infinite;
-}
-
-.liquid-orb-2 {
-  position: fixed;
-  bottom: 20%;
-  right: 15%;
-  width: 320px;
-  height: 320px;
-  border-radius: 9999px;
-  background: radial-gradient(circle, rgba(112, 80, 184, 0.18) 0%, rgba(70, 35, 110, 0.06) 50%, transparent 70%);
-  filter: blur(56px);
-  pointer-events: none;
-  z-index: 0;
-  animation: liquid-drift-2 18s ease-in-out infinite;
-}
-
-/* ─── Minimal Custom Scrollbar ─── */
-::-webkit-scrollbar {
-  width: 4px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(152, 120, 209, 0.25);
-  border-radius: 9999px;
-}
-
+/* ─── Reduced Motion Guardrail ─── */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
-  }
-  .liquid-orb-1, .liquid-orb-2 {
-    animation: none !important;
   }
 }

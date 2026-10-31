@@ -1,25 +1,32 @@
 import type { Metadata, Viewport } from "next";
-import { Plus_Jakarta_Sans, Playfair_Display } from "next/font/google";
+import { Zen_Maru_Gothic, Nunito, Klee_One } from "next/font/google";
 import "./globals.css";
 
-const jakarta = Plus_Jakarta_Sans({
-  variable: "--font-sans",
+const zenMaru = Zen_Maru_Gothic({
+  variable: "--font-display",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
+  weight: ["500", "700"],
   display: "swap",
 });
 
-const playfair = Playfair_Display({
-  variable: "--font-serif",
+const nunito = Nunito({
+  variable: "--font-sans",
   subsets: ["latin"],
-  style: ["normal", "italic"],
-  weight: ["400", "500", "600"],
+  weight: ["400", "600"],
+  display: "swap",
+});
+
+const kleeOne = Klee_One({
+  variable: "--font-handwritten",
+  subsets: ["latin"],
+  weight: ["400"],
   display: "swap",
 });
 
 export const metadata: Metadata = {
   title: "for fatima 💜",
-  description: "A private digital gift crafted with care, patience, and quiet luxury.",
+  description:
+    "A little paper night-sky, handmade for Fatima Kamran by Hassaan.",
   robots: {
     index: false,
     follow: false,
@@ -32,23 +39,23 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#100b19",
+  themeColor: "#171233",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
   viewportFit: "cover",
-  userScalable: false,
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html
       lang="en"
-      className={`${jakarta.variable} ${playfair.variable} antialiased selection:bg-[#2f2042] selection:text-[#f4eff8]`}
+      className={`${zenMaru.variable} ${nunito.variable} ${kleeOne.variable} antialiased`}
     >
-      <body className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans">
-        {children}
-      </body>
+      <body className="min-h-screen font-sans">{children}</body>
     </html>
   );
 }
