@@ -58,13 +58,13 @@ export default function SmileTab() {
         </p>
       </section>
 
-      {/* ─── Apple iOS 27 Haptic Pulse: "The Touch of Love" ─── */}
+      {/* ─── A Quiet Resonance: Gentle Tactile Heartbeat ─── */}
       <section 
-        aria-label="Tactile heartbeat connection"
+        aria-label="Quiet heartbeat resonance"
         className="luxury-card-elevated p-6 text-center space-y-3.5 relative overflow-hidden transition-all duration-500"
       >
         <span className="editorial-kicker text-[10px] text-[#c6b4e5]">
-          Acoustic Tactile Pulse • Hold to Feel
+          A Quiet Resonance • Touch & Hold
         </span>
 
         <div className="py-2 flex flex-col items-center justify-center">
@@ -97,15 +97,15 @@ export default function SmileTab() {
               }`}
             />
             <span className="text-[9px] font-mono uppercase tracking-wider text-[#857896] mt-1">
-              {isHoldingHeart ? "Beating..." : "Hold me"}
+              {isHoldingHeart ? "Stillness..." : "Hold"}
             </span>
           </motion.button>
         </div>
 
         <p className="editorial-body text-xs text-[#b8adc6] max-w-xs mx-auto leading-relaxed">
           {isHoldingHeart
-            ? "Ek khamosh dharkan jo hamesha tumhare sukoon ke sath thehri hui hai. 💜"
-            : "Press and hold for a quiet sub-bass heartbeat pulse and haptic warmth."}
+            ? "Ek khamosh thehrao jo hamesha tumhare sukoon ke sath hai. 💜"
+            : "Press and hold for a gentle, calming heartbeat pulse."}
         </p>
       </section>
 

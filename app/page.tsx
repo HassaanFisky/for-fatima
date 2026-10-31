@@ -81,9 +81,6 @@ export default function Home() {
           <p className="font-serif italic text-xs text-[#857896]">
             Crafted for Fatima Kamran • With quiet patience & care
           </p>
-          <p className="text-[9px] uppercase font-mono tracking-widest text-[#564966]">
-            Quiet Luxury • Apple Glass Specification
-          </p>
         </footer>
       </main>
 
