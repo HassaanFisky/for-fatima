@@ -1,5 +1,4 @@
 import type { AstronomySnapshot } from "./astronomy";
-import type { LocationResolution } from "./location";
 import type { DeviceClockSnapshot } from "./time";
 import {
   PHASE_PALETTES,
@@ -35,9 +34,6 @@ export interface WorldState {
   timezone: string;
   utcOffsetMinutesEast: number;
 
-  calculationMode: "device-location" | "creator-fallback" | "clock-only";
-  locationPermission: LocationResolution["permission"];
-
   solarAltitude: number | null;
   solarAzimuth: number | null;
   solarRising: boolean | null;
@@ -72,12 +68,12 @@ const NEXT_PHASE: Record<WorldPhase, WorldPhase> = {
 const BUBBLE_DENSITY: Record<WorldPhase, number> = {
   preDawn: 0.35,
   sunrise: 0.55,
-  morning: 0.9,
-  afternoon: 0.7,
+  morning: 0.85,
+  afternoon: 0.65,
   goldenHour: 0.45,
-  sunset: 0.3,
+  sunset: 0.35,
   blueHour: 0.35,
-  night: 0.25,
+  night: 0.28,
 };
 
 const WARMTH: Record<WorldPhase, number> = {
@@ -137,7 +133,6 @@ function mixHex(from: string, to: string, amount: number): string {
 
   const mixed = a.map((value, index) => {
     const channel = Math.round(value + (b[index] - value) * t);
-    // Floor at #171233 per channel to ensure no pixel drops darker than Midnight Indigo
     const minChannel = index === 0 ? 0x17 : index === 1 ? 0x12 : 0x33;
     return Math.max(minChannel, channel);
   });
@@ -161,6 +156,9 @@ function mixPalette(
       to.atmosphericAccent,
       amount
     ),
+    hillFar: mixHex(from.hillFar, to.hillFar, amount),
+    hillMid: mixHex(from.hillMid, to.hillMid, amount),
+    hillForeground: mixHex(from.hillForeground, to.hillForeground, amount),
   };
 }
 
@@ -169,19 +167,16 @@ function celestialScreenPosition(
   azimuth: number
 ): ScreenPosition {
   const azimuthRadians = (azimuth * Math.PI) / 180;
-
-  // East appears left, west appears right, solar transit near centre.
   const xPercent = Math.min(
     90,
     Math.max(10, 50 - 38 * Math.sin(azimuthRadians))
   );
-
   const normalizedAltitude = inverseLerp(-6, 75, altitude);
-  const yPercent = 78 - normalizedAltitude * 62;
+  const yPercent = 72 - normalizedAltitude * 56;
 
   return {
     xPercent,
-    yPercent: Math.min(82, Math.max(14, yPercent)),
+    yPercent: Math.min(76, Math.max(12, yPercent)),
   };
 }
 
@@ -256,15 +251,10 @@ function deriveAstronomicalPhase(
 
 export function deriveClockOnlyPhase(
   now: Date,
-  utcOffsetMinutesEast?: number
+  utcOffsetMinutesEast = 300
 ): { phase: WorldPhase; progress: number } {
-  let minutes: number;
-  if (typeof utcOffsetMinutesEast === "number") {
-    const shifted = new Date(now.getTime() + utcOffsetMinutesEast * 60_000);
-    minutes = shifted.getUTCHours() * 60 + shifted.getUTCMinutes();
-  } else {
-    minutes = now.getHours() * 60 + now.getMinutes();
-  }
+  const shifted = new Date(now.getTime() + utcOffsetMinutesEast * 60_000);
+  const minutes = shifted.getUTCHours() * 60 + shifted.getUTCMinutes();
 
   if (minutes >= 270 && minutes < 360) {
     return { phase: "preDawn", progress: inverseLerp(270, 360, minutes) };
@@ -292,27 +282,20 @@ export function deriveClockOnlyPhase(
 
 function approximateSunPosition(
   now: Date,
-  utcOffsetMinutesEast?: number
+  utcOffsetMinutesEast = 300
 ): ScreenPosition {
-  let minutes: number;
-  if (typeof utcOffsetMinutesEast === "number") {
-    const shifted = new Date(now.getTime() + utcOffsetMinutesEast * 60_000);
-    minutes = shifted.getUTCHours() * 60 + shifted.getUTCMinutes();
-  } else {
-    minutes = now.getHours() * 60 + now.getMinutes();
-  }
-
+  const shifted = new Date(now.getTime() + utcOffsetMinutesEast * 60_000);
+  const minutes = shifted.getUTCHours() * 60 + shifted.getUTCMinutes();
   const dayProgress = inverseLerp(6 * 60, 18 * 60, minutes);
 
   return {
     xPercent: 14 + dayProgress * 72,
-    yPercent: 74 - Math.sin(dayProgress * Math.PI) * 52,
+    yPercent: 70 - Math.sin(dayProgress * Math.PI) * 50,
   };
 }
 
 export function buildWorldState(
   clock: DeviceClockSnapshot,
-  location: LocationResolution,
   astronomy: AstronomySnapshot | null
 ): WorldState {
   const derived = astronomy
@@ -348,8 +331,6 @@ export function buildWorldState(
       localTime: clock.now,
       timezone: clock.timeZone,
       utcOffsetMinutesEast: clock.utcOffsetMinutesEast,
-      calculationMode: "clock-only",
-      locationPermission: location.permission,
 
       solarAltitude: null,
       solarAzimuth: null,
@@ -363,7 +344,7 @@ export function buildWorldState(
         derived.phase === "night" ||
         derived.phase === "blueHour" ||
         derived.phase === "preDawn"
-          ? { xPercent: 74, yPercent: 20 }
+          ? { xPercent: 76, yPercent: 18 }
           : null,
 
       sunrise: null,
@@ -413,12 +394,12 @@ export function buildWorldState(
         bubbleDensity: BUBBLE_DENSITY[derived.phase],
         petalDensity:
           derived.phase === "sunrise"
-            ? 0.85
+            ? 0.75
             : derived.phase === "morning"
-              ? 0.4
+              ? 0.38
               : derived.phase === "goldenHour"
-                ? 0.35
-                : 0,
+                ? 0.32
+                : 0.15,
       },
 
       palette,
@@ -444,13 +425,6 @@ export function buildWorldState(
     localTime: clock.now,
     timezone: clock.timeZone,
     utcOffsetMinutesEast: clock.utcOffsetMinutesEast,
-
-    calculationMode:
-      location.location?.source === "device"
-        ? "device-location"
-        : "creator-fallback",
-
-    locationPermission: location.permission,
 
     solarAltitude: altitude,
     solarAzimuth: astronomy.sun.azimuth,
@@ -484,12 +458,12 @@ export function buildWorldState(
       bubbleDensity: BUBBLE_DENSITY[derived.phase],
       petalDensity:
         derived.phase === "sunrise"
-          ? 0.85
+          ? 0.75
           : derived.phase === "morning"
-            ? 0.4
+            ? 0.38
             : derived.phase === "goldenHour"
-              ? 0.35
-              : 0,
+              ? 0.32
+              : 0.15,
     },
 
     palette,

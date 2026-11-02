@@ -1,101 +1,161 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { CLOSING_PROMISE } from "../../config/personal";
+import { OCTOBER_GIFT, CLOSING_PROMISE } from "../../config/personal";
 import { PaperCard } from "../illustrations/PaperCraft";
-import { ClosingBackScene } from "../illustrations/Characters";
+import { GiftBoxScene, ClosingBackScene } from "../illustrations/Characters";
 import { KonpeitoCandy } from "../illustrations/Konpeito";
+import { IconSparkle, IconRestart } from "../icons/StoryIcons";
+import { useLivingWorld } from "../world/LivingWorldProvider";
 import { fadeUp } from "../../lib/motion";
 
-export function ClosingSection() {
+export function ClosingSection({
+  onReturnToStart,
+}: {
+  onReturnToStart: () => void;
+}) {
+  const { playChord, playNote } = useLivingWorld();
+  const [unwrapped, setUnwrapped] = useState(false);
+
+  const handleRibbonTap = () => {
+    setUnwrapped((prev) => !prev);
+    playChord();
+  };
+
+  const handleRestart = () => {
+    playNote(0);
+    onReturnToStart();
+  };
+
   return (
-    <footer
+    <section
       id="closing"
       aria-labelledby="closing-heading"
-      className="relative z-10 max-w-[38rem] mx-auto px-4 sm:px-6 pt-12 pb-36"
+      className="relative w-full h-full flex flex-col items-center justify-center px-4 sm:px-6 py-4 z-10"
     >
-      {/* Pose #8 — Mochi & Yume seen from behind, looking up at the night sky */}
-      <div className="flex flex-col items-center text-center mb-4">
-        <ClosingBackScene />
-      </div>
+      <div className="w-full max-w-[36rem] mx-auto">
+        {/* Scene Header + Gift Box Illustration */}
+        <div className="flex flex-col items-center text-center mb-3">
+          <div className="inline-flex items-center gap-2 rounded-full px-3.5 py-1 text-xs font-semibold paper-pill-surface mb-1">
+            <KonpeitoCandy flavor="sakura" size={15} />
+            <span style={{ color: "var(--color-royal-violet)" }}>
+              Gift & Closing
+            </span>
+          </div>
 
-      {/* Final Closing Letter on Cream Paper */}
-      <motion.div
-        variants={fadeUp}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.15 }}
-      >
-        <PaperCard variant="cream" washi="top-left">
-          <p
-            className="text-xs font-semibold uppercase tracking-wider mb-1"
+          <GiftBoxScene
+            unwrapped={unwrapped}
+            onToggleUnwrap={handleRibbonTap}
+          />
+
+          <button
+            type="button"
+            onClick={handleRibbonTap}
+            className="mt-1 inline-flex items-center gap-1.5 rounded-full px-3.5 py-1 text-xs font-semibold paper-pill-surface transition-transform active:scale-95 min-h-[34px]"
             style={{ color: "var(--color-royal-violet)" }}
           >
-            {CLOSING_PROMISE.subtitle}
-          </p>
+            <IconSparkle size={14} />
+            <span>
+              {unwrapped
+                ? "Ribbon untied · Keepsake open"
+                : "Tap the ribbon for a gentle sparkle"}
+            </span>
+          </button>
+        </div>
 
-          <h2
-            id="closing-heading"
-            className="font-display font-bold mb-4"
-            style={{
-              fontSize: "clamp(1.375rem, 3.5vw, 1.875rem)",
-              lineHeight: 1.25,
-              color: "var(--color-ink-plum)",
-            }}
-          >
-            {CLOSING_PROMISE.title}
-          </h2>
+        {/* Combined Restrained Gift Reveal & Closing Message on Cream Paper */}
+        <motion.div variants={fadeUp} initial="hidden" animate="visible">
+          <PaperCard variant="cream" washi="top-left" stamp>
+            {/* Part 1: 15 October Keepsake Note */}
+            <div className="flex items-center justify-between gap-2 mb-1.5">
+              <span
+                className="text-xs font-semibold uppercase tracking-wider"
+                style={{ color: "var(--color-royal-violet)" }}
+              >
+                {OCTOBER_GIFT.subtitle}
+              </span>
+              <span
+                className="font-handwritten text-xs sm:text-sm px-2.5 py-0.5 rounded-full paper-card-lavender"
+                style={{ color: "var(--color-royal-violet)" }}
+              >
+                {OCTOBER_GIFT.dateBadge}
+              </span>
+            </div>
 
-          <div className="space-y-4">
-            {CLOSING_PROMISE.paragraphs.map(
-              (paragraph: string, idx: number) => (
+            <h2
+              id="closing-heading"
+              className="font-display font-bold mb-2"
+              style={{
+                fontSize: "clamp(1.2rem, 3vw, 1.55rem)",
+                lineHeight: 1.25,
+                color: "var(--color-ink-plum)",
+              }}
+            >
+              {OCTOBER_GIFT.title}
+            </h2>
+
+            <div className="space-y-2.5 mb-4">
+              {OCTOBER_GIFT.paragraphs.map((paragraph, index) => (
                 <p
-                  key={idx}
-                  className="font-sans text-[17px] leading-[1.75]"
+                  key={index}
+                  className="font-sans text-[15px] sm:text-[16px] leading-[1.68]"
                   style={{ color: "var(--color-ink-plum)" }}
                 >
                   {paragraph}
                 </p>
-              )
-            )}
-          </div>
-
-          {/* 3 Scattered Konpeitō Candies, 1 Tiny Sakura Heart, and Handwritten Sign-off */}
-          <div
-            className="mt-8 pt-5 border-t flex flex-wrap items-center justify-between gap-4"
-            style={{ borderColor: "var(--color-paper-border)" }}
-          >
-            <div className="flex items-center gap-2.5" aria-hidden="true">
-              <KonpeitoCandy flavor="sakura" />
-              <KonpeitoCandy flavor="butter" />
-              <KonpeitoCandy flavor="periwinkle" />
-              {/* Tiny Sakura Heart SVG */}
-              <svg viewBox="0 0 20 20" className="w-4 h-4">
-                <path
-                  d="M10 17.2 C10 17.2 3 12.4 3 7.2 C3 4.8 4.9 3 7.2 3 C8.6 3 9.5 3.7 10 4.6 C10.5 3.7 11.4 3 12.8 3 C15.1 3 17 4.8 17 7.2 C17 12.4 10 17.2 10 17.2 Z"
-                  fill="var(--color-sakura-deep)"
-                />
-              </svg>
+              ))}
             </div>
 
-            <div className="text-right">
+            {/* Part 2: Closing Promise & Signature */}
+            <div
+              className="pt-3.5 border-t"
+              style={{ borderColor: "var(--color-paper-border)" }}
+            >
               <p
-                className="text-xs font-medium"
-                style={{ color: "var(--color-ink-muted)" }}
+                className="font-sans text-[15px] sm:text-[16px] leading-[1.68] mb-3.5"
+                style={{ color: "var(--color-ink-plum)" }}
               >
-                {CLOSING_PROMISE.signoff}
+                {CLOSING_PROMISE.paragraphs[0]}
               </p>
-              <p
-                className="font-handwritten text-2xl mt-0.5"
-                style={{ color: "var(--color-royal-violet)" }}
-              >
-                {CLOSING_PROMISE.signature}
-              </p>
+
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleRestart}
+                    className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 text-xs font-semibold paper-card-lavender transition-transform active:scale-95 min-h-[38px]"
+                    style={{ color: "var(--color-royal-violet)" }}
+                  >
+                    <IconRestart size={14} />
+                    <span>Return to the beginning</span>
+                  </button>
+                </div>
+
+                <div className="text-right">
+                  <p
+                    className="text-xs font-medium"
+                    style={{ color: "var(--color-ink-muted)" }}
+                  >
+                    {CLOSING_PROMISE.signoff}
+                  </p>
+                  <p
+                    className="font-handwritten text-2xl leading-tight"
+                    style={{ color: "var(--color-royal-violet)" }}
+                  >
+                    {CLOSING_PROMISE.signature}
+                  </p>
+                </div>
+              </div>
             </div>
-          </div>
-        </PaperCard>
-      </motion.div>
-    </footer>
+          </PaperCard>
+        </motion.div>
+
+        {/* Subtle Closing Vignette Pose #8 Below Card on Tall Screens */}
+        <div className="hidden sm:flex justify-center mt-2 opacity-90">
+          <ClosingBackScene />
+        </div>
+      </div>
+    </section>
   );
 }

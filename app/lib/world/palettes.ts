@@ -15,10 +15,13 @@ export interface WorldPalette {
   cloudLight: string;
   cloudShadow: string;
   atmosphericAccent: string;
+  hillFar: string;
+  hillMid: string;
+  hillForeground: string;
 }
 
 /**
- * Konpeitō Night & The Living World master colour tokens.
+ * Konpeitō Night & The Living Karachi World master colour tokens.
  */
 export const KONPEITO_TOKENS = {
   midnightIndigo: "#171233",
@@ -54,6 +57,9 @@ export const PHASE_PALETTES: Record<WorldPhase, WorldPalette> = {
     cloudLight: "#C9C4E2",
     cloudShadow: "#756B9E",
     atmosphericAccent: "#B9C4FF",
+    hillFar: "#493E7E",
+    hillMid: "#362C65",
+    hillForeground: "#251E4B",
   },
   sunrise: {
     skyTop: "#6F75B7",
@@ -62,22 +68,31 @@ export const PHASE_PALETTES: Record<WorldPhase, WorldPalette> = {
     cloudLight: "#FFF2E6",
     cloudShadow: "#B88FAE",
     atmosphericAccent: "#FFE9A8",
+    hillFar: "#9E7FA8",
+    hillMid: "#7A5E8E",
+    hillForeground: "#584272",
   },
   morning: {
-    skyTop: "#A7B7EE",
-    skyMiddle: "#D5D7FB",
-    skyHorizon: "#FFF0DC",
+    skyTop: "#92A4E4",
+    skyMiddle: "#C7CBF7",
+    skyHorizon: "#F5E9EA",
     cloudLight: "#FFF8F1",
-    cloudShadow: "#BEC1E4",
+    cloudShadow: "#B5B9E0",
     atmosphericAccent: "#F6B8CF",
+    hillFar: "#9D97CC",
+    hillMid: "#7D74B3",
+    hillForeground: "#5E5594",
   },
   afternoon: {
-    skyTop: "#91A7E1",
-    skyMiddle: "#C3CCF4",
-    skyHorizon: "#EEE9FF",
+    skyTop: "#8599DC",
+    skyMiddle: "#B9C3F0",
+    skyHorizon: "#EAE3FF",
     cloudLight: "#FFF8F1",
-    cloudShadow: "#ADB4DD",
+    cloudShadow: "#A5ACE0",
     atmosphericAccent: "#B9C4FF",
+    hillFar: "#948EC6",
+    hillMid: "#756DAE",
+    hillForeground: "#58508F",
   },
   goldenHour: {
     skyTop: "#6B5FA5",
@@ -86,6 +101,9 @@ export const PHASE_PALETTES: Record<WorldPhase, WorldPalette> = {
     cloudLight: "#FFF0D4",
     cloudShadow: "#8E638B",
     atmosphericAccent: "#FFE9A8",
+    hillFar: "#8B6391",
+    hillMid: "#694978",
+    hillForeground: "#49325C",
   },
   sunset: {
     skyTop: "#44366F",
@@ -94,6 +112,9 @@ export const PHASE_PALETTES: Record<WorldPhase, WorldPalette> = {
     cloudLight: "#E6AFB0",
     cloudShadow: "#5D426F",
     atmosphericAccent: "#FFD3BF",
+    hillFar: "#6D4674",
+    hillMid: "#4F335E",
+    hillForeground: "#342147",
   },
   blueHour: {
     skyTop: "#202957",
@@ -102,6 +123,9 @@ export const PHASE_PALETTES: Record<WorldPhase, WorldPalette> = {
     cloudLight: "#BEB8DA",
     cloudShadow: "#3A386D",
     atmosphericAccent: "#B9C4FF",
+    hillFar: "#52467D",
+    hillMid: "#3B3164",
+    hillForeground: "#261E4B",
   },
   night: {
     skyTop: "#171233",
@@ -110,16 +134,19 @@ export const PHASE_PALETTES: Record<WorldPhase, WorldPalette> = {
     cloudLight: "#AFA7D1",
     cloudShadow: "#30275F",
     atmosphericAccent: "#FFF4D6",
+    hillFar: "#3D2E72",
+    hillMid: "#2B2056",
+    hillForeground: "#1D153E",
   },
 };
 
 export const PHASE_LABELS: Record<WorldPhase, string> = {
-  preDawn: "Quiet before dawn",
-  sunrise: "Sunrise atmosphere",
-  morning: "Morning light",
+  preDawn: "Pre-dawn stillness",
+  sunrise: "Sunrise light",
+  morning: "Morning sky",
   afternoon: "Gentle afternoon",
   goldenHour: "Golden hour",
-  sunset: "Sunset atmosphere",
-  blueHour: "Evening twilight",
-  night: "Calm night sky",
+  sunset: "Sunset glow",
+  blueHour: "Blue hour",
+  night: "Quiet night sky",
 };

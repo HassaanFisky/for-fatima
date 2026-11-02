@@ -7,7 +7,7 @@ import { KonpeitoCandy } from "./Konpeito";
 
 /**
  * Reusable Mochi Bear SVG group (2.5 heads tall, three-quarter front view, outline-free).
- * Tapping Mochi's Royal Violet scarf triggers a brief flutter.
+ * Tapping Mochi's Royal Violet scarf triggers a brief flutter without any rectangular outline.
  */
 export function MochiSvgGroup({
   x = 0,
@@ -34,7 +34,7 @@ export function MochiSvgGroup({
 
   return (
     <g transform={`translate(${x}, ${y}) scale(${scale})`}>
-      {/* Soft ground shadow on cloud */}
+      {/* Soft ground shadow on foreground stage */}
       <ellipse
         cx="50"
         cy="106"
@@ -203,7 +203,6 @@ export function MochiSvgGroup({
         </>
       ) : (
         <>
-          {/* Slightly closed calm sleepy oval bead eyes */}
           <ellipse
             cx="37"
             cy="36.5"
@@ -231,18 +230,14 @@ export function MochiSvgGroup({
         fill="none"
       />
 
-      {/* Signature Royal Violet Scarf (Tappable) */}
+      {/* Signature Royal Violet Scarf (Tappable, zero rectangular outline) */}
       <g
         onClick={handleTap}
-        style={{ cursor: "pointer" }}
-        role="button"
-        tabIndex={0}
-        aria-label="Mochi's royal violet scarf"
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            handleTap();
-          }
+        className="focus:outline-none select-none"
+        style={{
+          cursor: "pointer",
+          WebkitTapHighlightColor: "transparent",
+          outline: "none",
         }}
       >
         <rect
@@ -286,7 +281,7 @@ export function MochiSvgGroup({
 
 /**
  * Reusable Yume Bear SVG group (10% smaller than Mochi, Lavender fur, Sakura Pink bow on left ear).
- * Tapping Yume's bow triggers a tiny bounce.
+ * Tapping Yume's bow triggers a tiny bounce without any browser outline.
  */
 export function YumeSvgGroup({
   x = 0,
@@ -366,7 +361,7 @@ export function YumeSvgGroup({
         fill="var(--color-yume-shadow)"
       />
 
-      {/* Right arm (pointing up at stars or catching a petal) */}
+      {/* Right arm */}
       {armPose === "point-up" || armPose === "catch" ? (
         <rect
           x="64"
@@ -478,20 +473,17 @@ export function YumeSvgGroup({
         fill="none"
       />
 
-      {/* Signature Sakura Pink Bow on Left Ear (Tappable) */}
+      {/* Signature Sakura Pink Bow on Left Ear (Tappable, zero rectangular outline) */}
       <motion.g
         onClick={handleBowTap}
         animate={bounce ? { scale: [1, 1.24, 0.92, 1.08, 1] } : { scale: 1 }}
         transition={{ duration: 0.5 }}
-        style={{ transformOrigin: "29px 15px", cursor: "pointer" }}
-        role="button"
-        tabIndex={0}
-        aria-label="Yume's sakura pink bow"
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            handleBowTap();
-          }
+        className="focus:outline-none select-none"
+        style={{
+          transformOrigin: "29px 15px",
+          cursor: "pointer",
+          WebkitTapHighlightColor: "transparent",
+          outline: "none",
         }}
       >
         <ellipse
@@ -517,12 +509,8 @@ export function YumeSvgGroup({
 }
 
 /**
- * 1. OPENING SCENE ILLUSTRATION (Pose #1 of 8)
- * Adapts to the 4 Living World pose families:
- * - resting (preDawn)
- * - waking (sunrise, morning)
- * - reading (afternoon, goldenHour)
- * - stargazing (sunset, blueHour, night)
+ * 1. OPENING THRESHOLD ILLUSTRATION (Pose #1)
+ * Mochi and Yume resting on a foreground hill stage cushion under the Karachi sky.
  */
 export function OpeningCloudScene({
   phase,
@@ -543,12 +531,12 @@ export function OpeningCloudScene({
     lanternBoost;
 
   return (
-    <div className="relative mx-auto w-full max-w-[320px] flex justify-center select-none">
+    <div className="relative mx-auto w-full max-w-[300px] flex justify-center select-none">
       <svg
-        viewBox="0 0 320 185"
+        viewBox="0 0 320 180"
         className="w-full h-auto overflow-visible"
         role="img"
-        aria-label="Mochi and Yume resting on a soft cloud under the sky"
+        aria-label="Mochi and Yume resting on a foreground stage hill under the Karachi sky"
       >
         <defs>
           <radialGradient id="opening-lantern-glow" cx="50%" cy="50%" r="50%">
@@ -570,22 +558,30 @@ export function OpeningCloudScene({
           </radialGradient>
         </defs>
 
-        {/* Back cloud lobe shadow */}
-        <path
-          d="M36 142 C36 118 62 104 92 108 C108 90 144 86 168 100 C194 86 232 94 246 114 C272 114 292 128 292 146 C292 164 268 174 236 174 L84 174 C52 174 36 160 36 142 Z"
+        {/* Believable Foreground Hill Stage Cushion */}
+        <ellipse
+          cx="160"
+          cy="152"
+          rx="132"
+          ry="22"
           fill="var(--color-dusk-lavender)"
-          opacity="0.45"
-          transform="translate(0, 6)"
+          opacity="0.35"
         />
-
-        {/* Soft three-lobe cloud platform */}
         <path
-          d="M32 138 C32 114 58 100 88 104 C104 86 142 82 168 96 C194 82 234 90 248 110 C274 110 294 124 294 142 C294 160 270 170 238 170 L82 170 C50 170 32 156 32 138 Z"
+          d="M28 148 C44 120, 100 112, 160 112 C220 112, 276 120, 292 148 C298 160, 268 168, 160 168 C52 168, 22 160, 28 148 Z"
           fill="var(--color-lavender-paper)"
-          opacity="0.94"
+          opacity="0.96"
+        />
+        <path
+          d="M52 126 C98 114, 222 114, 268 126"
+          stroke="var(--color-cream-paper)"
+          strokeWidth="2"
+          strokeLinecap="round"
+          fill="none"
+          opacity="0.75"
         />
 
-        {/* Mochi on the left of the cloud */}
+        {/* Mochi on the left of the stage */}
         <MochiSvgGroup
           x={68}
           y={34}
@@ -595,7 +591,7 @@ export function OpeningCloudScene({
           onScarfTap={onInteraction}
         />
 
-        {/* Yume on the right of the cloud */}
+        {/* Yume on the right of the stage */}
         <YumeSvgGroup
           x={162}
           y={44}
@@ -644,7 +640,7 @@ export function OpeningCloudScene({
           </g>
         )}
 
-        {/* Pose-specific prop: Mochi's paper lantern in Sunset / Blue Hour / Night / Pre-dawn */}
+        {/* Pose-specific prop: Mochi's paper lantern */}
         {!isReading && (
           <g transform="translate(138, 72)">
             {lanternLit && (
@@ -655,7 +651,6 @@ export function OpeningCloudScene({
                 fill="url(#opening-lantern-glow)"
               />
             )}
-            {/* Lantern handle */}
             <path
               d="M8 10 Q16 2 24 10"
               stroke="var(--color-royal-violet)"
@@ -663,7 +658,6 @@ export function OpeningCloudScene({
               fill="none"
               strokeLinecap="round"
             />
-            {/* Lantern body */}
             <rect
               x="6"
               y="10"
@@ -709,12 +703,12 @@ export function OpeningCloudScene({
 }
 
 /**
- * 2. STORY INTRO ILLUSTRATION (Pose #2 of 8)
- * Yume catching a drifting sakura petal beside the story stream.
+ * 2. LETTER INTRO ILLUSTRATION (Pose #2)
+ * Yume catching a drifting sakura petal on a soft stage cushion.
  */
 export function StoryPetalScene() {
   return (
-    <div className="mx-auto w-[124px] h-[124px] flex items-center justify-center select-none">
+    <div className="mx-auto w-[112px] h-[112px] flex items-center justify-center select-none">
       <svg
         viewBox="0 0 130 130"
         className="w-full h-full overflow-visible"
@@ -724,13 +718,12 @@ export function StoryPetalScene() {
         <ellipse
           cx="65"
           cy="114"
-          rx="42"
-          ry="12"
+          rx="44"
+          ry="11"
           fill="var(--color-lavender-paper)"
-          opacity="0.9"
+          opacity="0.94"
         />
         <YumeSvgGroup x={18} y={14} scale={0.88} armPose="catch" />
-        {/* Drifting Sakura Petal near her paw */}
         <path
           d="M98 28 C104 22 114 26 112 34 C110 42 100 44 96 38 C93 34 95 30 98 28 Z"
           fill="var(--color-sakura-pink)"
@@ -741,12 +734,12 @@ export function StoryPetalScene() {
 }
 
 /**
- * 3. NOTES ILLUSTRATION (Pose #3 of 8)
- * Small Mochi holding his warm paper lantern beside the notes.
+ * 3. NOTICED THINGS ILLUSTRATION (Pose #3)
+ * Small Mochi holding his warm paper lantern.
  */
 export function NotesLanternScene() {
   return (
-    <div className="mx-auto w-[120px] h-[120px] flex items-center justify-center select-none">
+    <div className="mx-auto w-[108px] h-[108px] flex items-center justify-center select-none">
       <svg
         viewBox="0 0 130 130"
         className="w-full h-full overflow-visible"
@@ -756,10 +749,10 @@ export function NotesLanternScene() {
         <ellipse
           cx="62"
           cy="114"
-          rx="42"
-          ry="12"
+          rx="44"
+          ry="11"
           fill="var(--color-lavender-paper)"
-          opacity="0.9"
+          opacity="0.94"
         />
         <MochiSvgGroup x={12} y={12} scale={0.88} armPose="hold-right" />
         <g transform="translate(86, 52)">
@@ -786,19 +779,18 @@ export function NotesLanternScene() {
 }
 
 /**
- * 4. KEEPSAKES ILLUSTRATION (Pose #4 of 8)
- * Mochi and Yume peering at the glass jar of Konpeitō sugar-star candies.
+ * 4. KEEPSAKES ILLUSTRATION (Pose #4)
+ * Mochi and Yume peering at the glass jar of Konpeitō sugar-star candies on a cream shelf.
  */
 export function KeepsakesJarScene() {
   return (
-    <div className="mx-auto w-full max-w-[260px] flex justify-center select-none">
+    <div className="mx-auto w-full max-w-[236px] flex justify-center select-none">
       <svg
         viewBox="0 0 260 135"
         className="w-full h-auto overflow-visible"
         role="img"
         aria-label="Mochi and Yume beside a glass jar of konpeitō star candies"
       >
-        {/* Cream shelf base */}
         <rect
           x="18"
           y="108"
@@ -809,7 +801,6 @@ export function KeepsakesJarScene() {
         />
         <MochiSvgGroup x={22} y={12} scale={0.86} armPose="hold-right" />
 
-        {/* Center Konpeitō Glass Jar */}
         <g transform="translate(108, 38)">
           <rect
             x="10"
@@ -828,13 +819,11 @@ export function KeepsakesJarScene() {
             fill="var(--color-lavender-paper)"
             opacity="0.92"
           />
-          {/* 5 Konpeitō candies inside the jar */}
           <circle cx="15" cy="44" r="5.5" fill="var(--color-sakura-pink)" />
           <circle cx="28" cy="45" r="5.5" fill="var(--color-butter-yellow)" />
           <circle cx="21" cy="35" r="5.5" fill="var(--color-periwinkle)" />
           <circle cx="13" cy="32" r="5" fill="var(--color-soft-peach)" />
           <circle cx="29" cy="33" r="5" fill="var(--color-butter-yellow)" />
-          {/* Highlight sheen on jar */}
           <rect
             x="9"
             y="13"
@@ -853,20 +842,27 @@ export function KeepsakesJarScene() {
 }
 
 /**
- * 5. FLOWERS ILLUSTRATION (Pose #5 of 8)
- * Mochi standing at the left offering a single round-petal flower.
+ * 5. GARDEN ILLUSTRATION (Pose #5)
+ * Mochi offering a single round-petal flower on a stage cushion.
  */
 export function FlowersOfferScene() {
   return (
-    <div className="w-[136px] h-[126px] flex items-center justify-center select-none">
+    <div className="w-[122px] h-[114px] flex items-center justify-center select-none">
       <svg
         viewBox="0 0 140 130"
         className="w-full h-full overflow-visible"
         role="img"
         aria-label="Mochi offering a soft round-petal flower"
       >
+        <ellipse
+          cx="64"
+          cy="115"
+          rx="46"
+          ry="10"
+          fill="var(--color-lavender-paper)"
+          opacity="0.92"
+        />
         <MochiSvgGroup x={10} y={14} scale={0.9} armPose="offer" />
-        {/* Round-petal flower held in Mochi's right paw */}
         <g transform="translate(96, 48)">
           <rect
             x="-1.5"
@@ -895,19 +891,18 @@ export function FlowersOfferScene() {
 }
 
 /**
- * 6. STARS ILLUSTRATION (Pose #6 of 8)
+ * 6. STARS ILLUSTRATION (Pose #6)
  * Yume sitting quietly on the soft crescent moon in the corner of the constellation sky.
  */
 export function StarsMoonScene() {
   return (
-    <div className="w-[96px] h-[96px] select-none pointer-events-none">
+    <div className="w-[82px] h-[82px] select-none pointer-events-none">
       <svg
         viewBox="0 0 120 120"
         className="w-full h-full overflow-visible"
         role="img"
         aria-label="Yume sitting on a soft crescent moon"
       >
-        {/* Soft Crescent Moon */}
         <path
           d="M78 14 C46 18 24 44 24 74 C24 98 44 114 72 114 C40 118 12 94 12 60 C12 28 42 6 78 14 Z"
           fill="var(--color-starlight)"
@@ -917,7 +912,6 @@ export function StarsMoonScene() {
           fill="var(--color-butter-yellow)"
           opacity="0.55"
         />
-        {/* Yume seated inside the crescent curve */}
         <YumeSvgGroup x={28} y={24} scale={0.58} armPose="point-up" />
       </svg>
     </div>
@@ -925,7 +919,7 @@ export function StarsMoonScene() {
 }
 
 /**
- * 7. PERSONAL GIFT ILLUSTRATION (Pose #7 of 8)
+ * 7. GIFT ILLUSTRATION (Pose #7)
  * Mochi and Yume beside the Lavender Paper wrapped box with Royal Violet ribbon.
  */
 export function GiftBoxScene({
@@ -936,7 +930,7 @@ export function GiftBoxScene({
   onToggleUnwrap: () => void;
 }) {
   return (
-    <div className="mx-auto w-full max-w-[290px] flex flex-col items-center select-none">
+    <div className="mx-auto w-full max-w-[260px] flex flex-col items-center select-none">
       <svg
         viewBox="0 0 290 150"
         className="w-full h-auto overflow-visible"
@@ -949,31 +943,22 @@ export function GiftBoxScene({
           rx="112"
           ry="14"
           fill="var(--color-lavender-paper)"
-          opacity="0.9"
+          opacity="0.92"
         />
 
         <MochiSvgGroup x={20} y={22} scale={0.86} armPose="hold-right" />
         <YumeSvgGroup x={182} y={30} scale={0.78} armPose="peer" />
 
-        {/* Center Wrapped Box */}
+        {/* Center Wrapped Box (zero rectangular outline) */}
         <g
           onClick={onToggleUnwrap}
-          style={{ cursor: "pointer" }}
-          role="button"
-          tabIndex={0}
-          aria-label={
-            unwrapped
-              ? "Gift box ribbon untied"
-              : "Tap ribbon for a gentle unwrap animation"
-          }
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              onToggleUnwrap();
-            }
+          className="focus:outline-none select-none"
+          style={{
+            cursor: "pointer",
+            WebkitTapHighlightColor: "transparent",
+            outline: "none",
           }}
         >
-          {/* Box base */}
           <rect
             x="108"
             y="74"
@@ -982,7 +967,6 @@ export function GiftBoxScene({
             rx="10"
             fill="var(--color-lavender-paper)"
           />
-          {/* Subtle bear stamp wrapping pattern */}
           <circle
             cx="124"
             cy="96"
@@ -997,7 +981,6 @@ export function GiftBoxScene({
             fill="var(--color-yume-base)"
             opacity="0.65"
           />
-          {/* Vertical Royal Violet ribbon */}
           <rect
             x="137"
             y="74"
@@ -1006,7 +989,6 @@ export function GiftBoxScene({
             fill="var(--color-royal-violet)"
           />
 
-          {/* Popping Konpeitō candies when unwrapped */}
           {unwrapped && (
             <motion.g
               initial={{ opacity: 0, y: 14 }}
@@ -1034,7 +1016,6 @@ export function GiftBoxScene({
             </motion.g>
           )}
 
-          {/* Box lid & bow */}
           <motion.g
             animate={
               unwrapped
@@ -1059,7 +1040,6 @@ export function GiftBoxScene({
               height="15"
               fill="var(--color-royal-violet)"
             />
-            {/* Ribbon loops */}
             <ellipse
               cx="132"
               cy="57"
@@ -1086,45 +1066,44 @@ export function GiftBoxScene({
         </g>
       </svg>
 
-      {/* Subtle Konpeitō candies on paper below */}
-      <div className="flex items-center gap-2 mt-1" aria-hidden="true">
-        <KonpeitoCandy flavor="sakura" size={14} />
-        <KonpeitoCandy flavor="butter" size={14} />
-        <KonpeitoCandy flavor="periwinkle" size={14} />
+      <div className="flex items-center gap-2 mt-0.5" aria-hidden="true">
+        <KonpeitoCandy flavor="sakura" size={13} />
+        <KonpeitoCandy flavor="butter" size={13} />
+        <KonpeitoCandy flavor="periwinkle" size={13} />
       </div>
     </div>
   );
 }
 
 /**
- * 8. CLOSING ILLUSTRATION (Pose #8 of 8)
- * Both Mochi and Yume seen from behind, sitting on their cloud looking out at the night sky.
+ * 8. CLOSING ILLUSTRATION (Pose #8)
+ * Mochi and Yume seen from behind on a foreground stage hill looking out at the night sky.
  */
 export function ClosingBackScene() {
   return (
-    <div className="mx-auto w-full max-w-[280px] flex justify-center select-none">
+    <div className="mx-auto w-full max-w-[240px] flex justify-center select-none">
       <svg
-        viewBox="0 0 280 155"
+        viewBox="0 0 280 150"
         className="w-full h-auto overflow-visible"
         role="img"
         aria-label="Mochi and Yume sitting together from behind, looking out at the sky"
       >
-        {/* Cloud shadow */}
-        <path
-          d="M34 122 C34 102 58 90 84 94 C98 78 132 76 154 88 C178 76 212 82 224 100 C246 100 262 112 262 126 C262 140 242 148 214 148 L76 148 C48 148 34 136 34 122 Z"
+        <ellipse
+          cx="140"
+          cy="128"
+          rx="114"
+          ry="18"
           fill="var(--color-dusk-lavender)"
-          opacity="0.45"
-          transform="translate(0, 5)"
+          opacity="0.38"
         />
-        {/* Soft cloud platform */}
         <path
-          d="M30 118 C30 98 54 86 80 90 C94 74 128 72 150 84 C174 72 208 78 220 96 C242 96 258 108 258 122 C258 136 238 144 210 144 L72 144 C44 144 30 132 30 118 Z"
+          d="M28 126 C44 102, 92 96, 140 96 C188 96, 236 102, 252 126 C258 136, 232 142, 140 142 C48 142, 22 136, 28 126 Z"
           fill="var(--color-lavender-paper)"
-          opacity="0.94"
+          opacity="0.95"
         />
 
         {/* Mochi from behind (left) */}
-        <g transform="translate(66, 26) scale(0.9)">
+        <g transform="translate(66, 22) scale(0.88)">
           <circle cx="26" cy="20" r="10.5" fill="var(--color-mochi-shadow)" />
           <circle cx="72" cy="20" r="10.5" fill="var(--color-mochi-base)" />
           <rect
@@ -1143,7 +1122,6 @@ export function ClosingBackScene() {
             rx="23"
             fill="var(--color-mochi-base)"
           />
-          {/* Royal Violet scarf wrapped around back of neck with two tails */}
           <rect
             x="25"
             y="52"
@@ -1168,12 +1146,11 @@ export function ClosingBackScene() {
             rx="4.5"
             fill="var(--color-amethyst-dream)"
           />
-          {/* Tiny round tail */}
           <circle cx="49" cy="88" r="6" fill="var(--color-mochi-shadow)" />
         </g>
 
-        {/* Yume from behind (right, leaning gently near Mochi) */}
-        <g transform="translate(142, 34) scale(0.82)">
+        {/* Yume from behind (right) */}
+        <g transform="translate(142, 30) scale(0.8)">
           <circle cx="27" cy="21" r="10" fill="var(--color-yume-shadow)" />
           <circle cx="71" cy="21" r="10" fill="var(--color-yume-base)" />
           <rect
@@ -1192,7 +1169,6 @@ export function ClosingBackScene() {
             rx="22.5"
             fill="var(--color-yume-base)"
           />
-          {/* Sakura Pink bow visible on back of left ear */}
           <ellipse
             cx="22"
             cy="14"
@@ -1210,7 +1186,6 @@ export function ClosingBackScene() {
             fill="var(--color-sakura-pink)"
           />
           <circle cx="28" cy="15" r="2.8" fill="var(--color-soft-peach)" />
-          {/* Tiny round tail */}
           <circle cx="49" cy="88" r="5.5" fill="var(--color-yume-shadow)" />
         </g>
       </svg>

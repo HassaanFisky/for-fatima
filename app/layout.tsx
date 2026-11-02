@@ -24,9 +24,9 @@ const kleeOne = Klee_One({
 });
 
 export const metadata: Metadata = {
-  title: "for fatima 💜",
+  title: "for fatima 💜 — A little paper sky",
   description:
-    "A little paper night-sky, handmade for Fatima Kamran by Hassaan.",
+    "Konpeitō Night — A little paper sky, handmade for one person.",
   robots: {
     index: false,
     follow: false,
@@ -55,7 +55,9 @@ export default function RootLayout({
       lang="en"
       className={`${zenMaru.variable} ${nunito.variable} ${kleeOne.variable} antialiased`}
     >
-      <body className="min-h-screen font-sans">{children}</body>
+      <body className="h-[100dvh] w-full overflow-hidden font-sans">
+        {children}
+      </body>
     </html>
   );
 }

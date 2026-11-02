@@ -16,14 +16,8 @@ import {
   calculateAstronomy,
   type AstronomySnapshot,
 } from "../../lib/world/astronomy";
-import {
-  createFallbackResolution,
-  requestLocationFromUser,
-  resolveLocationWithoutPrompt,
-  type CreatorFallbackCoordinate,
-  type LocationResolution,
-} from "../../lib/world/location";
-import { readDeviceClock } from "../../lib/world/time";
+import { getKarachiLocation } from "../../lib/world/location";
+import { readKarachiClock } from "../../lib/world/time";
 import {
   buildWorldState,
   type WorldPhase,
@@ -32,21 +26,20 @@ import {
 import { AmbientAudioEngine } from "../../lib/world/ambient-audio";
 
 interface LivingWorldOptions {
-  fallback?: CreatorFallbackCoordinate;
   tickMs?: number;
 }
 
 export interface LivingWorldValue {
   world: WorldState;
-  location: LocationResolution;
-  locationBusy: boolean;
   reducedMotion: boolean;
   visible: boolean;
+  /** True when sound is set to ON (default true unless explicitly muted by user) */
   audioEnabled: boolean;
+  /** True when the browser AudioContext is actively running */
+  audioPlaying: boolean;
   audioSupported: boolean;
   constellationFocused: boolean;
   setConstellationFocused: (focused: boolean) => void;
-  requestLocation: () => Promise<LocationResolution>;
   refreshSky: () => void;
   toggleAudio: () => Promise<void>;
   playNote: (step?: number) => void;
@@ -55,12 +48,10 @@ export interface LivingWorldValue {
 
 const LivingWorldContext = createContext<LivingWorldValue | null>(null);
 
-const INITIAL_NIGHT_CLOCK = readDeviceClock(new Date(2026, 9, 31, 22, 0, 0));
-const INITIAL_WORLD_STATE = buildWorldState(
-  INITIAL_NIGHT_CLOCK,
-  { permission: "unknown", location: null, failure: null },
-  null
+const INITIAL_NIGHT_CLOCK = readKarachiClock(
+  new Date(Date.UTC(2026, 9, 31, 17, 30, 0)) // 22:30 PKT
 );
+const INITIAL_WORLD_STATE = buildWorldState(INITIAL_NIGHT_CLOCK, null);
 
 /**
  * Development-only deterministic QA override reader.
@@ -68,11 +59,6 @@ const INITIAL_WORLD_STATE = buildWorldState(
  */
 function readDevQaOverrides(): {
   date?: Date;
-  lat?: number;
-  lng?: number;
-  mode?: "device" | "creator-fallback" | "denied" | "clock-only";
-  tz?: string;
-  utcOffset?: number;
   reducedMotion?: boolean;
 } | null {
   if (
@@ -85,40 +71,22 @@ function readDevQaOverrides(): {
   const params = new URLSearchParams(window.location.search);
   const qaPhase = params.get("qaPhase") as WorldPhase | null;
   const qaTime = params.get("qaTime");
-  const qaLat = params.get("qaLat");
-  const qaLng = params.get("qaLng");
-  const qaMode = params.get("qaMode") as
-    | "device"
-    | "creator-fallback"
-    | "denied"
-    | "clock-only"
-    | null;
-  const qaTz = params.get("qaTz") || undefined;
-  const qaOffset = params.get("qaOffset");
   const qaReduced = params.get("qaReducedMotion");
 
-  if (
-    !qaPhase &&
-    !qaTime &&
-    !qaLat &&
-    !qaLng &&
-    !qaMode &&
-    !qaTz &&
-    !qaOffset &&
-    !qaReduced
-  ) {
+  if (!qaPhase && !qaTime && !qaReduced) {
     return null;
   }
 
-  const phaseHourMap: Record<WorldPhase, [number, number]> = {
-    preDawn: [5, 0],
-    sunrise: [6, 30],
-    morning: [9, 30],
-    afternoon: [14, 0],
-    goldenHour: [17, 0],
-    sunset: [18, 15],
-    blueHour: [19, 15],
-    night: [22, 30],
+  // UTC hours corresponding to Karachi (UTC+5) local phases
+  const phaseUtcHourMap: Record<WorldPhase, [number, number]> = {
+    preDawn: [0, 0],     // 05:00 PKT
+    sunrise: [1, 30],    // 06:30 PKT
+    morning: [4, 30],    // 09:30 PKT
+    afternoon: [9, 0],   // 14:00 PKT
+    goldenHour: [12, 0], // 17:00 PKT
+    sunset: [13, 15],    // 18:15 PKT
+    blueHour: [14, 15],  // 19:15 PKT
+    night: [17, 30],     // 22:30 PKT
   };
 
   let date: Date | undefined;
@@ -127,50 +95,77 @@ function readDevQaOverrides(): {
     if (!Number.isNaN(parsed.getTime())) {
       date = parsed;
     }
-  } else if (qaPhase && phaseHourMap[qaPhase]) {
-    const [h, m] = phaseHourMap[qaPhase];
-    date = new Date(2026, 9, 31, h, m, 0);
+  } else if (qaPhase && phaseUtcHourMap[qaPhase]) {
+    const [h, m] = phaseUtcHourMap[qaPhase];
+    date = new Date(Date.UTC(2026, 9, 31, h, m, 0));
   }
 
   return {
     date,
-    lat: qaLat !== null ? Number(qaLat) : undefined,
-    lng: qaLng !== null ? Number(qaLng) : undefined,
-    mode: qaMode || undefined,
-    tz: qaTz,
-    utcOffset: qaOffset !== null ? Number(qaOffset) : undefined,
     reducedMotion: qaReduced === "true",
   };
 }
 
 function useLivingWorldEngine({
-  fallback,
   tickMs = 30_000,
-}: LivingWorldOptions): LivingWorldValue {
+}: LivingWorldOptions = {}): LivingWorldValue {
   const activity = usePageActivity();
 
-  const [location, setLocation] = useState<LocationResolution>(() =>
-    createFallbackResolution(fallback)
-  );
-  const [locationBusy, setLocationBusy] = useState(false);
   const [world, setWorld] = useState<WorldState>(INITIAL_WORLD_STATE);
-  const [audioEnabled, setAudioEnabled] = useState(false);
+  const [audioEnabled, setAudioEnabled] = useState(true); // Sound ON by default
+  const [audioPlaying, setAudioPlaying] = useState(false);
   const [audioSupported, setAudioSupported] = useState(true);
   const [constellationFocused, setConstellationFocused] = useState(false);
   const [devReducedMotion, setDevReducedMotion] = useState(false);
 
-  const lastLocationCheck = useRef(0);
   const audioRef = useRef<AmbientAudioEngine | null>(null);
 
   useEffect(() => {
     const engine = new AmbientAudioEngine();
     audioRef.current = engine;
+
+    engine.onStateChange((desired, playing) => {
+      setAudioEnabled(desired);
+      setAudioPlaying(playing);
+    });
+
     const initTimer = window.setTimeout(() => {
       setAudioSupported(engine.isSupported);
+      // Attempt gentle autoplay immediately on load
+      void engine.unlockAndStart();
     }, 0);
+
+    // Browser-compliant autoplay fallback: start on the first deliberate user interaction
+    // unless the user has explicitly muted sound.
+    const handleFirstInteraction = (event: Event) => {
+      if (!audioRef.current || !audioRef.current.isDesired) {
+        return;
+      }
+      // Do not intercept clicks on the mute button itself (toggleAudio handles that directly)
+      const target = event.target as HTMLElement | null;
+      if (target?.closest?.('[data-audio-toggle="true"]')) {
+        return;
+      }
+      if (!audioRef.current.isPlaying) {
+        void audioRef.current.unlockAndStart();
+      }
+    };
+
+    window.addEventListener("pointerdown", handleFirstInteraction, {
+      passive: true,
+    });
+    window.addEventListener("keydown", handleFirstInteraction, {
+      passive: true,
+    });
+    window.addEventListener("touchstart", handleFirstInteraction, {
+      passive: true,
+    });
 
     return () => {
       window.clearTimeout(initTimer);
+      window.removeEventListener("pointerdown", handleFirstInteraction);
+      window.removeEventListener("keydown", handleFirstInteraction);
+      window.removeEventListener("touchstart", handleFirstInteraction);
       void engine.dispose();
       audioRef.current = null;
     };
@@ -182,86 +177,20 @@ function useLivingWorldEngine({
       setDevReducedMotion(devOverride.reducedMotion);
     }
 
-    const clock = readDeviceClock(
-      devOverride?.date ?? new Date(),
-      devOverride?.tz,
-      devOverride?.utcOffset
-    );
-
-    let activeLocation = location;
-    if (devOverride) {
-      if (devOverride.mode === "denied") {
-        activeLocation = {
-          permission: "denied",
-          location: null,
-          failure: "permission-denied",
-        };
-      } else if (devOverride.mode === "clock-only") {
-        activeLocation = {
-          permission: "prompt",
-          location: null,
-          failure: null,
-        };
-      } else if (
-        typeof devOverride.lat === "number" &&
-        typeof devOverride.lng === "number" &&
-        !Number.isNaN(devOverride.lat) &&
-        !Number.isNaN(devOverride.lng)
-      ) {
-        activeLocation = {
-          permission:
-            devOverride.mode === "creator-fallback" ? "unknown" : "granted",
-          failure: null,
-          location: {
-            latitude: Math.round(devOverride.lat * 100) / 100,
-            longitude: Math.round(devOverride.lng * 100) / 100,
-            source:
-              devOverride.mode === "creator-fallback"
-                ? "creator-fallback"
-                : "device",
-            capturedAt: clock.epochMs,
-          },
-        };
-      }
-    }
+    const clock = readKarachiClock(devOverride?.date ?? new Date());
+    const karachiLocation = getKarachiLocation(clock.epochMs);
 
     let astronomy: AstronomySnapshot | null = null;
-    if (activeLocation.location) {
-      try {
-        astronomy = calculateAstronomy(clock, activeLocation.location);
-      } catch {
-        astronomy = null;
-      }
+    try {
+      astronomy = calculateAstronomy(clock, karachiLocation);
+    } catch {
+      astronomy = null;
     }
 
-    const nextWorld = buildWorldState(clock, activeLocation, astronomy);
+    const nextWorld = buildWorldState(clock, astronomy);
     setWorld(nextWorld);
     audioRef.current?.setMood(nextWorld.phase);
-  }, [location]);
-
-  useEffect(() => {
-    if (!activity.visible) {
-      return;
-    }
-
-    const sixHours = 6 * 60 * 60 * 1000;
-    if (Date.now() - lastLocationCheck.current < sixHours) {
-      return;
-    }
-
-    lastLocationCheck.current = Date.now();
-    let cancelled = false;
-
-    void resolveLocationWithoutPrompt(fallback).then((result) => {
-      if (!cancelled) {
-        setLocation(result);
-      }
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [activity.visible, activity.resyncToken, fallback]);
+  }, []);
 
   useEffect(() => {
     if (!activity.visible) {
@@ -280,18 +209,6 @@ function useLivingWorldEngine({
     audioRef.current?.handleVisibility(activity.visible);
   }, [activity.visible]);
 
-  const requestLocation = useCallback(async () => {
-    setLocationBusy(true);
-    try {
-      const result = await requestLocationFromUser(fallback);
-      setLocation(result);
-      lastLocationCheck.current = Date.now();
-      return result;
-    } finally {
-      setLocationBusy(false);
-    }
-  }, [fallback]);
-
   const refreshSky = useCallback(() => {
     calculate();
   }, [calculate]);
@@ -301,13 +218,18 @@ function useLivingWorldEngine({
       audioRef.current = new AmbientAudioEngine();
     }
 
-    if (audioRef.current.isEnabled) {
-      await audioRef.current.mute();
+    const engine = audioRef.current;
+    engine.setMood(world.phase);
+
+    // If sound is currently desired ON and playing (or waiting to play), mute it when user clicks the mute toggle
+    if (engine.isDesired) {
+      await engine.mute();
       setAudioEnabled(false);
+      setAudioPlaying(false);
     } else {
-      audioRef.current.setMood(world.phase);
-      const started = await audioRef.current.start();
-      setAudioEnabled(started);
+      const started = await engine.unmute();
+      setAudioEnabled(true);
+      setAudioPlaying(started);
     }
   }, [world.phase]);
 
@@ -324,15 +246,13 @@ function useLivingWorldEngine({
   return useMemo(
     () => ({
       world,
-      location,
-      locationBusy,
       visible: activity.visible,
       reducedMotion: effectiveReducedMotion,
       audioEnabled,
+      audioPlaying,
       audioSupported,
       constellationFocused,
       setConstellationFocused,
-      requestLocation,
       refreshSky,
       toggleAudio,
       playNote,
@@ -340,14 +260,12 @@ function useLivingWorldEngine({
     }),
     [
       world,
-      location,
-      locationBusy,
       activity.visible,
       effectiveReducedMotion,
       audioEnabled,
+      audioPlaying,
       audioSupported,
       constellationFocused,
-      requestLocation,
       refreshSky,
       toggleAudio,
       playNote,
@@ -358,12 +276,10 @@ function useLivingWorldEngine({
 
 export function LivingWorldProvider({
   children,
-  fallback,
 }: {
   children: ReactNode;
-  fallback?: CreatorFallbackCoordinate;
 }) {
-  const value = useLivingWorldEngine({ fallback });
+  const value = useLivingWorldEngine();
 
   return (
     <LivingWorldContext.Provider value={value}>

@@ -6,47 +6,52 @@ export interface DeviceClockSnapshot {
   locale: string;
 }
 
-export function readDeviceClock(
-  now: Date = new Date(),
-  overrideTimeZone?: string,
-  overrideUtcOffsetMinutesEast?: number
+export const KARACHI_TIMEZONE = "Asia/Karachi";
+export const KARACHI_UTC_OFFSET_MINUTES_EAST = 300; // UTC+5 (PKT, no DST)
+
+/**
+ * Reads the current moment anchored to Karachi time (Asia/Karachi, UTC+5).
+ * Never queries device geolocation or permissions.
+ */
+export function readKarachiClock(
+  now: Date = new Date()
 ): DeviceClockSnapshot {
   if (Number.isNaN(now.getTime())) {
-    throw new TypeError("readDeviceClock received an invalid Date.");
+    throw new TypeError("readKarachiClock received an invalid Date.");
   }
-
-  const resolved = new Intl.DateTimeFormat().resolvedOptions();
-  const timeZone = overrideTimeZone || resolved.timeZone || "UTC";
-  const utcOffsetMinutesEast =
-    typeof overrideUtcOffsetMinutesEast === "number"
-      ? overrideUtcOffsetMinutesEast
-      : -now.getTimezoneOffset();
 
   return {
     now,
     epochMs: now.getTime(),
-    timeZone,
-    utcOffsetMinutesEast,
-    locale: resolved.locale || "en",
+    timeZone: KARACHI_TIMEZONE,
+    utcOffsetMinutesEast: KARACHI_UTC_OFFSET_MINUTES_EAST,
+    locale: "en-PK",
   };
 }
 
+// Preserve backwards-compatible export alias for any caller expecting readDeviceClock
+export const readDeviceClock = readKarachiClock;
+
 export function formatLocalEventTime(
   date: Date | null | undefined,
-  clock: Pick<DeviceClockSnapshot, "timeZone" | "locale">
+  clock: Pick<DeviceClockSnapshot, "timeZone" | "locale"> = {
+    timeZone: KARACHI_TIMEZONE,
+    locale: "en-PK",
+  }
 ): string | null {
   if (!date || Number.isNaN(date.getTime())) {
     return null;
   }
 
   try {
-    return new Intl.DateTimeFormat(clock.locale, {
-      timeZone: clock.timeZone,
+    return new Intl.DateTimeFormat(clock.locale || "en-PK", {
+      timeZone: clock.timeZone || KARACHI_TIMEZONE,
       hour: "numeric",
       minute: "2-digit",
     }).format(date);
   } catch {
     return new Intl.DateTimeFormat("en", {
+      timeZone: KARACHI_TIMEZONE,
       hour: "numeric",
       minute: "2-digit",
     }).format(date);

@@ -1,107 +1,130 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { BookOpen, Sparkles, Flower2, Star, Gift } from "lucide-react";
-import { useLivingWorld } from "./LivingWorldProvider";
+import React from "react";
+import { STORY_SCENES } from "../../config/personal";
+import {
+  IconChevronLeft,
+  IconChevronRight,
+  IconRestart,
+} from "../icons/StoryIcons";
 
-export interface NavItem {
-  id: string;
-  label: string;
-  icon: React.ComponentType<{ className?: string }>;
+interface BottomNavProps {
+  activeScene: number;
+  onSelectScene: (index: number) => void;
+  onPrev: () => void;
+  onNext: () => void;
 }
 
-const NAV_ITEMS: NavItem[] = [
-  { id: "story", label: "Story", icon: BookOpen },
-  { id: "keepsakes", label: "Keepsakes", icon: Sparkles },
-  { id: "flowers", label: "Flowers", icon: Flower2 },
-  { id: "stars", label: "Stars", icon: Star },
-  { id: "gift", label: "Gift", icon: Gift },
-];
-
-export function BottomNav() {
-  const { constellationFocused, playNote } = useLivingWorld();
-  const [visible, setVisible] = useState(false);
-  const [activeId, setActiveId] = useState<string>("story");
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const y = window.scrollY;
-      const threshold = Math.max(240, window.innerHeight * 0.45);
-      setVisible(y > threshold);
-
-      // Determine active section by scroll position
-      let current = "story";
-      for (const item of NAV_ITEMS) {
-        const el = document.getElementById(item.id);
-        if (el) {
-          const rect = el.getBoundingClientRect();
-          if (rect.top <= window.innerHeight * 0.48) {
-            current = item.id;
-          }
-        }
-      }
-      setActiveId(current);
-    };
-
-    handleScroll();
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const scrollToSection = (id: string, index: number) => {
-    playNote(index);
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
-      setActiveId(id);
-    }
-  };
-
-  const isShown = visible && !constellationFocused;
+export function BottomNav({
+  activeScene,
+  onSelectScene,
+  onPrev,
+  onNext,
+}: BottomNavProps) {
+  const total = STORY_SCENES.length;
+  const isFirst = activeScene <= 0;
+  const isLast = activeScene >= total - 1;
+  const nextSceneMeta = !isLast ? STORY_SCENES[activeScene + 1] : null;
 
   return (
     <nav
-      aria-label="Chapter bookmark navigation"
+      aria-label="Storybook scene navigation"
       style={{
-        bottom: "calc(env(safe-area-inset-bottom, 0px) + 12px)",
+        paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 12px)",
       }}
-      className={`fixed inset-x-0 z-30 flex justify-center px-4 pointer-events-none transition-all duration-500 ${
-        isShown
-          ? "opacity-100 translate-y-0"
-          : "opacity-0 translate-y-4"
-      }`}
+      className="fixed bottom-0 inset-x-0 z-30 flex justify-center px-3 sm:px-6 pointer-events-none"
     >
-      <div className="pointer-events-auto inline-flex items-center gap-1 sm:gap-2 px-3 py-1.5 rounded-full nav-frosted-bookmark">
-        {NAV_ITEMS.map((item, idx) => {
-          const Icon = item.icon;
-          const isActive = activeId === item.id;
-          return (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => scrollToSection(item.id, idx)}
-              aria-current={isActive ? "location" : undefined}
-              className="relative flex flex-col items-center justify-center min-w-[54px] min-h-[44px] px-2.5 py-1 rounded-full transition-transform active:scale-95"
-              style={{
-                color: isActive
-                  ? "var(--color-royal-violet)"
-                  : "var(--color-ink-muted)",
-              }}
-            >
-              <Icon className="w-4 h-4 mb-0.5" aria-hidden="true" />
-              <span className="text-[11px] font-semibold leading-none tracking-tight">
-                {item.label}
-              </span>
-              {isActive && (
+      <div className="pointer-events-auto w-full max-w-[36rem] flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-full nav-frosted-bookmark">
+        {/* Previous Scene Button */}
+        <button
+          type="button"
+          onClick={onPrev}
+          disabled={isFirst}
+          aria-label="Previous scene"
+          className={`inline-flex items-center gap-1 rounded-full px-3 min-h-[42px] text-xs font-semibold transition-all active:scale-95 ${
+            isFirst
+              ? "opacity-35 cursor-not-allowed"
+              : "hover:bg-[var(--color-paper-lavender)]"
+          }`}
+          style={{ color: "var(--color-ink-plum)" }}
+        >
+          <IconChevronLeft size={17} />
+          <span className="hidden xs:inline sm:inline">Previous</span>
+        </button>
+
+        {/* Interactive 8-Scene Progress Dots */}
+        <div
+          role="tablist"
+          aria-label="Storybook scenes"
+          className="flex items-center justify-center gap-1 sm:gap-1.5 px-1"
+        >
+          {STORY_SCENES.map((scene) => {
+            const isCurrent = scene.index === activeScene;
+            const isVisited = scene.index < activeScene;
+            return (
+              <button
+                key={scene.id}
+                type="button"
+                role="tab"
+                aria-selected={isCurrent}
+                aria-label={`Scene ${scene.index + 1}: ${scene.title}`}
+                title={`${scene.index + 1}. ${scene.title}`}
+                onClick={() => onSelectScene(scene.index)}
+                className="group relative flex items-center justify-center py-2.5 px-1 focus:outline-none"
+              >
                 <span
-                  aria-hidden="true"
-                  className="mt-0.5 w-1.5 h-1.5 rounded-full"
-                  style={{ backgroundColor: "var(--color-butter-star)" }}
+                  className={`block rounded-full transition-all duration-300 ${
+                    isCurrent
+                      ? "w-6 h-2"
+                      : "w-2 h-2 group-hover:scale-125"
+                  }`}
+                  style={{
+                    backgroundColor: isCurrent
+                      ? "var(--color-royal-violet)"
+                      : isVisited
+                        ? "var(--color-amethyst-dream)"
+                        : "var(--color-paper-border)",
+                  }}
                 />
-              )}
-            </button>
-          );
-        })}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Next Scene / Return to Beginning Button */}
+        {!isLast ? (
+          <button
+            type="button"
+            onClick={onNext}
+            aria-label={
+              nextSceneMeta
+                ? `Next scene: ${nextSceneMeta.title}`
+                : "Next scene"
+            }
+            className="inline-flex items-center gap-1 rounded-full px-3.5 min-h-[42px] text-xs font-semibold transition-all active:scale-95"
+            style={{
+              backgroundColor: "var(--color-royal-violet)",
+              color: "var(--color-paper-cream)",
+            }}
+          >
+            <span>Next</span>
+            <IconChevronRight size={17} />
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => onSelectScene(0)}
+            aria-label="Return to the beginning"
+            className="inline-flex items-center gap-1.5 rounded-full px-3.5 min-h-[42px] text-xs font-semibold transition-all active:scale-95"
+            style={{
+              backgroundColor: "var(--color-paper-lavender)",
+              color: "var(--color-royal-violet)",
+            }}
+          >
+            <IconRestart size={15} />
+            <span>Beginning</span>
+          </button>
+        )}
       </div>
     </nav>
   );

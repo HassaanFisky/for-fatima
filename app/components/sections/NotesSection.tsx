@@ -1,173 +1,151 @@
 "use client";
 
-import React from "react";
-import { motion } from "framer-motion";
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  SINCERE_APOLOGY,
-  CORE_PILLARS,
-  EDITORIAL_NOTES,
+  NOTICED_OBSERVATIONS,
+  type NoticedObservation,
 } from "../../config/personal";
 import { PaperCard } from "../illustrations/PaperCraft";
 import { NotesLanternScene } from "../illustrations/Characters";
 import { KonpeitoCandy } from "../illustrations/Konpeito";
+import { NoticedObjectIllustration } from "../icons/StoryIcons";
+import { useLivingWorld } from "../world/LivingWorldProvider";
 import { fadeUp } from "../../lib/motion";
 
 export function NotesSection() {
+  const { playNote } = useLivingWorld();
+  const [activeItem, setActiveItem] = useState<NoticedObservation>(
+    NOTICED_OBSERVATIONS[0]
+  );
+
+  const handleSelect = (item: NoticedObservation, index: number) => {
+    playNote(index + 1);
+    setActiveItem(item);
+  };
+
   return (
     <section
-      id="notes"
-      aria-labelledby="notes-heading"
-      className="relative z-10 max-w-[38rem] mx-auto px-4 sm:px-6 py-12"
+      id="noticed"
+      aria-labelledby="noticed-heading"
+      className="relative w-full h-full flex flex-col items-center justify-center px-4 sm:px-6 py-4 z-10"
     >
-      {/* Header & Pose #3 — Mochi holding a warm paper lantern */}
-      <div className="flex flex-col items-center text-center mb-4">
-        <div className="inline-flex items-center gap-2 rounded-full px-3.5 py-1 text-xs font-semibold paper-pill-surface mb-2">
-          <KonpeitoCandy flavor="periwinkle" />
-          <span style={{ color: "var(--color-royal-violet)" }}>
-            Honest words · Notes
-          </span>
-        </div>
+      <div className="w-full max-w-[36rem] mx-auto">
+        {/* Scene Header & Pose #3 — Mochi holding a warm paper lantern */}
+        <div className="flex flex-col items-center text-center mb-3">
+          <div className="inline-flex items-center gap-2 rounded-full px-3.5 py-1 text-xs font-semibold paper-pill-surface mb-1">
+            <KonpeitoCandy flavor="periwinkle" size={15} />
+            <span style={{ color: "var(--color-royal-violet)" }}>
+              Things That Were Noticed
+            </span>
+          </div>
 
-        <NotesLanternScene />
-      </div>
-
-      {/* Sincere Apology Letter Card on Cream Paper */}
-      <motion.div
-        variants={fadeUp}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.15 }}
-        className="mb-8"
-      >
-        <PaperCard variant="cream" washi="top-left" stamp>
-          <p
-            className="text-xs font-semibold uppercase tracking-wider mb-1"
-            style={{ color: "var(--color-royal-violet)" }}
-          >
-            {SINCERE_APOLOGY.subtitle}
-          </p>
+          <NotesLanternScene />
 
           <h2
-            id="notes-heading"
-            className="font-display font-bold mb-4"
+            id="noticed-heading"
+            className="font-display font-bold mt-1"
             style={{
-              fontSize: "clamp(1.375rem, 3.5vw, 1.875rem)",
+              fontSize: "clamp(1.25rem, 3.2vw, 1.65rem)",
               lineHeight: 1.25,
-              color: "var(--color-ink-plum)",
+              color: "var(--color-paper-cream)",
             }}
           >
-            {SINCERE_APOLOGY.title}
+            Small details remembered quietly
           </h2>
+        </div>
 
-          <div className="space-y-4">
-            {SINCERE_APOLOGY.paragraphs.map(
-              (paragraph: string, index: number) => (
-                <p
-                  key={index}
-                  className="font-sans text-[17px] leading-[1.75]"
-                  style={{ color: "var(--color-ink-plum)" }}
-                >
-                  {paragraph}
-                </p>
-              )
-            )}
-          </div>
-        </PaperCard>
-      </motion.div>
-
-      {/* Three Core Growth Commitments */}
-      <div className="space-y-5 mb-8">
-        {CORE_PILLARS.map((pillar, idx) => (
-          <motion.div
-            key={pillar.id}
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
+        {/* Tactile Illustrated Object Selector Tray (Not a generic card grid) */}
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          className="rounded-[24px] p-2.5 sm:p-3 paper-card-lavender mb-3.5"
+        >
+          <div
+            role="tablist"
+            aria-label="Observed details"
+            className="grid grid-cols-4 gap-2"
           >
-            <PaperCard
-              variant={idx % 2 === 0 ? "lavender" : "cream"}
-              stamp
-            >
-              <div className="flex items-center justify-between gap-2 mb-2">
-                <span
-                  className="text-xs font-semibold uppercase tracking-wider"
-                  style={{ color: "var(--color-royal-violet)" }}
+            {NOTICED_OBSERVATIONS.map((item, idx) => {
+              const isSelected = activeItem.id === item.id;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={isSelected}
+                  onClick={() => handleSelect(item, idx)}
+                  className={`group rounded-[18px] px-2 py-2.5 flex flex-col items-center text-center transition-all duration-300 focus:outline-none ${
+                    isSelected
+                      ? "paper-card-cream -translate-y-1"
+                      : "opacity-80 hover:opacity-100 hover:-translate-y-0.5"
+                  }`}
                 >
-                  Promise {pillar.number}
-                </span>
-                <span
-                  className="font-handwritten text-sm"
-                  style={{ color: "var(--color-ink-muted)" }}
-                >
-                  {pillar.mantra}
-                </span>
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center mb-1">
+                    <NoticedObjectIllustration type={item.id} />
+                  </div>
+                  <span
+                    className="font-display font-bold text-[11px] sm:text-xs leading-tight line-clamp-1"
+                    style={{
+                      color: isSelected
+                        ? "var(--color-royal-violet)"
+                        : "var(--color-ink-plum)",
+                    }}
+                  >
+                    {item.title}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </motion.div>
+
+        {/* Illuminated Specimen Reading Sheet */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeItem.id}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.26 }}
+          >
+            <PaperCard variant="cream" washi="top-left" stamp>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3.5 mb-3">
+                <div className="w-16 h-16 rounded-2xl paper-card-lavender flex items-center justify-center shrink-0">
+                  <NoticedObjectIllustration type={activeItem.id} />
+                </div>
+                <div>
+                  <p
+                    className="text-xs font-semibold uppercase tracking-wider mb-0.5"
+                    style={{ color: "var(--color-royal-violet)" }}
+                  >
+                    Observation {activeItem.num} · {activeItem.poeticLine}
+                  </p>
+                  <h3
+                    className="font-display font-bold text-lg sm:text-xl"
+                    style={{ color: "var(--color-ink-plum)" }}
+                  >
+                    {activeItem.title}
+                  </h3>
+                  <p
+                    className="text-xs sm:text-sm font-medium"
+                    style={{ color: "var(--color-ink-muted)" }}
+                  >
+                    {activeItem.subtitle}
+                  </p>
+                </div>
               </div>
 
-              <h3
-                className="font-display font-bold mb-2"
-                style={{
-                  fontSize: "clamp(1.125rem, 2.5vw, 1.35rem)",
-                  lineHeight: 1.3,
-                  color: "var(--color-ink-plum)",
-                }}
-              >
-                {pillar.title}
-              </h3>
-
               <p
-                className="font-sans text-[17px] leading-[1.75]"
+                className="font-sans text-[15.5px] sm:text-[16.5px] leading-[1.72]"
                 style={{ color: "var(--color-ink-plum)" }}
               >
-                {pillar.detail}
+                {activeItem.note}
               </p>
             </PaperCard>
           </motion.div>
-        ))}
-      </div>
-
-      {/* Three Editorial Letter Notes */}
-      <div className="space-y-5">
-        {EDITORIAL_NOTES.map((note, idx) => (
-          <motion.div
-            key={note.number}
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
-          >
-            <PaperCard
-              variant={idx % 2 === 0 ? "cream" : "lavender"}
-              washi={idx === 0 ? "top-right" : "none"}
-              stamp
-            >
-              <p
-                className="font-handwritten text-base mb-1"
-                style={{ color: "var(--color-royal-violet)" }}
-              >
-                Note {note.number}
-              </p>
-
-              <h3
-                className="font-display font-bold mb-2.5"
-                style={{
-                  fontSize: "clamp(1.125rem, 2.5vw, 1.35rem)",
-                  lineHeight: 1.3,
-                  color: "var(--color-ink-plum)",
-                }}
-              >
-                {note.headline}
-              </h3>
-
-              <p
-                className="font-sans text-[17px] leading-[1.75]"
-                style={{ color: "var(--color-ink-plum)" }}
-              >
-                {note.content}
-              </p>
-            </PaperCard>
-          </motion.div>
-        ))}
+        </AnimatePresence>
       </div>
     </section>
   );
