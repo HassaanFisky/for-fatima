@@ -26,8 +26,8 @@ export const STORY_SCENES: readonly StorySceneMeta[] = [
   {
     index: 1,
     id: "letter",
-    shortLabel: "Letter",
-    title: "A Small Letter",
+    shortLabel: "Shikwa",
+    title: "A Small Call & Response",
     kicker: "Scene II",
   },
   {
@@ -54,7 +54,7 @@ export const STORY_SCENES: readonly StorySceneMeta[] = [
   {
     index: 5,
     id: "quiet-sky",
-    shortLabel: "Quiet Sky",
+    shortLabel: "Post You",
     title: "The Quiet Sky",
     kicker: "Scene VI",
   },
@@ -83,15 +83,39 @@ export const PERSONAL_CONTENT = {
   continueLabel: "Continue into the story",
 } as const;
 
-export const SMALL_LETTER = {
-  salutation: "Dear Fatima,",
-  title: "A calmer place than a notification",
-  paragraphs: [
-    "Some thoughts deserve a quieter home than a rushed message on a loud day. This little world was built to sit patiently under the sky until whenever you feel like turning its pages.",
-    "When someone asks for time and space, the right answer is calm understanding. I am sorry for the moment I let impatience turn into noise when my only intention was to care.",
-    "There is no timer here and no expectation attached to these pages. It is simply a handmade keepsake of appreciation, respect, and quiet sincerity.",
-  ],
-  footerNote: "Kept at your own pace",
+export interface ShikwaExchangeItem {
+  id: "first-response" | "second-response";
+  stepLabel: string;
+  callContext: string;
+  revealPrompt: string;
+  spokenResponse: string;
+  noteStep: number;
+}
+
+export const SHIKWA_MOMENT = {
+  kicker: "Shikwa · Talhah Yunus",
+  title: "From the ending of the second verse",
+  intro:
+    "That Snapchat video you liked used the close of the second verse — where the song speaks from its own side, and my spoken replies answer back.",
+  exchanges: [
+    {
+      id: "first-response",
+      stepLabel: "First reply",
+      callContext: "When the song's narrator weighs the fault on its side",
+      revealPrompt: "Tap to reveal what I said first",
+      spokenResponse: "Meri galti hai.",
+      noteStep: 1,
+    },
+    {
+      id: "second-response",
+      stepLabel: "Second reply",
+      callContext: "When the verse says she does not understand",
+      revealPrompt: "Tap to reveal my answer to that line",
+      spokenResponse: "Wo toh samajhti bhi hai.",
+      noteStep: 3,
+    },
+  ] satisfies readonly ShikwaExchangeItem[],
+  footerNote: "A favourite little memory",
   signature: "Hassaan",
 } as const;
 
@@ -110,15 +134,15 @@ export const NOTICED_OBSERVATIONS: readonly NoticedObservation[] = [
     num: "01",
     title: "Gajre",
     subtitle: "Fragrant jasmine & quiet grace",
-    note: "Jahan khushbuein phoolon ki hon, wahan saadgi khud bolti hai. The effortless way you wear gajre stays in memory without ever trying to stand out.",
+    note: "Hath mein pehne gajre aur unki saadgi. The effortless way you wear them stays in memory without ever trying to stand out.",
     poeticLine: "Small details remembered quietly.",
   },
   {
     id: "piercings",
     num: "02",
     title: "The three ear piercings",
-    subtitle: "Delicate silver light, including the center one from Ramzan",
-    note: "Like three tiny stars aligned along the ear, including the center Ramzan piercing you once mentioned. The smallest details are always worth noticing.",
+    subtitle: "Three delicate points of silver light",
+    note: "Three ear piercings aligned softly, including the center wali Ramzan piercing. Even the smallest details are always worth noticing.",
     poeticLine: "Three subtle points of light.",
   },
   {
@@ -134,7 +158,7 @@ export const NOTICED_OBSERVATIONS: readonly NoticedObservation[] = [
     num: "04",
     title: "Quiet late-night calm",
     subtitle: "When the city finally slows down",
-    note: "Muskura de agar tu, ye be-noor shehar thora thehar jata hai. Those peaceful late-night hours and the line you once hummed, 'Phir se jeena chahta hun,' remain a warm memory.",
+    note: "Raat ke un khamosh ghanton ka sukoon jab shehar thora thehar jata hai. Those peaceful late-night hours remain a warm memory.",
     poeticLine: "Stillness after midnight.",
   },
 ] as const;
@@ -152,10 +176,10 @@ export const KEEPSAKE_ITEMS: readonly KeepsakeItem[] = [
   {
     id: "letter",
     num: "01",
-    title: "A quiet letter",
+    title: "A quiet note",
     subtitle: "Lafz aur thehrao",
     reflection:
-      "Kuch baatein jaldbazi mein bheje gaye messages ke qabil nahi hotin. Screen par shor ke bajaye ek aisi jagah jahan ehsaas thehar sake, bina kisi dabao ke.",
+      "Kuch chhoti baatein aur yaadein jo waqt ke sath aur bhi pyari lagti hain, bilkul saadgi aur sukoon ke sath.",
     artifactType: "letter",
   },
   {
@@ -168,12 +192,12 @@ export const KEEPSAKE_ITEMS: readonly KeepsakeItem[] = [
     artifactType: "jar",
   },
   {
-    id: "respect",
+    id: "warmth",
     num: "03",
-    title: "Care without pressure",
-    subtitle: "Izzat sab se pehle",
+    title: "Steady warmth",
+    subtitle: "Pur-sukoon khayal",
     reflection:
-      "Asal parwah woh hoti hai jo samne wale ko azaad mehsoos karaye. Jab kisi baat ya waqt ke liye mana kiya jaye, toh uski pehli baar mein izzat karna hi sabse bada saboot hai.",
+      "Har din ke shor se hat kar ek halka aur pur-sukoon ehsaas, jahan sirf aaram, muskurahat aur khushi ki dua ho.",
     artifactType: "heart",
   },
   {
@@ -224,10 +248,12 @@ export const GARDEN_FLOWERS: readonly GardenFlowerSpec[] = [
 ] as const;
 
 export const QUIET_SKY_CONTENT = {
-  kicker: "Atmospheric interlude",
-  title: "Waves of the evening sky",
+  kicker: "Post You · Talhah Yunus",
+  title: "A lighter kind of day",
+  spokenLine:
+    "Tum khush hoti ho, toh mere mushkil din bhi thode halke lagne lagte hain.",
   caption:
-    "Between words and stars, a quiet current of lavender light moves at its own unhurried rhythm. Pause here for a breath before we look up at the constellation.",
+    "As this quiet wave settles into stillness, one simple thought stays clear — seeing you happy naturally makes heavy days feel lighter.",
   visualNote:
     "3D liquid-glass ribbon wave in 4:3 harmonic stage · Source: creator-supplied Adobe 3D Wave study (verify commercial/redistribution licence if ever published publicly).",
 } as const;
@@ -246,7 +272,7 @@ export const CLOSING_PROMISE = {
   subtitle: "Under the same sky",
   title: "Wishing you peace tonight",
   paragraphs: [
-    "If it is late at night when you are reading this, set your phone aside soon and get some rest. wherever your days take you, I hope you always feel respected and surrounded by calm.",
+    "If it is late at night when you are reading this, set your phone aside soon and get some rest. Wherever your days take you, I hope you always feel respected and surrounded by calm.",
   ],
   signoff: "With quiet respect and care,",
   signature: "Hassaan",
@@ -286,9 +312,9 @@ const STAR_LABELS: ReadonlyArray<{ label: string; description: string }> = [
       "Choosing sukoon and stillness over unnecessary noise.",
   },
   {
-    label: "Trust",
+    label: "Calm",
     description:
-      "Built slowly through listening and keeping every boundary safe.",
+      "A steady, reassuring stillness that makes the evening feel lighter.",
   },
   {
     label: "Kindness",
@@ -316,14 +342,14 @@ const STAR_LABELS: ReadonlyArray<{ label: string; description: string }> = [
       "Softness that remains strong even on tiring days.",
   },
   {
-    label: "Respect",
+    label: "Simplicity",
     description:
-      "Honoring your words and your pace the very first time.",
+      "Appreciating your quiet grace and the thoughtful way you move through life.",
   },
   {
-    label: "Honesty",
+    label: "Clarity",
     description:
-      "Owning mistakes clearly and growing without excuses.",
+      "Simple, genuine words spoken from a clear and warm heart.",
   },
   {
     label: "Sincerity",

@@ -186,7 +186,7 @@ function StorybookDeck() {
                 : "translate3d(-24px, 0, 0) scale(0.985)",
           pointerEvents: isActive ? "auto" : "none",
         }}
-        className="absolute inset-0 w-full h-full overflow-y-auto overflow-x-hidden scene-scroll-container flex flex-col justify-center"
+        className="absolute inset-0 w-full h-full overflow-y-auto overflow-x-hidden scene-scroll-container [&>section]:!h-auto [&>section]:min-h-full"
       >
         {child}
       </div>

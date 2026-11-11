@@ -34,6 +34,9 @@ export function QuietSkySection({ isActive }: { isActive: boolean }) {
     const shouldPlay = isActive && visible && !reducedMotion;
 
     if (shouldPlay) {
+      if (video.readyState === 0) {
+        video.load();
+      }
       const playPromise = video.play();
       if (playPromise && typeof playPromise.catch === "function") {
         playPromise.catch(() => {
@@ -103,7 +106,7 @@ export function QuietSkySection({ isActive }: { isActive: boolean }) {
                 muted
                 loop
                 playsInline
-                preload="metadata"
+                preload={isActive ? "auto" : "none"}
                 onTimeUpdate={handleTimeUpdate}
                 aria-label="Translucent iridescent liquid-glass 3D ribbon wave drifting across a soft lavender sky"
                 className={`relative z-10 w-full h-full object-contain transition-opacity duration-500 ${
@@ -131,7 +134,7 @@ export function QuietSkySection({ isActive }: { isActive: boolean }) {
           </div>
         </motion.div>
 
-        {/* Minimal Poetic Paper Caption Below the 4:3 Stage */}
+        {/* Post You Supportive Feeling Paper Card Below the 4:3 Stage */}
         <motion.div
           variants={fadeUp}
           initial="hidden"
@@ -139,15 +142,21 @@ export function QuietSkySection({ isActive }: { isActive: boolean }) {
           className="w-full max-w-[33rem] mt-3.5"
         >
           <div className="rounded-[22px] px-5 py-4 sm:px-7 sm:py-5 text-center paper-card-cream">
+            <p
+              className="font-handwritten text-sm sm:text-base mb-1"
+              style={{ color: "var(--color-royal-violet)" }}
+            >
+              {QUIET_SKY_CONTENT.kicker} · {QUIET_SKY_CONTENT.title}
+            </p>
             <h2
               id="quiet-sky-heading"
-              className="font-display font-bold text-base sm:text-lg mb-1"
+              className="font-display font-bold text-base sm:text-lg mb-1.5"
               style={{ color: "var(--color-ink-plum)" }}
             >
-              {QUIET_SKY_CONTENT.title}
+              &ldquo;{QUIET_SKY_CONTENT.spokenLine}&rdquo;
             </h2>
             <p
-              className="font-sans text-sm sm:text-[15.5px] leading-[1.68]"
+              className="font-sans text-xs sm:text-[14.5px] leading-[1.68]"
               style={{ color: "var(--color-ink-muted)" }}
             >
               {QUIET_SKY_CONTENT.caption}

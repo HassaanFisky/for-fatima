@@ -365,8 +365,8 @@ export function ConstellationSection({ isActive }: { isActive: boolean }) {
                   className="font-sans text-xs sm:text-sm leading-relaxed"
                   style={{ color: "var(--color-ink-muted)" }}
                 >
-                  Every single point of light finds its way back to the same
-                  quiet promise made for you, Fatima.
+                  Fourteen little stars gathered together under the same calm
+                  night sky, Fatima.
                 </p>
               </>
             ) : (
