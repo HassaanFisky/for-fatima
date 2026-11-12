@@ -177,6 +177,7 @@ function StorybookDeck() {
             ? "none"
             : "opacity 420ms cubic-bezier(0.22, 1, 0.36, 1), transform 420ms cubic-bezier(0.22, 1, 0.36, 1)",
           opacity: isActive ? 1 : 0,
+          visibility: isActive ? "visible" : "hidden",
           transform: reducedMotion
             ? "none"
             : isActive

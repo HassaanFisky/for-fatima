@@ -32,31 +32,37 @@ export function BottomNav({
       style={{
         paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 12px)",
       }}
-      className="fixed bottom-0 inset-x-0 z-30 flex justify-center px-3 sm:px-6 pointer-events-none"
+      className="fixed bottom-0 inset-x-0 z-30 flex justify-center px-2.5 sm:px-6 pointer-events-none"
     >
-      <div className="pointer-events-auto w-full max-w-[36rem] flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-full nav-frosted-bookmark">
-        {/* Previous Scene Button */}
+      <div className="pointer-events-auto w-full max-w-[36rem] flex items-center justify-between gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1.5 rounded-full nav-frosted-bookmark">
+        {/* Previous Scene Button (High Contrast Enabled/Disabled States) */}
         <button
           type="button"
           onClick={onPrev}
           disabled={isFirst}
           aria-label="Previous scene"
-          className={`inline-flex items-center gap-1 rounded-full px-3 min-h-[42px] text-xs font-semibold transition-all active:scale-95 ${
+          className={`inline-flex items-center gap-1 rounded-full px-2.5 sm:px-3.5 min-h-[40px] sm:min-h-[42px] text-xs font-bold transition-all active:scale-95 shrink-0 ${
             isFirst
-              ? "opacity-35 cursor-not-allowed"
-              : "hover:bg-[var(--color-paper-lavender)]"
+              ? "opacity-40 cursor-not-allowed"
+              : "cursor-pointer hover:brightness-95 shadow-xs"
           }`}
-          style={{ color: "var(--color-ink-plum)" }}
+          style={{
+            backgroundColor: isFirst ? "transparent" : "#EFE6FF",
+            border: isFirst
+              ? "1px solid rgba(107, 98, 138, 0.28)"
+              : "1px solid #B79CED",
+            color: "var(--color-ink-plum)",
+          }}
         >
-          <IconChevronLeft size={17} />
-          <span className="hidden xs:inline sm:inline">Previous</span>
+          <IconChevronLeft size={16} />
+          <span className="hidden sm:inline">Back</span>
         </button>
 
-        {/* Interactive 8-Scene Progress Dots */}
+        {/* Interactive 8-Scene Progress Indicators (Unmistakable Active, Visited, and Unvisited Contrast) */}
         <div
           role="tablist"
           aria-label="Storybook scenes"
-          className="flex items-center justify-center gap-1 sm:gap-1.5 px-1"
+          className="flex items-center justify-center gap-1 sm:gap-2 px-0.5"
         >
           {STORY_SCENES.map((scene) => {
             const isCurrent = scene.index === activeScene;
@@ -70,22 +76,34 @@ export function BottomNav({
                 aria-label={`Scene ${scene.index + 1}: ${scene.title}`}
                 title={`${scene.index + 1}. ${scene.title}`}
                 onClick={() => onSelectScene(scene.index)}
-                className="group relative flex items-center justify-center py-2.5 px-1 focus:outline-none"
+                className="group relative flex items-center justify-center py-2 px-0.5 sm:px-1 cursor-pointer focus:outline-none"
               >
                 <span
-                  className={`block rounded-full transition-all duration-300 ${
+                  className={`flex items-center justify-center rounded-full transition-all duration-300 ${
                     isCurrent
-                      ? "w-6 h-2"
-                      : "w-2 h-2 group-hover:scale-125"
+                      ? "w-5 h-2.5 sm:w-7 sm:h-3 shadow-xs"
+                      : "w-2 h-2 sm:w-2.5 sm:h-2.5 group-hover:scale-125"
                   }`}
                   style={{
                     backgroundColor: isCurrent
-                      ? "var(--color-royal-violet)"
+                      ? "#5E3FB8"
                       : isVisited
-                        ? "var(--color-amethyst-dream)"
-                        : "var(--color-paper-border)",
+                        ? "#8A6BE0"
+                        : "#DDD0F7",
+                    border: isCurrent
+                      ? "1.5px solid #2E2452"
+                      : isVisited
+                        ? "1px solid #5E3FB8"
+                        : "1.5px solid #7C69B4",
                   }}
-                />
+                >
+                  {isCurrent && (
+                    <span
+                      className="block w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full"
+                      style={{ backgroundColor: "var(--color-paper-cream)" }}
+                    />
+                  )}
+                </span>
               </button>
             );
           })}
@@ -101,28 +119,30 @@ export function BottomNav({
                 ? `Next scene: ${nextSceneMeta.title}`
                 : "Next scene"
             }
-            className="inline-flex items-center gap-1 rounded-full px-3.5 min-h-[42px] text-xs font-semibold transition-all active:scale-95"
+            className="inline-flex items-center gap-1 rounded-full px-3 sm:px-4 min-h-[40px] sm:min-h-[42px] text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-xs shrink-0"
             style={{
               backgroundColor: "var(--color-royal-violet)",
+              border: "1px solid #2E2452",
               color: "var(--color-paper-cream)",
             }}
           >
             <span>Next</span>
-            <IconChevronRight size={17} />
+            <IconChevronRight size={16} />
           </button>
         ) : (
           <button
             type="button"
             onClick={() => onSelectScene(0)}
             aria-label="Return to the beginning"
-            className="inline-flex items-center gap-1.5 rounded-full px-3.5 min-h-[42px] text-xs font-semibold transition-all active:scale-95"
+            className="inline-flex items-center gap-1 rounded-full px-3 sm:px-3.5 min-h-[40px] sm:min-h-[42px] text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-xs shrink-0"
             style={{
-              backgroundColor: "var(--color-paper-lavender)",
+              backgroundColor: "#EFE6FF",
+              border: "1px solid #5E3FB8",
               color: "var(--color-royal-violet)",
             }}
           >
             <IconRestart size={15} />
-            <span>Beginning</span>
+            <span>Start</span>
           </button>
         )}
       </div>

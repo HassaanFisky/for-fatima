@@ -1,28 +1,16 @@
 "use client";
 
-/**
- * Scene 6 — The Quiet Sky
- * Integrates the 4:3 translucent liquid-glass 3D ribbon wave video derived from
- * `E:\ADOBE 3D WAVE.mp4` (`1600×1200` 4:3, 30fps, 12.67s, silent).
- *
- * Asset & Licensing Note:
- * - Served from optimised silent (`-an`) 4:3 web derivatives:
- *   `/media/liquid-wave-4x3.mp4` (desktop 1200×900)
- *   `/media/liquid-wave-mobile-4x3.mp4` (mobile 960×720)
- *   `/media/liquid-wave-poster.jpg` (poster frame)
- * - Source is creator-supplied Adobe 3D Wave visual study (`E:\ADOBE 3D WAVE.mp4` kept untouched).
- *   If this private gift is ever repurposed commercially, verify the Adobe Stock / artist redistribution licence.
- */
-
 import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { QUIET_SKY_CONTENT } from "../../config/personal";
+import { LIQUID_WAVE_CONTENT } from "../../config/personal";
 import { KonpeitoStar } from "../illustrations/Konpeito";
 import { useLivingWorld } from "../world/LivingWorldProvider";
-import { fadeUp } from "../../lib/motion";
+import { fadeUp, getTitleCadenceVariants } from "../../lib/motion";
+
+const titleCadence = getTitleCadenceVariants(5);
 
 export function QuietSkySection({ isActive }: { isActive: boolean }) {
-  const { visible, reducedMotion } = useLivingWorld();
+  const { visible, reducedMotion, playStarBell } = useLivingWorld();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [loopSoftening, setLoopSoftening] = useState(false);
 
@@ -67,16 +55,7 @@ export function QuietSkySection({ isActive }: { isActive: boolean }) {
       className="relative w-full h-full flex flex-col items-center justify-center px-4 sm:px-6 py-4 z-10"
     >
       <div className="w-full max-w-[38rem] mx-auto flex flex-col items-center">
-        {/* Subtle Scene Header Pill */}
-        <div className="inline-flex items-center gap-2 rounded-full px-3.5 py-1 text-xs font-semibold paper-pill-surface mb-3">
-          <KonpeitoStar size="sm" />
-          <span style={{ color: "var(--color-royal-violet)" }}>
-            {QUIET_SKY_CONTENT.kicker} · The Quiet Sky
-          </span>
-          <KonpeitoStar size="sm" />
-        </div>
-
-        {/* Deliberate 4:3 Atmospheric Stage Harmonising the Bright Lavender Video Backdrop */}
+        {/* Deliberate 4:3 Liquid-Wave Atmospheric Stage */}
         <motion.div
           variants={fadeUp}
           initial="hidden"
@@ -108,7 +87,7 @@ export function QuietSkySection({ isActive }: { isActive: boolean }) {
                 playsInline
                 preload={isActive ? "auto" : "none"}
                 onTimeUpdate={handleTimeUpdate}
-                aria-label="Translucent iridescent liquid-glass 3D ribbon wave drifting across a soft lavender sky"
+                aria-label="Translucent liquid-glass wave drifting across a soft lavender sky"
                 className={`relative z-10 w-full h-full object-contain transition-opacity duration-500 ${
                   loopSoftening ? "opacity-55" : "opacity-100"
                 }`}
@@ -122,7 +101,7 @@ export function QuietSkySection({ isActive }: { isActive: boolean }) {
               </video>
             )}
 
-            {/* Soft Lavender Vignette Feather so the 4:3 Window Melts Naturally into the Frame */}
+            {/* Soft Lavender Vignette Feather */}
             <div
               aria-hidden="true"
               className="pointer-events-none absolute inset-0 z-20 rounded-[22px]"
@@ -134,33 +113,36 @@ export function QuietSkySection({ isActive }: { isActive: boolean }) {
           </div>
         </motion.div>
 
-        {/* Post You Supportive Feeling Paper Card Below the 4:3 Stage */}
+        {/* Central Roman Urdu Message Card — Clean, Unexplained, Intimate */}
         <motion.div
-          variants={fadeUp}
+          variants={titleCadence.container}
           initial="hidden"
           animate="visible"
           className="w-full max-w-[33rem] mt-3.5"
         >
-          <div className="rounded-[22px] px-5 py-4 sm:px-7 sm:py-5 text-center paper-card-cream">
-            <p
-              className="font-handwritten text-sm sm:text-base mb-1"
-              style={{ color: "var(--color-royal-violet)" }}
-            >
-              {QUIET_SKY_CONTENT.kicker} · {QUIET_SKY_CONTENT.title}
-            </p>
-            <h2
+          <div className="rounded-[22px] px-5 py-4.5 sm:px-7 sm:py-5 text-center paper-card-cream">
+            <div className="inline-flex items-center justify-center gap-2 mb-1.5">
+              <KonpeitoStar
+                size="sm"
+                onClick={playStarBell}
+                ariaLabel="Ring left star chime"
+              />
+              <KonpeitoStar
+                size="sm"
+                variant="four-point"
+                onClick={playStarBell}
+                ariaLabel="Ring right star chime"
+              />
+            </div>
+
+            <motion.h2
               id="quiet-sky-heading"
-              className="font-display font-bold text-base sm:text-lg mb-1.5"
+              variants={titleCadence.heading}
+              className="font-display font-bold text-base sm:text-xl leading-relaxed"
               style={{ color: "var(--color-ink-plum)" }}
             >
-              &ldquo;{QUIET_SKY_CONTENT.spokenLine}&rdquo;
-            </h2>
-            <p
-              className="font-sans text-xs sm:text-[14.5px] leading-[1.68]"
-              style={{ color: "var(--color-ink-muted)" }}
-            >
-              {QUIET_SKY_CONTENT.caption}
-            </p>
+              &ldquo;{LIQUID_WAVE_CONTENT.spokenLine}&rdquo;
+            </motion.h2>
           </div>
         </motion.div>
       </div>

@@ -2,15 +2,17 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { SHIKWA_MOMENT } from "../../config/personal";
+import { PERSONAL_MOMENT } from "../../config/personal";
 import { PaperCard } from "../illustrations/PaperCraft";
 import { StoryPetalScene } from "../illustrations/Characters";
 import { KonpeitoCandy, KonpeitoStar } from "../illustrations/Konpeito";
 import { useLivingWorld } from "../world/LivingWorldProvider";
-import { fadeUp } from "../../lib/motion";
+import { fadeUp, getTitleCadenceVariants } from "../../lib/motion";
+
+const titleCadence = getTitleCadenceVariants(1);
 
 export function StorySection() {
-  const { playNote, reducedMotion } = useLivingWorld();
+  const { playNote, playStarBell, reducedMotion } = useLivingWorld();
   const [revealedIds, setRevealedIds] = useState<Record<string, boolean>>({});
 
   const handleToggleExchange = (id: string, noteStep: number) => {
@@ -31,51 +33,52 @@ export function StorySection() {
     >
       <div className="w-full max-w-[35rem] mx-auto">
         {/* Scene Header & Pose #2 — Yume catching a falling sakura petal */}
-        <div className="flex flex-col items-center text-center mb-3">
-          <div className="inline-flex items-center gap-2 rounded-full px-3.5 py-1 text-xs font-semibold paper-pill-surface mb-1.5">
+        <motion.div
+          variants={titleCadence.container}
+          initial="hidden"
+          animate="visible"
+          className="flex flex-col items-center text-center mb-3"
+        >
+          <motion.div
+            variants={titleCadence.kicker}
+            className="inline-flex items-center gap-2 rounded-full px-3.5 py-1 text-xs font-semibold paper-pill-surface mb-1.5"
+          >
             <KonpeitoCandy flavor="sakura" size={15} />
             <span style={{ color: "var(--color-royal-violet)" }}>
-              {SHIKWA_MOMENT.kicker}
+              A Small Memory
             </span>
-          </div>
+          </motion.div>
 
           <StoryPetalScene />
-        </div>
+        </motion.div>
 
         {/* Cream-Paper Call-and-Response Card */}
         <motion.div variants={fadeUp} initial="hidden" animate="visible">
           <PaperCard variant="cream" washi="top-left" stamp>
-            <p
-              className="font-handwritten text-base sm:text-lg mb-1"
-              style={{ color: "var(--color-royal-violet)" }}
+            <motion.div
+              variants={titleCadence.container}
+              initial="hidden"
+              animate="visible"
             >
-              {SHIKWA_MOMENT.kicker}
-            </p>
-
-            <h2
-              id="letter-heading"
-              className="font-display font-bold mb-2.5"
-              style={{
-                fontSize: "clamp(1.25rem, 3vw, 1.65rem)",
-                lineHeight: 1.25,
-                color: "var(--color-ink-plum)",
-              }}
-            >
-              {SHIKWA_MOMENT.title}
-            </h2>
-
-            <p
-              className="font-sans text-[14.5px] sm:text-[15.5px] leading-[1.68] mb-4"
-              style={{ color: "var(--color-ink-muted)" }}
-            >
-              {SHIKWA_MOMENT.intro}
-            </p>
+              <motion.h2
+                id="letter-heading"
+                variants={titleCadence.heading}
+                className="font-display font-bold mb-4"
+                style={{
+                  fontSize: "clamp(1.25rem, 3vw, 1.6rem)",
+                  lineHeight: 1.25,
+                  color: "var(--color-ink-plum)",
+                }}
+              >
+                {PERSONAL_MOMENT.title}
+              </motion.h2>
+            </motion.div>
 
             {/* Two Interactive Call-and-Response Cards */}
             <div className="space-y-3">
-              {SHIKWA_MOMENT.exchanges.map((item, idx) => {
+              {PERSONAL_MOMENT.exchanges.map((item) => {
                 const isRevealed = Boolean(revealedIds[item.id]);
-                const panelId = `shikwa-response-${item.id}`;
+                const panelId = `moment-response-${item.id}`;
 
                 return (
                   <div
@@ -83,10 +86,10 @@ export function StorySection() {
                     className="rounded-[18px] border transition-colors"
                     style={{
                       background: isRevealed
-                        ? "rgba(244, 238, 255, 0.72)"
-                        : "rgba(255, 252, 247, 0.78)",
+                        ? "rgba(244, 238, 255, 0.76)"
+                        : "rgba(255, 252, 247, 0.84)",
                       borderColor: isRevealed
-                        ? "rgba(109, 74, 255, 0.32)"
+                        ? "rgba(94, 63, 184, 0.36)"
                         : "var(--color-paper-border)",
                     }}
                   >
@@ -97,38 +100,30 @@ export function StorySection() {
                       onClick={() =>
                         handleToggleExchange(item.id, item.noteStep)
                       }
-                      className="w-full text-left px-4 py-3 sm:px-4.5 sm:py-3.5 rounded-[18px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6D4AFF]"
+                      className="w-full text-left px-4 py-3.5 sm:px-5 sm:py-4 rounded-[18px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5E3FB8]"
                     >
-                      <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center justify-between gap-3">
                         <div className="min-w-0">
-                          <span
-                            className="block text-[11px] font-semibold uppercase tracking-wider mb-1"
-                            style={{ color: "var(--color-royal-violet)" }}
-                          >
-                            0{idx + 1} · {item.stepLabel}
-                          </span>
                           <p
-                            className="font-sans text-xs sm:text-[13.5px] leading-relaxed"
+                            className="font-display font-bold text-base sm:text-lg leading-snug"
                             style={{ color: "var(--color-ink-plum)" }}
                           >
-                            {item.callContext}
+                            &ldquo;{item.musicalThought}&rdquo;
                           </p>
                         </div>
 
                         <span
-                          className="shrink-0 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold border transition-colors"
+                          className="shrink-0 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold border transition-colors"
                           style={{
                             background: isRevealed
-                              ? "rgba(109, 74, 255, 0.12)"
-                              : "rgba(255, 255, 255, 0.85)",
-                            borderColor: "rgba(109, 74, 255, 0.24)",
+                              ? "rgba(94, 63, 184, 0.14)"
+                              : "rgba(255, 255, 255, 0.9)",
+                            borderColor: "rgba(94, 63, 184, 0.28)",
                             color: "var(--color-royal-violet)",
                           }}
                         >
                           <KonpeitoStar size="sm" />
-                          <span>
-                            {isRevealed ? "Revealed" : item.revealPrompt}
-                          </span>
+                          <span>{isRevealed ? "Heard" : "Listen"}</span>
                         </span>
                       </div>
                     </button>
@@ -136,9 +131,9 @@ export function StorySection() {
                     <div
                       id={panelId}
                       role="region"
-                      aria-label={item.stepLabel}
+                      aria-label={item.musicalThought}
                       hidden={!isRevealed}
-                      className="px-4 pb-3.5 sm:px-4.5"
+                      className="px-4 pb-3.5 sm:px-5"
                     >
                       {isRevealed && (
                         <motion.div
@@ -147,26 +142,25 @@ export function StorySection() {
                           }
                           animate={{ opacity: 1, y: 0 }}
                           transition={{
-                            duration: reducedMotion ? 0 : 0.22,
+                            duration: reducedMotion ? 0 : 0.24,
                             ease: [0.22, 1, 0.36, 1],
                           }}
-                          className="pt-2.5 border-t"
+                          className="pt-2.5 border-t flex items-center justify-between gap-2"
                           style={{
-                            borderColor: "rgba(109, 74, 255, 0.16)",
+                            borderColor: "rgba(94, 63, 184, 0.18)",
                           }}
                         >
-                          <span
-                            className="block text-[11px] font-medium mb-0.5"
-                            style={{ color: "var(--color-ink-muted)" }}
-                          >
-                            Hassaan&apos;s spoken response
-                          </span>
                           <p
-                            className="font-display font-bold text-base sm:text-lg"
-                            style={{ color: "var(--color-ink-plum)" }}
+                            className="font-handwritten text-xl sm:text-2xl font-bold"
+                            style={{ color: "var(--color-royal-violet)" }}
                           >
                             &ldquo;{item.spokenResponse}&rdquo;
                           </p>
+                          <KonpeitoStar
+                            size="sm"
+                            onClick={playStarBell}
+                            ariaLabel="Ring star chime"
+                          />
                         </motion.div>
                       )}
                     </div>
@@ -176,20 +170,14 @@ export function StorySection() {
             </div>
 
             <div
-              className="mt-4 pt-3 border-t flex items-center justify-between"
+              className="mt-4 pt-3 border-t flex items-center justify-end"
               style={{ borderColor: "var(--color-paper-border)" }}
             >
-              <span
-                className="text-xs font-medium"
-                style={{ color: "var(--color-ink-muted)" }}
-              >
-                {SHIKWA_MOMENT.footerNote}
-              </span>
               <span
                 className="font-handwritten text-xl"
                 style={{ color: "var(--color-royal-violet)" }}
               >
-                {SHIKWA_MOMENT.signature}
+                {PERSONAL_MOMENT.signature}
               </span>
             </div>
           </PaperCard>

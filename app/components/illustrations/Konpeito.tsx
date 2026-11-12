@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useId } from "react";
+import React, { useId, useState, useCallback } from "react";
 
 interface KonpeitoStarProps {
   size?: "lg" | "md" | "sm";
@@ -8,17 +8,18 @@ interface KonpeitoStarProps {
   className?: string;
   onClick?: () => void;
   ariaLabel?: string;
+  variant?: "five-point" | "four-point";
 }
 
 const SIZE_MAP = {
-  lg: 48,
-  md: 20,
-  sm: 6,
+  lg: 44,
+  md: 24,
+  sm: 12,
 } as const;
 
 /**
- * Faceted 8-point rounded Konpeitō sugar-star.
- * Only Large stars include an SVG radialGradient halo glow.
+ * Crisp, recognizable 5-point or 4-point celestial star with warm starlight facets.
+ * Supports tactile touch/click shimmer and bell chime callback.
  */
 export function KonpeitoStar({
   size = "md",
@@ -26,44 +27,59 @@ export function KonpeitoStar({
   className = "",
   onClick,
   ariaLabel,
+  variant = "five-point",
 }: KonpeitoStarProps) {
   const uid = useId();
   const px = SIZE_MAP[size];
+  const [shimmering, setShimmering] = useState(false);
 
-  if (size === "sm") {
-    return (
-      <svg
-        width={px}
-        height={px}
-        viewBox="0 0 8 8"
-        className={className}
-        aria-hidden="true"
-      >
-        <circle cx="4" cy="4" r="3" fill="var(--color-starlight)" />
-      </svg>
-    );
-  }
+  const handlePress = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.stopPropagation();
+      setShimmering(true);
+      onClick?.();
+      window.setTimeout(() => setShimmering(false), 520);
+    },
+    [onClick]
+  );
+
+  // Clean, symmetrical 5-point star path (center 24,24, outer R=19, inner r=8.2)
+  const fivePointOuter =
+    "M24 5 L28.8 17.4 L42.1 18.1 L31.8 26.5 L35.2 39.4 L24 32.2 L12.8 39.4 L16.2 26.5 L5.9 18.1 L19.2 17.4 Z";
+  const fivePointCore =
+    "M24 9.5 L27.6 18.8 L37.6 19.3 L29.9 25.6 L32.4 35.2 L24 29.8 L15.6 35.2 L18.1 25.6 L10.4 19.3 L20.4 18.8 Z";
+
+  // Clean 4-point celestial diamond star path
+  const fourPointOuter =
+    "M24 4 L28.6 19.4 L44 24 L28.6 28.6 L24 44 L19.4 28.6 L4 24 L19.4 19.4 Z";
+  const fourPointCore =
+    "M24 9 L27.3 20.7 L39 24 L27.3 27.3 L24 39 L20.7 27.3 L9 24 L20.7 20.7 Z";
+
+  const outerPath = variant === "four-point" ? fourPointOuter : fivePointOuter;
+  const corePath = variant === "four-point" ? fourPointCore : fivePointCore;
 
   const content = (
     <svg
       width={px}
       height={px}
       viewBox="0 0 48 48"
-      className={className}
+      className={`${className} transition-transform duration-300 ${
+        shimmering ? "scale-125" : "scale-100"
+      }`}
       aria-hidden={onClick ? undefined : "true"}
     >
       <defs>
-        {glow && (
+        {(glow || shimmering) && (
           <radialGradient id={`star-halo-${uid}`} cx="50%" cy="50%" r="50%">
             <stop
               offset="0%"
               stopColor="var(--color-starlight)"
-              stopOpacity="0.65"
+              stopOpacity={shimmering ? "0.92" : "0.68"}
             />
             <stop
-              offset="45%"
+              offset="50%"
               stopColor="var(--color-butter-yellow)"
-              stopOpacity="0.28"
+              stopOpacity={shimmering ? "0.48" : "0.28"}
             />
             <stop
               offset="100%"
@@ -74,37 +90,39 @@ export function KonpeitoStar({
         )}
       </defs>
 
-      {glow && <circle cx="24" cy="24" r="23" fill={`url(#star-halo-${uid})`} />}
+      {(glow || shimmering) && (
+        <circle
+          cx="24"
+          cy="24"
+          r={shimmering ? "24" : "22"}
+          fill={`url(#star-halo-${uid})`}
+        />
+      )}
 
-      {/* Outer amethyst sugar rim */}
+      {/* Soft outer star rim */}
       <path
-        d="M24 6 C26 6 27 11 29 12 C31 13 36 10 37 11 C38 12 35 17 36 19 C37 21 42 22 42 24 C42 26 37 27 36 29 C35 31 38 36 37 37 C36 38 31 35 29 36 C27 37 26 42 24 42 C22 42 21 37 19 36 C17 35 12 38 11 37 C10 36 13 31 12 29 C11 27 6 26 6 24 C6 22 11 21 12 19 C13 17 10 12 11 11 C12 10 17 13 19 12 C21 11 22 6 24 6 Z"
-        fill="var(--color-amethyst-dream)"
-        opacity="0.32"
-        transform="scale(1.06)"
-        style={{ transformOrigin: "24px 24px" }}
-      />
-
-      {/* Mid butter-yellow crystal body */}
-      <path
-        d="M24 7 C26 7 27 11.5 28.8 12.5 C30.5 13.5 35 10.8 36.2 12 C37.4 13.2 34.5 17.5 35.5 19.2 C36.5 21 41 22 41 24 C41 26 36.5 27 35.5 28.8 C34.5 30.5 37.4 34.8 36.2 36 C35 37.2 30.5 34.5 28.8 35.5 C27 36.5 26 41 24 41 C22 41 21 36.5 19.2 35.5 C17.5 34.5 13 37.2 11.8 36 C10.6 34.8 13.5 30.5 12.5 28.8 C11.5 27 7 26 7 24 C7 22 11.5 21 12.5 19.2 C13.5 17.5 10.6 13.2 11.8 12 C13 10.8 17.5 13.5 19.2 12.5 C21 11.5 22 7 24 7 Z"
+        d={outerPath}
         fill="var(--color-butter-yellow)"
+        stroke="var(--color-starlight)"
+        strokeWidth="1.2"
+        strokeLinejoin="round"
       />
 
-      {/* Starlight core facet */}
-      <polygon
-        points="24,11 31,20 24,25 17,20"
+      {/* Warm starlight inner facet */}
+      <path
+        d={corePath}
         fill="var(--color-starlight)"
         opacity="0.92"
-      />
-      <polygon
-        points="24,25 33,24 27,33 20,31"
-        fill="var(--color-starlight)"
-        opacity="0.65"
+        strokeLinejoin="round"
       />
 
-      {/* Top-left moonlit highlight dot */}
-      <circle cx="20.5" cy="17.5" r="2.2" fill="var(--color-cream-paper)" />
+      {/* Crisp center gleam */}
+      <circle
+        cx="24"
+        cy="23"
+        r={size === "sm" ? "3.2" : "2.6"}
+        fill="var(--color-cream-paper)"
+      />
     </svg>
   );
 
@@ -112,9 +130,9 @@ export function KonpeitoStar({
     return (
       <button
         type="button"
-        onClick={onClick}
-        aria-label={ariaLabel || "Bright konpeitō star"}
-        className="inline-flex items-center justify-center min-w-[44px] min-h-[44px] rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-amethyst-dream)]"
+        onClick={handlePress}
+        aria-label={ariaLabel || "Celestial star"}
+        className="pointer-events-auto inline-flex items-center justify-center min-w-[36px] min-h-[36px] rounded-full cursor-pointer transition-transform duration-200 hover:scale-110 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-amethyst-dream)]"
       >
         {content}
       </button>
@@ -151,10 +169,13 @@ export function KonpeitoCandy({
       aria-hidden="true"
     >
       <path
-        d="M16 3 C17.6 3 18.4 7 19.8 7.8 C21.2 8.6 25 6.4 26 7.4 C27 8.4 24.6 12 25.4 13.4 C26.2 14.8 30 15.6 30 17 C30 18.4 26.2 19.2 25.4 20.6 C24.6 22 27 25.6 26 26.6 C25 27.6 21.2 25.4 19.8 26.2 C18.4 27 17.6 30 16 30 C14.4 30 13.6 27 12.2 26.2 C10.8 25.4 7 27.6 6 26.6 C5 25.6 7.4 22 6.6 20.6 C5.8 19.2 2 18.4 2 17 C2 15.6 5.8 14.8 6.6 13.4 C7.4 12 5 8.4 6 7.4 C7 6.4 10.8 8.6 12.2 7.8 C13.6 7 14.4 3 16 3 Z"
+        d="M16 3 L19.5 11.2 L28.4 12.1 L21.6 18.1 L23.6 26.8 L16 22.1 L8.4 26.8 L10.4 18.1 L3.6 12.1 L12.5 11.2 Z"
         fill={CANDY_FILL[flavor]}
+        stroke="var(--color-cream-paper)"
+        strokeWidth="0.9"
+        strokeLinejoin="round"
       />
-      <circle cx="13" cy="12" r="2" fill="var(--color-cream-paper)" opacity="0.85" />
+      <circle cx="14.5" cy="13.5" r="2" fill="var(--color-cream-paper)" opacity="0.85" />
     </svg>
   );
 }

@@ -24,9 +24,8 @@ const kleeOne = Klee_One({
 });
 
 export const metadata: Metadata = {
-  title: "for fatima 💜 — A little paper sky",
-  description:
-    "Konpeitō Night — A little paper sky, handmade for one person.",
+  title: "For Fatima",
+  description: "A small handmade world for Fatima.",
   robots: {
     index: false,
     follow: false,

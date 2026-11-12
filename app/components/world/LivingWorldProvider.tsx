@@ -44,6 +44,8 @@ export interface LivingWorldValue {
   toggleAudio: () => Promise<void>;
   playNote: (step?: number) => void;
   playChord: () => void;
+  playStarBell: () => void;
+  playPlushTouch: () => void;
 }
 
 const LivingWorldContext = createContext<LivingWorldValue | null>(null);
@@ -241,6 +243,14 @@ function useLivingWorldEngine({
     audioRef.current?.playCompletionChord();
   }, []);
 
+  const playStarBell = useCallback(() => {
+    audioRef.current?.playStarBell();
+  }, []);
+
+  const playPlushTouch = useCallback(() => {
+    audioRef.current?.playPlushTouch();
+  }, []);
+
   const effectiveReducedMotion = activity.reducedMotion || devReducedMotion;
 
   return useMemo(
@@ -257,6 +267,8 @@ function useLivingWorldEngine({
       toggleAudio,
       playNote,
       playChord,
+      playStarBell,
+      playPlushTouch,
     }),
     [
       world,
@@ -270,6 +282,8 @@ function useLivingWorldEngine({
       toggleAudio,
       playNote,
       playChord,
+      playStarBell,
+      playPlushTouch,
     ]
   );
 }

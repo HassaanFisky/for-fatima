@@ -21,25 +21,30 @@ export function WorldControls({ activeScene = 0 }: { activeScene?: number }) {
       }}
     >
       <div className="max-w-3xl mx-auto flex items-center justify-between gap-2">
-        {/* Left: Original Identity Mark + Scene Indicator + Living Sky Phase */}
-        <div className="pointer-events-auto inline-flex items-center gap-2.5 rounded-full pl-2.5 pr-4 py-1.5 text-xs font-semibold paper-pill-surface">
+        {/* Left: Identity Mark + High-Contrast Scene Badge + Scene Title */}
+        <div className="pointer-events-auto inline-flex items-center gap-2 rounded-full pl-2 pr-4 py-1.5 text-xs font-semibold paper-pill-surface">
           <KonpeitoWaveMark size={20} />
+          <span
+            className="inline-flex items-center justify-center rounded-full px-2 py-0.5 text-[11px] font-bold"
+            style={{
+              backgroundColor: "var(--color-royal-violet)",
+              color: "var(--color-paper-cream)",
+            }}
+          >
+            {sceneMeta.index + 1} / {STORY_SCENES.length}
+          </span>
           <span
             className="font-display font-bold tracking-tight"
             style={{ color: "var(--color-ink-plum)" }}
           >
-            {sceneMeta.index + 1} / {STORY_SCENES.length} · {sceneMeta.title}
+            {sceneMeta.title}
           </span>
           <span
-            aria-hidden="true"
-            className="hidden sm:inline opacity-40"
-            style={{ color: "var(--color-ink-muted)" }}
-          >
-            |
-          </span>
-          <span
-            className="hidden sm:inline text-[11px] font-medium"
-            style={{ color: "var(--color-ink-muted)" }}
+            className="hidden sm:inline text-[11px] font-medium pl-1.5 border-l"
+            style={{
+              color: "var(--color-ink-muted)",
+              borderColor: "var(--color-paper-border)",
+            }}
           >
             {world.phaseLabel}
           </span>
@@ -57,7 +62,7 @@ export function WorldControls({ activeScene = 0 }: { activeScene?: number }) {
               : "Unmute ambient night-sky sound"
           }
           title={audioEnabled ? "Sound on (tap to mute)" : "Sound muted (tap to unmute)"}
-          className="pointer-events-auto h-11 px-3.5 rounded-full inline-flex items-center justify-center gap-1.5 paper-pill-surface transition-transform active:scale-95 shrink-0 min-w-[44px]"
+          className="pointer-events-auto h-11 px-3.5 rounded-full inline-flex items-center justify-center gap-1.5 paper-pill-surface transition-transform active:scale-95 shrink-0 min-w-[44px] cursor-pointer"
           style={{
             color: audioEnabled
               ? "var(--color-royal-violet)"

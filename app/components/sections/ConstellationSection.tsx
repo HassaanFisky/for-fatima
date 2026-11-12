@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
+import { motion } from "framer-motion";
 import {
   CONSTELLATION_STARS,
   type ConstellationStarSpec,
@@ -9,15 +10,20 @@ import { StarsMoonScene } from "../illustrations/Characters";
 import { KonpeitoCandy } from "../illustrations/Konpeito";
 import { IconSparkle, IconRestart } from "../icons/StoryIcons";
 import { useLivingWorld } from "../world/LivingWorldProvider";
+import { getTitleCadenceVariants } from "../../lib/motion";
+
+const titleCadence = getTitleCadenceVariants(6);
 
 /**
  * Scene 7 — The Constellation
- * Restored 14-star parametric heart constellation (`CONSTELLATION_STARS`).
+ * 14-star parametric heart constellation (`CONSTELLATION_STARS`).
  * - 14 scattered stars (`sx`, `sy`) glide smoothly (`1.1s cubic-bezier(.2,.8,.2,1)`)
  *   to their parametric heart coordinates (`hx`, `hy`) when tapped or dragged across.
+ * - When all 14 stars are gathered, the crescent moon (`StarsMoonScene`) enters gently
+ *   from outside the visible scene into its resting place in the upper-right sky.
  */
 export function ConstellationSection({ isActive }: { isActive: boolean }) {
-  const { setConstellationFocused, playNote, playChord } = useLivingWorld();
+  const { setConstellationFocused, playStarBell, playChord } = useLivingWorld();
   const svgRef = useRef<SVGSVGElement | null>(null);
 
   const [activeMap, setActiveMap] = useState<Record<number, boolean>>({});
@@ -43,20 +49,19 @@ export function ConstellationSection({ isActive }: { isActive: boolean }) {
       const star = CONSTELLATION_STARS[index];
       if (!star) return;
       setSelectedStar(star);
+      playStarBell();
 
       setActiveMap((prev) => {
         if (prev[index]) return prev;
         const next = { ...prev, [index]: true };
         const nextCount = Object.values(next).filter(Boolean).length;
         if (nextCount === totalCount) {
-          playChord();
-        } else {
-          playNote(index);
+          window.setTimeout(() => playChord(), 160);
         }
         return next;
       });
     },
-    [playChord, playNote, totalCount]
+    [playStarBell, playChord, totalCount]
   );
 
   const handlePointerSweep = (clientX: number, clientY: number) => {
@@ -94,13 +99,14 @@ export function ConstellationSection({ isActive }: { isActive: boolean }) {
     });
     setActiveMap(all);
     setSelectedStar(CONSTELLATION_STARS[totalCount - 1]);
-    playChord();
+    playStarBell();
+    window.setTimeout(() => playChord(), 160);
   };
 
   const handleReplay = () => {
     setActiveMap({});
     setSelectedStar(CONSTELLATION_STARS[0]);
-    playNote(0);
+    playStarBell();
   };
 
   const heartPolygonPoints = CONSTELLATION_STARS.map(
@@ -115,16 +121,25 @@ export function ConstellationSection({ isActive }: { isActive: boolean }) {
     >
       <div className="w-full max-w-[36rem] mx-auto">
         {/* Scene Header */}
-        <div className="flex flex-col items-center text-center mb-2.5">
-          <div className="inline-flex items-center gap-2 rounded-full px-3.5 py-1 text-xs font-semibold paper-pill-surface mb-1.5">
+        <motion.div
+          variants={titleCadence.container}
+          initial="hidden"
+          animate="visible"
+          className="flex flex-col items-center text-center mb-2.5"
+        >
+          <motion.div
+            variants={titleCadence.kicker}
+            className="inline-flex items-center gap-2 rounded-full px-3.5 py-1 text-xs font-semibold paper-pill-surface mb-1.5"
+          >
             <KonpeitoCandy flavor="butter" size={15} />
             <span style={{ color: "var(--color-royal-violet)" }}>
               The Constellation
             </span>
-          </div>
+          </motion.div>
 
-          <h2
+          <motion.h2
             id="stars-heading"
+            variants={titleCadence.heading}
             className="font-display font-bold"
             style={{
               fontSize: "clamp(1.25rem, 3.2vw, 1.6rem)",
@@ -132,29 +147,41 @@ export function ConstellationSection({ isActive }: { isActive: boolean }) {
               color: "var(--color-paper-cream)",
             }}
           >
-            Trace the stars to gather our sky
-          </h2>
-        </div>
+            Trace the stars across the night sky
+          </motion.h2>
+        </motion.div>
 
         {/* Contained Night-Sky Window */}
         <div className="relative rounded-[26px] overflow-hidden p-3.5 sm:p-5 constellation-night-window shadow-lg">
-          <div className="flex items-center justify-between gap-2 mb-1">
+          <div className="flex items-center justify-between gap-2 mb-1 min-h-[54px]">
             <span
               className="text-xs font-semibold px-3 py-1 rounded-full paper-pill-surface"
               style={{ color: "var(--color-ink-plum)" }}
             >
-              {isComplete
-                ? "All 14 stars gathered"
-                : `${activeCount} / ${totalCount} stars lit`}
+              {`${activeCount} / ${totalCount} stars`}
             </span>
 
-            <StarsMoonScene />
+            {/* Moon enters gently from outside the visible scene when all 14 stars are gathered */}
+            <div
+              className="transition-all duration-1000"
+              style={{
+                opacity: isComplete ? 1 : 0,
+                transform: isComplete
+                  ? "translate3d(0, 0, 0) scale(1)"
+                  : "translate3d(48px, -64px, 0) scale(0.72)",
+                transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
+                pointerEvents: isComplete ? "auto" : "none",
+              }}
+              aria-hidden={!isComplete}
+            >
+              <StarsMoonScene />
+            </div>
           </div>
 
           {/* Interactive SVG Star Canvas (0..100 Coordinate Space) */}
           <div
             data-no-swipe="true"
-            className="relative w-full aspect-[4/3] max-h-[290px] sm:max-h-[320px] mx-auto select-none touch-none"
+            className="relative w-full aspect-[4/3] max-h-[280px] sm:max-h-[310px] mx-auto select-none touch-none"
           >
             <svg
               ref={svgRef}
@@ -179,12 +206,12 @@ export function ConstellationSection({ isActive }: { isActive: boolean }) {
                   <stop
                     offset="0%"
                     stopColor="var(--color-butter-star)"
-                    stopOpacity="0.85"
+                    stopOpacity="0.88"
                   />
                   <stop
                     offset="55%"
                     stopColor="var(--color-peach-glow)"
-                    stopOpacity="0.35"
+                    stopOpacity="0.38"
                   />
                   <stop
                     offset="100%"
@@ -233,7 +260,7 @@ export function ConstellationSection({ isActive }: { isActive: boolean }) {
                     x2={star.hx}
                     y2={star.hy}
                     stroke="var(--color-periwinkle)"
-                    strokeWidth="0.7"
+                    strokeWidth="0.75"
                     strokeLinecap="round"
                     className="transition-opacity duration-700"
                     style={{ opacity: bothActive ? 0.88 : 0 }}
@@ -248,13 +275,13 @@ export function ConstellationSection({ isActive }: { isActive: boolean }) {
                 x2={CONSTELLATION_STARS[0].hx}
                 y2={CONSTELLATION_STARS[0].hy}
                 stroke="var(--color-periwinkle)"
-                strokeWidth="0.7"
+                strokeWidth="0.75"
                 strokeLinecap="round"
                 className="transition-opacity duration-700"
                 style={{ opacity: isComplete ? 0.88 : 0 }}
               />
 
-              {/* 14 Tappable Star Nodes gliding from (sx, sy) to (hx, hy) */}
+              {/* 14 Tappable Crisp 5-Point Star Nodes gliding from (sx, sy) to (hx, hy) */}
               {CONSTELLATION_STARS.map((star, idx) => {
                 const isAct = Boolean(activeMap[idx]);
                 const cx = isAct ? star.hx : star.sx;
@@ -279,22 +306,26 @@ export function ConstellationSection({ isActive }: { isActive: boolean }) {
                     <circle
                       cx="0"
                       cy="0"
-                      r={isAct ? "5.2" : "2.8"}
+                      r={isAct ? "5.4" : "3.1"}
                       fill="url(#constellation-star-halo)"
                       style={{
-                        opacity: isAct ? 0.95 : 0.4,
+                        opacity: isAct ? 0.95 : 0.45,
                         transition: "all 0.5s ease",
                       }}
                     />
-                    <polygon
-                      points="0,-2.6 0.7,-1.1 2.2,-1.6 1.2,-0.3 2.6,0.5 1.0,1.0 1.5,2.4 0.1,1.4 -0.9,2.5 -0.8,1.0 -2.4,1.0 -1.2,-0.1 -2.2,-1.5 -0.7,-1.0"
+                    {/* Crisp, symmetrical 5-point star silhouette */}
+                    <path
+                      d="M0 -3.2 L0.95 -1.0 L3.3 -0.75 L1.5 0.8 L2.05 3.1 L0 1.85 L-2.05 3.1 L-1.5 0.8 L-3.3 -0.75 L-0.95 -1.0 Z"
                       fill={
                         isAct
                           ? "var(--color-butter-star)"
                           : "var(--color-paper-cream)"
                       }
+                      stroke="var(--color-starlight)"
+                      strokeWidth="0.22"
+                      strokeLinejoin="round"
                       style={{
-                        transform: isAct ? "scale(1.15)" : "scale(0.85)",
+                        transform: isAct ? "scale(1.18)" : "scale(0.92)",
                         transition: "transform 0.5s ease",
                       }}
                     />
@@ -311,7 +342,7 @@ export function ConstellationSection({ isActive }: { isActive: boolean }) {
                 <button
                   type="button"
                   onClick={handleLightNextStar}
-                  className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold paper-pill-surface transition-transform active:scale-95 min-h-[38px]"
+                  className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold paper-pill-surface transition-transform active:scale-95 min-h-[38px] cursor-pointer"
                   style={{ color: "var(--color-ink-plum)" }}
                 >
                   <IconSparkle
@@ -324,7 +355,7 @@ export function ConstellationSection({ isActive }: { isActive: boolean }) {
                 <button
                   type="button"
                   onClick={handleGatherAll}
-                  className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold paper-pill-surface transition-transform active:scale-95 min-h-[38px]"
+                  className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold paper-pill-surface transition-transform active:scale-95 min-h-[38px] cursor-pointer"
                   style={{ color: "var(--color-royal-violet)" }}
                 >
                   <span>Gather all 14</span>
@@ -336,7 +367,7 @@ export function ConstellationSection({ isActive }: { isActive: boolean }) {
               <button
                 type="button"
                 onClick={handleReplay}
-                className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold paper-pill-surface transition-transform active:scale-95 min-h-[38px]"
+                className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold paper-pill-surface transition-transform active:scale-95 min-h-[38px] cursor-pointer"
                 style={{ color: "var(--color-ink-muted)" }}
               >
                 <IconRestart size={14} />
@@ -349,12 +380,6 @@ export function ConstellationSection({ isActive }: { isActive: boolean }) {
           <div className="mt-3 rounded-[20px] px-4 py-3.5 paper-card-cream text-center">
             {isComplete ? (
               <>
-                <p
-                  className="font-handwritten text-sm mb-0.5"
-                  style={{ color: "var(--color-royal-violet)" }}
-                >
-                  Constellation complete · All 14 stars gathered
-                </p>
                 <h3
                   className="font-display font-bold text-base sm:text-lg mb-0.5"
                   style={{ color: "var(--color-ink-plum)" }}
@@ -365,8 +390,7 @@ export function ConstellationSection({ isActive }: { isActive: boolean }) {
                   className="font-sans text-xs sm:text-sm leading-relaxed"
                   style={{ color: "var(--color-ink-muted)" }}
                 >
-                  Fourteen little stars gathered together under the same calm
-                  night sky, Fatima.
+                  Fourteen stars gathered under the same calm night sky, Fatima.
                 </p>
               </>
             ) : (
@@ -375,7 +399,7 @@ export function ConstellationSection({ isActive }: { isActive: boolean }) {
                   className="font-handwritten text-xs sm:text-sm mb-0.5"
                   style={{ color: "var(--color-royal-violet)" }}
                 >
-                  Star {selectedStar.id} of {totalCount} · {selectedStar.label}
+                  {selectedStar.label}
                 </p>
                 <p
                   className="font-sans text-xs sm:text-sm leading-relaxed"

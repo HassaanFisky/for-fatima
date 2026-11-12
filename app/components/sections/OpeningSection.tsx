@@ -1,22 +1,18 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { motion } from "framer-motion";
 import { PERSONAL_CONTENT } from "../../config/personal";
 import { OpeningCloudScene } from "../illustrations/Characters";
 import { KonpeitoStar } from "../illustrations/Konpeito";
-import { IconChevronRight, IconSparkle } from "../icons/StoryIcons";
+import { IconChevronRight } from "../icons/StoryIcons";
 import { useLivingWorld } from "../world/LivingWorldProvider";
-import { fadeUp } from "../../lib/motion";
+import { fadeUp, getTitleCadenceVariants } from "../../lib/motion";
+
+const titleCadence = getTitleCadenceVariants(0);
 
 export function OpeningSection({ onContinue }: { onContinue: () => void }) {
-  const { world, playNote } = useLivingWorld();
-  const [lanternBoosted, setLanternBoosted] = useState(false);
-
-  const handleBrightStarTap = () => {
-    setLanternBoosted((prev) => !prev);
-    playNote(3);
-  };
+  const { world, playNote, playStarBell } = useLivingWorld();
 
   const handleEnterStory = () => {
     playNote(0);
@@ -26,43 +22,18 @@ export function OpeningSection({ onContinue }: { onContinue: () => void }) {
   return (
     <section
       id="threshold"
-      aria-label="Scene 1: The Threshold"
+      aria-label="Scene 1: For Fatima"
       className="relative w-full h-full flex flex-col items-center justify-center px-4 sm:px-6 py-4 z-10"
     >
       <div className="w-full max-w-[34rem] mx-auto flex flex-col items-center">
-        {/* Subtle Interactive Konpeitō Star Above Foreground Stage */}
-        <div className="mb-1 flex flex-col items-center">
-          <button
-            type="button"
-            onClick={handleBrightStarTap}
-            className="group relative inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-medium paper-pill-surface transition-transform active:scale-95 focus:outline-none"
-            style={{ color: "var(--color-ink-plum)" }}
-            aria-label="Tap to warm Mochi's star lantern"
-          >
-            <IconSparkle
-              size={13}
-              className="text-[var(--color-royal-violet)]"
-            />
-            <span>
-              {lanternBoosted
-                ? "Lantern glowing warmly"
-                : "Tap to warm the lantern"}
-            </span>
-          </button>
-        </div>
-
-        {/* Pose #1 — Mochi & Yume on Foreground Hill Stage */}
+        {/* Pose #1 — Mochi & Yume sitting close together on Foreground Hill Stage with directly interactive lantern & candle */}
         <motion.div
           variants={fadeUp}
           initial="hidden"
           animate="visible"
-          className="w-full max-w-[290px] my-1 flex flex-col items-center"
+          className="w-full max-w-[295px] my-1 flex flex-col items-center"
         >
-          <OpeningCloudScene
-            phase={world.phase}
-            lanternBoost={lanternBoosted}
-            onInteraction={handleBrightStarTap}
-          />
+          <OpeningCloudScene phase={world.phase} />
         </motion.div>
 
         {/* Cream Paper Threshold Card */}
@@ -73,41 +44,60 @@ export function OpeningSection({ onContinue }: { onContinue: () => void }) {
           className="w-full"
         >
           <div className="relative rounded-[24px] px-6 py-6 sm:px-9 sm:py-8 text-center paper-card-cream">
-            <div className="inline-flex items-center gap-1.5 mb-2">
-              <KonpeitoStar size="sm" />
-              <p
-                className="font-handwritten text-lg sm:text-xl"
-                style={{ color: "var(--color-royal-violet)" }}
+            <motion.div
+              variants={titleCadence.container}
+              initial="hidden"
+              animate="visible"
+            >
+              <motion.div
+                variants={titleCadence.kicker}
+                className="inline-flex items-center gap-1.5 mb-2"
               >
-                {PERSONAL_CONTENT.dedication}
-              </p>
-              <KonpeitoStar size="sm" />
-            </div>
+                <KonpeitoStar
+                  size="sm"
+                  onClick={playStarBell}
+                  ariaLabel="Ring left star chime"
+                />
+                <p
+                  className="font-handwritten text-lg sm:text-xl"
+                  style={{ color: "var(--color-royal-violet)" }}
+                >
+                  {PERSONAL_CONTENT.dedication}
+                </p>
+                <KonpeitoStar
+                  size="sm"
+                  onClick={playStarBell}
+                  ariaLabel="Ring right star chime"
+                />
+              </motion.div>
 
-            <h1
-              className="font-display font-bold tracking-tight mb-2.5"
-              style={{
-                fontSize: "clamp(1.85rem, 4.8vw, 2.75rem)",
-                lineHeight: 1.15,
-                letterSpacing: "-0.015em",
-                color: "var(--color-ink-plum)",
-              }}
-            >
-              {PERSONAL_CONTENT.heroTitle}
-            </h1>
+              <motion.h1
+                variants={titleCadence.heading}
+                className="font-display font-bold tracking-tight mb-2.5"
+                style={{
+                  fontSize: "clamp(1.85rem, 4.8vw, 2.75rem)",
+                  lineHeight: 1.15,
+                  letterSpacing: "-0.015em",
+                  color: "var(--color-ink-plum)",
+                }}
+              >
+                {PERSONAL_CONTENT.heroTitle}
+              </motion.h1>
 
-            <p
-              className="font-sans text-[15px] sm:text-[16.5px] leading-[1.7] max-w-[44ch] mx-auto mb-6"
-              style={{ color: "var(--color-ink-muted)" }}
-            >
-              {PERSONAL_CONTENT.heroSubtitle}
-            </p>
+              <motion.p
+                variants={titleCadence.subtitle}
+                className="font-sans text-[15px] sm:text-[16.5px] leading-[1.7] max-w-[44ch] mx-auto mb-6"
+                style={{ color: "var(--color-ink-muted)" }}
+              >
+                {PERSONAL_CONTENT.heroSubtitle}
+              </motion.p>
+            </motion.div>
 
-            {/* Single Elegant Action to Enter / Continue */}
+            {/* Single Action to Enter / Continue */}
             <button
               type="button"
               onClick={handleEnterStory}
-              className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-all active:scale-95 min-h-[46px] shadow-sm"
+              className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-all active:scale-95 min-h-[46px] shadow-sm cursor-pointer"
               style={{
                 backgroundColor: "var(--color-royal-violet)",
                 color: "var(--color-paper-cream)",

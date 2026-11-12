@@ -1,72 +1,21 @@
 /**
- * Warm Celesta & Ambient Pad Synthesis Engine for Konpeitō Night.
+ * Ambient & Tactile Sound Engine for For Fatima.
  * - Intended experience: Sound ON by default (desiredSoundOn = true).
- * - Attempts gentle autoplay on load; if blocked by browser autoplay policy,
- *   seamlessly unlocks on the first deliberate user interaction unless muted.
- * - Warm low-pass filtered acoustic pad + soft music-box bell harmonics.
+ * - Background Music: Plays the creator-provided instrumental (/audio/background-instrumental.mp3)
+ *   in a single seamless loop with volume set to 0.70 (70%).
+ * - Attempts autoplay on load; if blocked by browser autoplay policy,
+ *   seamlessly starts on the first user interaction unless muted.
+ * - Provides dedicated tactile sound identities:
+ *   1. playStarBell(): Soft two-note bell "tin tin" for all stars and the moon.
+ *   2. playPlushTouch(): Soft, gentle "puchup" plush-squish for teddy bears.
+ *   3. playInteractionNote() & playCompletionChord() for cards, lantern, and flowers.
  */
 
 import type { WorldPhase } from "./world-state";
 
-interface AudioMood {
-  frequencies: readonly [number, number, number, number];
-  filterCutoff: number;
-  voiceGain: number;
-  chimeProbability: number;
-}
+export const BACKGROUND_INSTRUMENTAL_SRC = "/audio/background-instrumental.mp3";
+export const BACKGROUND_INSTRUMENTAL_VOLUME = 0.7; // 70% volume
 
-export const AUDIO_MOODS: Record<WorldPhase, AudioMood> = {
-  preDawn: {
-    frequencies: [130.81, 196.0, 246.94, 293.66], // Cmaj9 warm voicing
-    filterCutoff: 440,
-    voiceGain: 0.011,
-    chimeProbability: 0.25,
-  },
-  sunrise: {
-    frequencies: [146.83, 220.0, 277.18, 329.63], // Dmaj9
-    filterCutoff: 680,
-    voiceGain: 0.014,
-    chimeProbability: 0.45,
-  },
-  morning: {
-    frequencies: [174.61, 261.63, 329.63, 392.0], // Fmaj9
-    filterCutoff: 860,
-    voiceGain: 0.013,
-    chimeProbability: 0.5,
-  },
-  afternoon: {
-    frequencies: [164.81, 246.94, 329.63, 369.99], // Eadd9
-    filterCutoff: 780,
-    voiceGain: 0.012,
-    chimeProbability: 0.35,
-  },
-  goldenHour: {
-    frequencies: [146.83, 220.0, 293.66, 369.99], // Dmaj7
-    filterCutoff: 660,
-    voiceGain: 0.014,
-    chimeProbability: 0.42,
-  },
-  sunset: {
-    frequencies: [130.81, 196.0, 261.63, 329.63], // Cmaj7
-    filterCutoff: 560,
-    voiceGain: 0.014,
-    chimeProbability: 0.38,
-  },
-  blueHour: {
-    frequencies: [110.0, 164.81, 220.0, 261.63], // Am7 warm
-    filterCutoff: 490,
-    voiceGain: 0.012,
-    chimeProbability: 0.32,
-  },
-  night: {
-    frequencies: [110.0, 164.81, 246.94, 277.18], // Amaj9 dreamy lullaby
-    filterCutoff: 450,
-    voiceGain: 0.011,
-    chimeProbability: 0.3,
-  },
-};
-
-// Warm pentatonic music-box scale (A major / F# minor pentatonic in warm middle register)
 const CELESTA_SCALE = [
   329.63, // E4
   369.99, // F#4
@@ -78,29 +27,19 @@ const CELESTA_SCALE = [
   880.0,  // A5
 ];
 
-interface Voice {
-  oscillator: OscillatorNode;
-  subOscillator: OscillatorNode;
-  gain: GainNode;
-  panner: StereoPannerNode;
-}
-
 export class AmbientAudioEngine {
   private context: AudioContext | null = null;
   private master: GainNode | null = null;
-  private filter: BiquadFilterNode | null = null;
-  private warmthFilter: BiquadFilterNode | null = null;
   private compressor: DynamicsCompressorNode | null = null;
 
-  private voices: Voice[] = [];
-  private modulationOscillator: OscillatorNode | null = null;
-  private modulationGain: GainNode | null = null;
+  private bgAudio: HTMLAudioElement | null = null;
 
   private mood: WorldPhase = "night";
   private desiredSoundOn = true;
   private playing = false;
   private wasRunningBeforeHide = false;
-  private chimeTimer: number | null = null;
+  private lastStarBellMs = 0;
+  private lastPlushMs = 0;
   private stateChangeCallback: ((desired: boolean, playing: boolean) => void) | null = null;
 
   public get isDesired(): boolean {
@@ -108,7 +47,11 @@ export class AmbientAudioEngine {
   }
 
   public get isPlaying(): boolean {
-    return this.playing && this.context?.state === "running";
+    const bgPlaying = Boolean(
+      this.bgAudio && !this.bgAudio.paused && !this.bgAudio.ended
+    );
+    const ctxRunning = this.context?.state === "running";
+    return this.desiredSoundOn && (bgPlaying || Boolean(ctxRunning && this.playing));
   }
 
   public get isSupported(): boolean {
@@ -118,7 +61,7 @@ export class AmbientAudioEngine {
     const win = window as Window & {
       webkitAudioContext?: typeof AudioContext;
     };
-    return Boolean(window.AudioContext || win.webkitAudioContext);
+    return Boolean(window.AudioContext || win.webkitAudioContext || window.Audio);
   }
 
   public onStateChange(cb: (desired: boolean, playing: boolean) => void): void {
@@ -129,10 +72,43 @@ export class AmbientAudioEngine {
     this.stateChangeCallback?.(this.desiredSoundOn, this.isPlaying);
   }
 
-  private createGraph(): void {
+  private ensureBackgroundAudio(): HTMLAudioElement | null {
+    if (typeof window === "undefined" || typeof Audio === "undefined") {
+      return null;
+    }
+    if (!this.bgAudio) {
+      const audio = new Audio(BACKGROUND_INSTRUMENTAL_SRC);
+      audio.loop = true;
+      audio.preload = "auto";
+      audio.volume = BACKGROUND_INSTRUMENTAL_VOLUME;
+
+      audio.addEventListener("play", () => {
+        this.playing = this.desiredSoundOn;
+        this.notifyState();
+      });
+      audio.addEventListener("pause", () => {
+        if (!this.desiredSoundOn) {
+          this.playing = false;
+        }
+        this.notifyState();
+      });
+
+      this.bgAudio = audio;
+    } else {
+      this.bgAudio.volume = BACKGROUND_INSTRUMENTAL_VOLUME;
+      this.bgAudio.loop = true;
+    }
+    return this.bgAudio;
+  }
+
+  private ensureWebAudioGraph(): void {
     if (typeof window === "undefined") {
       return;
     }
+    if (this.context && this.context.state !== "closed") {
+      return;
+    }
+
     const win = window as Window & {
       webkitAudioContext?: typeof AudioContext;
     };
@@ -142,175 +118,43 @@ export class AmbientAudioEngine {
     }
 
     const context = new AudioContextCtor({
-      latencyHint: "playback",
-    });
-
-    // Primary lowpass filter to remove any harsh high-frequency buzz on phone speakers
-    const filter = new BiquadFilterNode(context, {
-      type: "lowpass",
-      frequency: AUDIO_MOODS[this.mood].filterCutoff,
-      Q: 0.55,
-    });
-
-    // Warm body shelf filter
-    const warmthFilter = new BiquadFilterNode(context, {
-      type: "lowshelf",
-      frequency: 240,
-      gain: 2.5,
+      latencyHint: "interactive",
     });
 
     const master = new GainNode(context, {
-      gain: 0.0001,
+      gain: 0.34,
     });
 
     const compressor = new DynamicsCompressorNode(context, {
-      threshold: -22,
-      knee: 20,
-      ratio: 3.5,
-      attack: 0.03,
-      release: 0.45,
+      threshold: -20,
+      knee: 18,
+      ratio: 3.0,
+      attack: 0.015,
+      release: 0.35,
     });
 
-    filter.connect(warmthFilter);
-    warmthFilter.connect(master);
     master.connect(compressor);
     compressor.connect(context.destination);
 
-    const panPositions = [-0.45, -0.15, 0.15, 0.45];
-
-    this.voices = AUDIO_MOODS[this.mood].frequencies.map(
-      (frequency, index) => {
-        const oscillator = new OscillatorNode(context, {
-          type: index % 2 === 0 ? "sine" : "triangle",
-          frequency,
-          detune: index % 2 === 0 ? -4 : 4,
-        });
-
-        const subOscillator = new OscillatorNode(context, {
-          type: "sine",
-          frequency: frequency * 0.5,
-          detune: 2,
-        });
-
-        const subGain = new GainNode(context, {
-          gain: 0.35,
-        });
-
-        const gain = new GainNode(context, {
-          gain: AUDIO_MOODS[this.mood].voiceGain,
-        });
-
-        const panner = new StereoPannerNode(context, {
-          pan: panPositions[index] ?? 0,
-        });
-
-        oscillator.connect(gain);
-        subOscillator.connect(subGain);
-        subGain.connect(gain);
-        gain.connect(panner);
-        panner.connect(filter);
-
-        oscillator.start();
-        subOscillator.start();
-
-        return { oscillator, subOscillator, gain, panner };
-      }
-    );
-
-    const modulationOscillator = new OscillatorNode(context, {
-      type: "sine",
-      frequency: 0.05,
-    });
-
-    const modulationGain = new GainNode(context, {
-      gain: 48,
-    });
-
-    modulationOscillator.connect(modulationGain);
-    modulationGain.connect(filter.frequency);
-    modulationOscillator.start();
-
     context.addEventListener("statechange", () => {
-      this.playing = this.desiredSoundOn && context.state === "running";
       this.notifyState();
     });
 
     this.context = context;
-    this.filter = filter;
-    this.warmthFilter = warmthFilter;
     this.master = master;
     this.compressor = compressor;
-    this.modulationOscillator = modulationOscillator;
-    this.modulationGain = modulationGain;
-  }
-
-  private rampMaster(value: number, durationSeconds: number): void {
-    if (!this.context || !this.master) {
-      return;
-    }
-
-    const now = this.context.currentTime;
-    const gain = this.master.gain;
-
-    gain.cancelScheduledValues(now);
-    gain.setValueAtTime(Math.max(0.0001, gain.value), now);
-    gain.linearRampToValueAtTime(value, now + durationSeconds);
   }
 
   public setMood(mood: WorldPhase): void {
     this.mood = mood;
-
-    if (!this.context || !this.filter) {
-      return;
-    }
-
-    const target = AUDIO_MOODS[mood];
-    const now = this.context.currentTime;
-    const transitionEnd = now + 6;
-
-    this.voices.forEach((voice, index) => {
-      const targetFreq = target.frequencies[index] ?? target.frequencies[0];
-      voice.oscillator.frequency.cancelScheduledValues(now);
-      voice.oscillator.frequency.setValueAtTime(
-        Math.max(20, voice.oscillator.frequency.value),
-        now
-      );
-      voice.oscillator.frequency.exponentialRampToValueAtTime(
-        targetFreq,
-        transitionEnd
-      );
-
-      voice.subOscillator.frequency.cancelScheduledValues(now);
-      voice.subOscillator.frequency.setValueAtTime(
-        Math.max(20, voice.subOscillator.frequency.value),
-        now
-      );
-      voice.subOscillator.frequency.exponentialRampToValueAtTime(
-        targetFreq * 0.5,
-        transitionEnd
-      );
-
-      voice.gain.gain.cancelScheduledValues(now);
-      voice.gain.gain.setValueAtTime(voice.gain.gain.value, now);
-      voice.gain.gain.linearRampToValueAtTime(
-        target.voiceGain,
-        transitionEnd
-      );
-    });
-
-    this.filter.frequency.cancelScheduledValues(now);
-    this.filter.frequency.setValueAtTime(this.filter.frequency.value, now);
-    this.filter.frequency.linearRampToValueAtTime(
-      target.filterCutoff,
-      transitionEnd
-    );
   }
 
   private playWarmBellTone(
     frequency: number,
     peakGain: number,
     durationSeconds: number,
-    pan = 0
+    pan = 0,
+    delaySeconds = 0
   ): void {
     if (
       !this.context ||
@@ -322,9 +166,8 @@ export class AmbientAudioEngine {
     }
 
     const context = this.context;
-    const now = context.currentTime;
+    const startTime = context.currentTime + delaySeconds;
 
-    // Warm celesta voice: fundamental sine + soft octave harmonic through lowpass
     const fundamental = new OscillatorNode(context, {
       type: "sine",
       frequency,
@@ -340,7 +183,7 @@ export class AmbientAudioEngine {
 
     const toneFilter = new BiquadFilterNode(context, {
       type: "lowpass",
-      frequency: Math.min(1800, frequency * 2.6),
+      frequency: Math.min(2400, frequency * 2.6),
       Q: 0.5,
     });
 
@@ -352,13 +195,16 @@ export class AmbientAudioEngine {
       pan,
     });
 
-    envelope.gain.setValueAtTime(0.0001, now);
-    envelope.gain.linearRampToValueAtTime(peakGain, now + 0.035);
+    envelope.gain.setValueAtTime(0.0001, startTime);
+    envelope.gain.linearRampToValueAtTime(peakGain, startTime + 0.018);
     envelope.gain.exponentialRampToValueAtTime(
       peakGain * 0.32,
-      now + durationSeconds * 0.35
+      startTime + durationSeconds * 0.35
     );
-    envelope.gain.exponentialRampToValueAtTime(0.0001, now + durationSeconds);
+    envelope.gain.exponentialRampToValueAtTime(
+      0.0001,
+      startTime + durationSeconds
+    );
 
     fundamental.connect(toneFilter);
     overtone.connect(overtoneGain);
@@ -367,10 +213,10 @@ export class AmbientAudioEngine {
     envelope.connect(panner);
     panner.connect(this.master);
 
-    fundamental.start(now);
-    overtone.start(now);
-    fundamental.stop(now + durationSeconds + 0.05);
-    overtone.stop(now + durationSeconds + 0.05);
+    fundamental.start(startTime);
+    overtone.start(startTime);
+    fundamental.stop(startTime + durationSeconds + 0.04);
+    overtone.stop(startTime + durationSeconds + 0.04);
 
     fundamental.addEventListener(
       "ended",
@@ -386,27 +232,128 @@ export class AmbientAudioEngine {
     );
   }
 
-  private playChime(): void {
-    if (
-      !this.context ||
-      !this.master ||
-      !this.desiredSoundOn ||
-      typeof document === "undefined" ||
-      document.visibilityState !== "visible"
-    ) {
+  /**
+   * Consistent two-note bell-like "tin tin" sound for all stars and the moon.
+   */
+  public playStarBell(): void {
+    if (!this.desiredSoundOn) {
       return;
     }
 
-    const mood = AUDIO_MOODS[this.mood];
-    if (Math.random() > mood.chimeProbability) {
+    const nowMs = Date.now();
+    if (nowMs - this.lastStarBellMs < 135) {
+      return;
+    }
+    this.lastStarBellMs = nowMs;
+
+    const triggerTinTin = () => {
+      this.playWarmBellTone(1046.5, 0.032, 0.52, -0.08, 0);
+      this.playWarmBellTone(1318.51, 0.036, 0.68, 0.08, 0.095);
+    };
+
+    if (!this.context || this.context.state !== "running") {
+      void this.unlockAndStart().then((started) => {
+        if (started) {
+          triggerTinTin();
+        }
+      });
       return;
     }
 
-    const note =
-      CELESTA_SCALE[Math.floor(Math.random() * CELESTA_SCALE.length)];
-    const pan = -0.4 + Math.random() * 0.8;
+    triggerTinTin();
+  }
 
-    this.playWarmBellTone(note, 0.015, 2.8, pan);
+  /**
+   * Soft, gentle "puchup" plush-squish sound when touching Mochi or Yume teddy bears.
+   */
+  public playPlushTouch(): void {
+    if (!this.desiredSoundOn) {
+      return;
+    }
+
+    const nowMs = Date.now();
+    if (nowMs - this.lastPlushMs < 150) {
+      return;
+    }
+    this.lastPlushMs = nowMs;
+
+    const triggerPuchup = () => {
+      if (
+        !this.context ||
+        !this.master ||
+        this.context.state !== "running"
+      ) {
+        return;
+      }
+
+      const context = this.context;
+      const now = context.currentTime;
+
+      const osc = new OscillatorNode(context, {
+        type: "sine",
+        frequency: 220,
+      });
+      const sub = new OscillatorNode(context, {
+        type: "triangle",
+        frequency: 145,
+      });
+      const filter = new BiquadFilterNode(context, {
+        type: "lowpass",
+        frequency: 580,
+        Q: 0.7,
+      });
+      const env = new GainNode(context, {
+        gain: 0.0001,
+      });
+
+      // Syllable 1 ("pu"): soft cushion compress
+      osc.frequency.setValueAtTime(240, now);
+      osc.frequency.exponentialRampToValueAtTime(185, now + 0.042);
+      // Syllable 2 ("chup"): gentle plush rebound
+      osc.frequency.setValueAtTime(255, now + 0.052);
+      osc.frequency.exponentialRampToValueAtTime(345, now + 0.115);
+
+      sub.frequency.setValueAtTime(140, now);
+      sub.frequency.exponentialRampToValueAtTime(195, now + 0.115);
+
+      env.gain.setValueAtTime(0.0001, now);
+      env.gain.linearRampToValueAtTime(0.036, now + 0.016);
+      env.gain.exponentialRampToValueAtTime(0.008, now + 0.048);
+      env.gain.linearRampToValueAtTime(0.04, now + 0.066);
+      env.gain.exponentialRampToValueAtTime(0.0001, now + 0.135);
+
+      osc.connect(filter);
+      sub.connect(filter);
+      filter.connect(env);
+      env.connect(this.master);
+
+      osc.start(now);
+      sub.start(now);
+      osc.stop(now + 0.15);
+      sub.stop(now + 0.15);
+
+      osc.addEventListener(
+        "ended",
+        () => {
+          osc.disconnect();
+          sub.disconnect();
+          filter.disconnect();
+          env.disconnect();
+        },
+        { once: true }
+      );
+    };
+
+    if (!this.context || this.context.state !== "running") {
+      void this.unlockAndStart().then((started) => {
+        if (started) {
+          triggerPuchup();
+        }
+      });
+      return;
+    }
+
+    triggerPuchup();
   }
 
   public playInteractionNote(stepIndex = 0): void {
@@ -414,21 +361,22 @@ export class AmbientAudioEngine {
       return;
     }
 
-    // If audio is desired ON and user just interacted, ensure context is running
-    if (!this.isPlaying) {
+    const triggerNote = () => {
+      const frequency =
+        CELESTA_SCALE[Math.abs(stepIndex) % CELESTA_SCALE.length];
+      this.playWarmBellTone(frequency, 0.028, 1.4, 0);
+    };
+
+    if (!this.context || this.context.state !== "running") {
       void this.unlockAndStart().then((started) => {
         if (started) {
-          const freq =
-            CELESTA_SCALE[Math.abs(stepIndex) % CELESTA_SCALE.length];
-          this.playWarmBellTone(freq, 0.02, 1.6, 0);
+          triggerNote();
         }
       });
       return;
     }
 
-    const frequency =
-      CELESTA_SCALE[Math.abs(stepIndex) % CELESTA_SCALE.length];
-    this.playWarmBellTone(frequency, 0.02, 1.6, 0);
+    triggerNote();
   }
 
   public playCompletionChord(): void {
@@ -440,12 +388,12 @@ export class AmbientAudioEngine {
       [0, 2, 4, 5].forEach((noteIndex, i) => {
         window.setTimeout(() => {
           const freq = CELESTA_SCALE[noteIndex % CELESTA_SCALE.length];
-          this.playWarmBellTone(freq, 0.018, 2.1, -0.25 + i * 0.16);
-        }, i * 115);
+          this.playWarmBellTone(freq, 0.025, 1.9, -0.24 + i * 0.16);
+        }, i * 110);
       });
     };
 
-    if (!this.isPlaying) {
+    if (!this.context || this.context.state !== "running") {
       void this.unlockAndStart().then((started) => {
         if (started) {
           triggerArpeggio();
@@ -457,62 +405,42 @@ export class AmbientAudioEngine {
     triggerArpeggio();
   }
 
-  private scheduleNextChime(): void {
-    if (this.chimeTimer !== null && typeof window !== "undefined") {
-      window.clearTimeout(this.chimeTimer);
-    }
-
-    if (!this.desiredSoundOn || !this.isPlaying || typeof window === "undefined") {
-      this.chimeTimer = null;
-      return;
-    }
-
-    const delay = 8_500 + Math.random() * 11_000;
-
-    this.chimeTimer = window.setTimeout(() => {
-      this.playChime();
-      this.scheduleNextChime();
-    }, delay);
-  }
-
-  /**
-   * Attempts to start playback immediately (or on first user gesture).
-   * Returns true if AudioContext entered "running" state.
-   */
   public async unlockAndStart(): Promise<boolean> {
     if (!this.isSupported || !this.desiredSoundOn) {
       return false;
     }
 
+    let startedAny = false;
+
     try {
-      if (!this.context || this.context.state === "closed") {
-        this.createGraph();
-      }
-
-      if (!this.context) {
-        return false;
-      }
-
-      if (this.context.state === "suspended") {
+      this.ensureWebAudioGraph();
+      if (this.context && this.context.state === "suspended") {
         await this.context.resume();
       }
-
-      const isNowRunning = this.context.state === "running";
-      this.playing = isNowRunning;
-
-      if (isNowRunning) {
-        this.setMood(this.mood);
-        this.rampMaster(0.24, 1.5);
-        this.scheduleNextChime();
+      if (this.context?.state === "running") {
+        startedAny = true;
       }
-
-      this.notifyState();
-      return isNowRunning;
     } catch {
-      this.playing = false;
-      this.notifyState();
-      return false;
+      // Continue to HTMLAudioElement playback
     }
+
+    try {
+      const bg = this.ensureBackgroundAudio();
+      if (bg) {
+        bg.volume = BACKGROUND_INSTRUMENTAL_VOLUME;
+        bg.loop = true;
+        if (bg.paused) {
+          await bg.play();
+        }
+        startedAny = true;
+      }
+    } catch {
+      // Autoplay blocked until first user gesture
+    }
+
+    this.playing = startedAny;
+    this.notifyState();
+    return startedAny;
   }
 
   public async unmute(): Promise<boolean> {
@@ -524,55 +452,37 @@ export class AmbientAudioEngine {
   public async mute(): Promise<void> {
     this.desiredSoundOn = false;
     this.playing = false;
-    this.scheduleNextChime();
-    this.notifyState();
 
-    if (!this.context) {
-      return;
+    if (this.bgAudio && !this.bgAudio.paused) {
+      this.bgAudio.pause();
     }
 
-    this.rampMaster(0.0001, 0.3);
-
-    await new Promise<void>((resolve) => {
-      window.setTimeout(resolve, 320);
-    });
-
-    if (!this.desiredSoundOn && this.context && this.context.state === "running") {
+    if (this.context && this.context.state === "running") {
       try {
         await this.context.suspend();
       } catch {
         // Ignore suspend errors
       }
     }
+
     this.notifyState();
   }
 
   public handleVisibility(visible: boolean): void {
-    if (!this.context) {
-      return;
-    }
-
     if (!visible) {
-      this.wasRunningBeforeHide =
-        this.desiredSoundOn && this.context.state === "running";
+      this.wasRunningBeforeHide = this.desiredSoundOn && this.isPlaying;
 
-      this.scheduleNextChime();
-
-      if (this.context.state === "running") {
+      if (this.bgAudio && !this.bgAudio.paused) {
+        this.bgAudio.pause();
+      }
+      if (this.context && this.context.state === "running") {
         void this.context.suspend().catch(() => {});
       }
       return;
     }
 
     if (visible && this.wasRunningBeforeHide && this.desiredSoundOn) {
-      void this.context
-        .resume()
-        .then(() => {
-          this.playing = this.context?.state === "running";
-          this.scheduleNextChime();
-          this.notifyState();
-        })
-        .catch(() => {});
+      void this.unlockAndStart();
     }
   }
 
@@ -580,9 +490,14 @@ export class AmbientAudioEngine {
     this.desiredSoundOn = false;
     this.playing = false;
 
-    if (this.chimeTimer !== null && typeof window !== "undefined") {
-      window.clearTimeout(this.chimeTimer);
-      this.chimeTimer = null;
+    if (this.bgAudio) {
+      try {
+        this.bgAudio.pause();
+        this.bgAudio.src = "";
+      } catch {
+        // Ignore errors
+      }
+      this.bgAudio = null;
     }
 
     if (this.context && this.context.state !== "closed") {
@@ -595,11 +510,8 @@ export class AmbientAudioEngine {
 
     this.context = null;
     this.master = null;
-    this.filter = null;
-    this.warmthFilter = null;
     this.compressor = null;
-    this.voices = [];
-    this.modulationOscillator = null;
-    this.modulationGain = null;
   }
 }
+
+export const AmbientNightSynth = AmbientAudioEngine;

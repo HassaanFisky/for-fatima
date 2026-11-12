@@ -10,7 +10,9 @@ import { PaperCard, KeepsakeArtifactIcon } from "../illustrations/PaperCraft";
 import { KeepsakesJarScene } from "../illustrations/Characters";
 import { KonpeitoCandy } from "../illustrations/Konpeito";
 import { useLivingWorld } from "../world/LivingWorldProvider";
-import { fadeUp } from "../../lib/motion";
+import { fadeUp, getTitleCadenceVariants } from "../../lib/motion";
+
+const titleCadence = getTitleCadenceVariants(3);
 
 export function KeepsakesSection() {
   const { playNote } = useLivingWorld();
@@ -30,19 +32,28 @@ export function KeepsakesSection() {
       className="relative w-full h-full flex flex-col items-center justify-center px-4 sm:px-6 py-4 z-10"
     >
       <div className="w-full max-w-[36rem] mx-auto">
-        {/* Scene Header + Pose #4 — Mochi & Yume beside a glass jar of Konpeitō */}
-        <div className="flex flex-col items-center text-center mb-3">
-          <div className="inline-flex items-center gap-2 rounded-full px-3.5 py-1 text-xs font-semibold paper-pill-surface mb-1">
+        {/* Scene Header + Pose #4 — Mochi & Yume beside a glass jar of star candies */}
+        <motion.div
+          variants={titleCadence.container}
+          initial="hidden"
+          animate="visible"
+          className="flex flex-col items-center text-center mb-3"
+        >
+          <motion.div
+            variants={titleCadence.kicker}
+            className="inline-flex items-center gap-2 rounded-full px-3.5 py-1 text-xs font-semibold paper-pill-surface mb-1"
+          >
             <KonpeitoCandy flavor="butter" size={15} />
             <span style={{ color: "var(--color-royal-violet)" }}>
               Keepsake Shelf
             </span>
-          </div>
+          </motion.div>
 
           <KeepsakesJarScene />
 
-          <h2
+          <motion.h2
             id="keepsakes-heading"
+            variants={titleCadence.heading}
             className="font-display font-bold mt-1"
             style={{
               fontSize: "clamp(1.25rem, 3.2vw, 1.65rem)",
@@ -51,10 +62,10 @@ export function KeepsakesSection() {
             }}
           >
             Small objects kept on the shelf
-          </h2>
-        </div>
+          </motion.h2>
+        </motion.div>
 
-        {/* 4 Tactile Keepsakes on the Shelf — Responding with subtle movement, depth, and shadow (NO purple selection outlines) */}
+        {/* 4 Tactile Keepsakes on the Shelf */}
         <motion.div
           variants={fadeUp}
           initial="hidden"
@@ -69,7 +80,7 @@ export function KeepsakesSection() {
                 type="button"
                 onClick={() => handleSelectArtifact(item, idx)}
                 aria-pressed={isSelected}
-                className={`group text-center rounded-[20px] p-3.5 flex flex-col items-center justify-between min-h-[124px] transition-all duration-300 focus:outline-none ${
+                className={`group text-center rounded-[20px] p-3.5 flex flex-col items-center justify-between min-h-[124px] transition-all duration-300 cursor-pointer focus:outline-none ${
                   isSelected
                     ? "paper-card-cream -translate-y-1.5"
                     : "paper-card-lavender opacity-88 hover:opacity-100 hover:-translate-y-0.5"
@@ -127,7 +138,6 @@ export function KeepsakesSection() {
                     className="text-xs font-semibold uppercase tracking-wider"
                     style={{ color: "var(--color-royal-violet)" }}
                   >
-                    Keepsake {selectedArtifact.num} ·{" "}
                     {selectedArtifact.subtitle}
                   </p>
                   <h3

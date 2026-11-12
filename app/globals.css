@@ -144,11 +144,11 @@ body {
 
 /* ─── Single Frosted Bookmark Navigation Pill ─── */
 .nav-frosted-bookmark {
-  background-color: rgba(255, 248, 241, 0.94);
+  background-color: rgba(255, 248, 241, 0.96);
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
-  border: 1px solid var(--color-paper-border);
-  box-shadow: 0 10px 28px rgba(23, 18, 51, 0.28);
+  border: 1px solid #D5C4F3;
+  box-shadow: 0 10px 28px rgba(23, 18, 51, 0.32);
 }
 
 /* ─── Scene 6: 4:3 Liquid-Glass Wave Stage Frame ─── */
@@ -183,15 +183,15 @@ body {
   display: none;
 }
 
-/* ─── Ambient Star Twinkle Classes (4 CSS classes max) ─── */
+/* ─── Ambient Star Twinkle Classes (4 CSS classes) ─── */
 @keyframes konpeito-twinkle {
   0%, 100% {
-    opacity: 0.35;
+    opacity: 0.42;
     transform: scale(0.92);
   }
   50% {
     opacity: 1;
-    transform: scale(1.08);
+    transform: scale(1.1);
   }
 }
 
@@ -208,69 +208,259 @@ body {
   animation: konpeito-twinkle 4.8s ease-in-out infinite;
 }
 
-/* ─── Cloud Drift Animations (Transform-only) ─── */
-@keyframes cloud-drift-x {
+/* ─── Layered Cloud Drift Animations (Transform-only, Varied Speed & Travel) ─── */
+@keyframes cloud-glide-right {
   0%, 100% {
-    transform: translate3d(0, 0, 0);
+    transform: translate3d(-24px, 0, 0);
   }
   50% {
-    transform: translate3d(14px, 0, 0);
+    transform: translate3d(48px, -4px, 0);
   }
 }
 
-.cloud-drift-slow {
-  animation: cloud-drift-x 38s ease-in-out infinite;
+@keyframes cloud-glide-left {
+  0%, 100% {
+    transform: translate3d(28px, 0, 0);
+  }
+  50% {
+    transform: translate3d(-46px, 3px, 0);
+  }
 }
 
-.cloud-drift-mid {
-  animation: cloud-drift-x 30s ease-in-out infinite reverse;
+@keyframes cloud-glide-wide {
+  0%, 100% {
+    transform: translate3d(-38px, 2px, 0);
+  }
+  50% {
+    transform: translate3d(52px, -3px, 0);
+  }
 }
 
-/* ─── Bubble & Sakura Drift Keyframes (Transform + Opacity only) ─── */
-@keyframes bubble-rise {
+.cloud-drift-1 {
+  animation: cloud-glide-right 34s ease-in-out infinite;
+}
+.cloud-drift-2 {
+  animation: cloud-glide-left 28s ease-in-out infinite;
+}
+.cloud-drift-3 {
+  animation: cloud-glide-wide 42s ease-in-out infinite;
+}
+.cloud-drift-4 {
+  animation: cloud-glide-left 36s ease-in-out infinite -9s;
+}
+.cloud-drift-5 {
+  animation: cloud-glide-right 46s ease-in-out infinite -14s;
+}
+
+/* ─── Nighttime Ocean Waves & Moonlit Water Shimmer ─── */
+@keyframes ocean-swell-a {
+  0%, 100% {
+    transform: translate3d(-18px, 0, 0);
+  }
+  50% {
+    transform: translate3d(22px, 3px, 0);
+  }
+}
+
+@keyframes ocean-swell-b {
+  0%, 100% {
+    transform: translate3d(20px, 2px, 0);
+  }
+  50% {
+    transform: translate3d(-22px, -2px, 0);
+  }
+}
+
+@keyframes water-moon-shimmer {
+  0%, 100% {
+    opacity: 0.45;
+    transform: scaleX(0.94);
+  }
+  50% {
+    opacity: 0.88;
+    transform: scaleX(1.06);
+  }
+}
+
+.ocean-wave-far {
+  animation: ocean-swell-a 16s ease-in-out infinite;
+}
+.ocean-wave-mid {
+  animation: ocean-swell-b 12.5s ease-in-out infinite;
+}
+.ocean-wave-near {
+  animation: ocean-swell-a 9.5s ease-in-out infinite -3s;
+}
+.ocean-wave-shore {
+  animation: ocean-swell-b 7.8s ease-in-out infinite -1.5s;
+}
+.water-reflection-shimmer {
+  transform-origin: center;
+  animation: water-moon-shimmer 5.6s ease-in-out infinite;
+}
+
+/* ─── Breeze Sway for Trees, Branches, Leaves & Garden Roses ─── */
+@keyframes tree-breeze-left {
+  0%, 100% {
+    transform: rotate(-1.2deg);
+  }
+  50% {
+    transform: rotate(2.1deg);
+  }
+}
+
+@keyframes tree-breeze-right {
+  0%, 100% {
+    transform: rotate(1.4deg);
+  }
+  50% {
+    transform: rotate(-2.2deg);
+  }
+}
+
+@keyframes foliage-flutter {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(-1.5deg);
+  }
+  50% {
+    transform: translate3d(3px, -1.5px, 0) rotate(2.4deg);
+  }
+}
+
+@keyframes rose-stem-sway {
+  0%, 100% {
+    transform: rotate(-2deg);
+  }
+  50% {
+    transform: rotate(2.8deg);
+  }
+}
+
+.tree-sway-left {
+  transform-box: fill-box;
+  transform-origin: 50% 95%;
+  animation: tree-breeze-left 8.4s ease-in-out infinite;
+}
+
+.tree-sway-right {
+  transform-box: fill-box;
+  transform-origin: 50% 95%;
+  animation: tree-breeze-right 9.2s ease-in-out infinite -2.5s;
+}
+
+.branch-breeze {
+  transform-box: fill-box;
+  transform-origin: 50% 85%;
+  animation: foliage-flutter 6.2s ease-in-out infinite;
+}
+
+.rose-sway {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: rose-stem-sway 6.8s ease-in-out infinite;
+}
+
+/* ─── Natural Candle Flame Flicker & Warm Glow ─── */
+@keyframes flame-flicker {
+  0%, 100% {
+    transform: scale(1, 1) rotate(-1deg);
+    opacity: 0.94;
+  }
+  28% {
+    transform: scale(0.95, 1.07) rotate(1.5deg);
+    opacity: 1;
+  }
+  56% {
+    transform: scale(1.04, 0.95) rotate(-1.5deg);
+    opacity: 0.89;
+  }
+  82% {
+    transform: scale(0.98, 1.05) rotate(1deg);
+    opacity: 0.97;
+  }
+}
+
+.candle-flicker {
+  transform-box: fill-box;
+  transform-origin: 50% 90%;
+  animation: flame-flicker 2.8s ease-in-out infinite;
+}
+
+/* ─── Localized Water-Like Touch Ripple Keyframes ─── */
+@keyframes water-ripple-expand {
   0% {
-    transform: translate3d(0, 0, 0) scale(0.9);
-    opacity: 0;
-  }
-  15% {
+    transform: translate(-50%, -50%) scale(0.18);
     opacity: 0.78;
   }
-  85% {
-    opacity: 0.72;
+  65% {
+    opacity: 0.34;
   }
   100% {
-    transform: translate3d(12px, -96vh, 0) scale(1.04);
+    transform: translate(-50%, -50%) scale(1.55);
     opacity: 0;
   }
 }
 
-.bubble-float-up {
-  animation-name: bubble-rise;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
+@keyframes water-ripple-inner {
+  0% {
+    transform: translate(-50%, -50%) scale(0.12);
+    opacity: 0.65;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.12);
+    opacity: 0;
+  }
 }
 
-@keyframes sakura-fall {
+.water-ripple-ring-outer {
+  animation: water-ripple-expand 1.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.water-ripple-ring-inner {
+  animation: water-ripple-inner 0.95s cubic-bezier(0.16, 1, 0.3, 1) 0.08s forwards;
+}
+
+/* ─── Gentle Breeze-Carried Petals Near Left & Right Trees ─── */
+@keyframes petal-glide-left {
   0% {
-    transform: translate3d(0, -24px, 0) rotate(0deg);
+    transform: translate3d(0, 0, 0) rotate(0deg);
     opacity: 0;
   }
   15% {
-    opacity: 0.85;
+    opacity: 0.72;
   }
-  85% {
-    opacity: 0.75;
+  80% {
+    opacity: 0.58;
   }
   100% {
-    transform: translate3d(-28px, 96vh, 0) rotate(220deg);
+    transform: translate3d(44px, 42vh, 0) rotate(165deg);
     opacity: 0;
   }
 }
 
-.sakura-drift-down {
-  animation-name: sakura-fall;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
+@keyframes petal-glide-right {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.72;
+  }
+  80% {
+    opacity: 0.58;
+  }
+  100% {
+    transform: translate3d(-44px, 42vh, 0) rotate(-165deg);
+    opacity: 0;
+  }
+}
+
+.petal-breeze-left {
+  animation: petal-glide-left 18s ease-in-out infinite;
+}
+
+.petal-breeze-right {
+  animation: petal-glide-right 19s ease-in-out infinite;
 }
 
 /* ─── Accessible Keyboard Focus Ring (Excludes inline SVG decorative clicks) ─── */

@@ -11,7 +11,9 @@ import { NotesLanternScene } from "../illustrations/Characters";
 import { KonpeitoCandy } from "../illustrations/Konpeito";
 import { NoticedObjectIllustration } from "../icons/StoryIcons";
 import { useLivingWorld } from "../world/LivingWorldProvider";
-import { fadeUp } from "../../lib/motion";
+import { fadeUp, getTitleCadenceVariants } from "../../lib/motion";
+
+const titleCadence = getTitleCadenceVariants(2);
 
 export function NotesSection() {
   const { playNote } = useLivingWorld();
@@ -31,19 +33,28 @@ export function NotesSection() {
       className="relative w-full h-full flex flex-col items-center justify-center px-4 sm:px-6 py-4 z-10"
     >
       <div className="w-full max-w-[36rem] mx-auto">
-        {/* Scene Header & Pose #3 — Mochi holding a warm paper lantern */}
-        <div className="flex flex-col items-center text-center mb-3">
-          <div className="inline-flex items-center gap-2 rounded-full px-3.5 py-1 text-xs font-semibold paper-pill-surface mb-1">
+        {/* Scene Header & Pose #3 — Mochi holding a warm interactive paper lantern */}
+        <motion.div
+          variants={titleCadence.container}
+          initial="hidden"
+          animate="visible"
+          className="flex flex-col items-center text-center mb-3"
+        >
+          <motion.div
+            variants={titleCadence.kicker}
+            className="inline-flex items-center gap-2 rounded-full px-3.5 py-1 text-xs font-semibold paper-pill-surface mb-1"
+          >
             <KonpeitoCandy flavor="periwinkle" size={15} />
             <span style={{ color: "var(--color-royal-violet)" }}>
-              Things That Were Noticed
+              Little Details
             </span>
-          </div>
+          </motion.div>
 
           <NotesLanternScene />
 
-          <h2
+          <motion.h2
             id="noticed-heading"
+            variants={titleCadence.heading}
             className="font-display font-bold mt-1"
             style={{
               fontSize: "clamp(1.25rem, 3.2vw, 1.65rem)",
@@ -52,10 +63,10 @@ export function NotesSection() {
             }}
           >
             Small details remembered quietly
-          </h2>
-        </div>
+          </motion.h2>
+        </motion.div>
 
-        {/* Tactile Illustrated Object Selector Tray (Not a generic card grid) */}
+        {/* Tactile Illustrated Object Selector Tray */}
         <motion.div
           variants={fadeUp}
           initial="hidden"
@@ -76,10 +87,10 @@ export function NotesSection() {
                   role="tab"
                   aria-selected={isSelected}
                   onClick={() => handleSelect(item, idx)}
-                  className={`group rounded-[18px] px-2 py-2.5 flex flex-col items-center text-center transition-all duration-300 focus:outline-none ${
+                  className={`group rounded-[18px] px-2 py-2.5 flex flex-col items-center text-center transition-all duration-300 cursor-pointer focus:outline-none ${
                     isSelected
                       ? "paper-card-cream -translate-y-1"
-                      : "opacity-80 hover:opacity-100 hover:-translate-y-0.5"
+                      : "opacity-85 hover:opacity-100 hover:-translate-y-0.5"
                   }`}
                 >
                   <div className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center mb-1">
@@ -116,12 +127,6 @@ export function NotesSection() {
                   <NoticedObjectIllustration type={activeItem.id} />
                 </div>
                 <div>
-                  <p
-                    className="text-xs font-semibold uppercase tracking-wider mb-0.5"
-                    style={{ color: "var(--color-royal-violet)" }}
-                  >
-                    Observation {activeItem.num} · {activeItem.poeticLine}
-                  </p>
                   <h3
                     className="font-display font-bold text-lg sm:text-xl"
                     style={{ color: "var(--color-ink-plum)" }}
@@ -130,7 +135,7 @@ export function NotesSection() {
                   </h3>
                   <p
                     className="text-xs sm:text-sm font-medium"
-                    style={{ color: "var(--color-ink-muted)" }}
+                    style={{ color: "var(--color-royal-violet)" }}
                   >
                     {activeItem.subtitle}
                   </p>
